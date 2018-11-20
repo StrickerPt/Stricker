@@ -1,0 +1,82 @@
+<apex:page standardController="Opportunity" renderAs="pdf" extensions="c_PDFPackingList" language="{!lang}" cache="false" readOnly="true" standardStylesheets="false" applyBodyTag="false" applyHtmlTag="false" showHeader="false" >
+    <html>
+        <head>
+            <style type="text/css" media="print">
+                @page {
+                size: A4 portrait;
+                margin-left: 3.0cm;
+                margin-right: 3.0cm;
+                margin-top: 3.8cm;
+                margin-bottom: 2.5cm;
+                @top-center {
+                content: element(header);
+                }
+                }
+                div.header {
+                padding: 10px;
+                position: running(header);
+                }
+                th.spacing{
+                padding-top: 4px;
+                font-size: small;
+                text-align: center;
+                }
+                tbody{
+                margin-top: 10px;
+                background-color: white;
+                border-color: white;
+                font-size: 12px;
+                }
+                table.bordered_table tr td{
+                border: 2px solid black;
+                }
+                body {
+                font-family: Arial Unicode MS;
+                }
+            </style>
+        </head>
+        <body style="padding: 0;margin: 0;font-family: Arial, Helvetica, sans-serif;">
+            <div class="header" style="margin-left: 0px;margin-right: 0px;">
+                <table style="width: 100%;padding: 0;margin: 0;">
+                    <tr>
+                        <td style="width: 30%;padding-right:20px;border-right:1px solid black;"><apex:image style="margin-left: -10px;" height="64px" value="{!LogoUrl}"/></td>
+                        <td style="width: 50%;padding-left:20px;">
+                            <p></p>
+                            <p style="font-size: 7pt;margin:2px;line-height: 90%;">Núcleo Industrial de Murtede, Lote 5</p>
+                            <p style="font-size: 7pt;margin:2px;line-height: 90%;">3060-372 Murtede, Portugal</p>
+                            <p style="font-size: 7pt;margin:2px;line-height: 90%;"><b>t.</b> +351 231 209 980</p>
+                            <p style="font-size: 7pt;margin:2px;line-height: 90%;"><b>f.</b> +351 231 209 989</p>
+                            <p style="font-size: 7pt;margin:2px;line-height: 90%;"><b>e.</b> info@stricker.pt</p>
+                            <p style="font-size: 7pt;margin:2px;line-height: 90%;"><a><b>www.stricker.pt</b></a> <a><b>www.ambientes.pt</b></a></p>
+                        </td>
+                        <td style="width: 25%;text-align: right;padding: 0;margin: 0;">
+
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <div style="text-align: justify; font-size:13px;">
+            <br></br>
+            <br></br>
+            <br></br>
+            <br></br>
+            <br></br>
+            <br></br>
+                <p>Paul Stricker SA, with VAT number PT 501888640, with main office in Núcleo Ind. Murtede, Lt
+5, 3060-372 Murtede, Portugal, hereby declare that we offered free shipping by TNT Economy
+for the goods delivery with invoice number 860, for the company Limush LLC, VAT 00847729,
+21/3 Qochinyan str, 0010 Yerevan, Armenia.</p>
+<p>We hereby confirm that we have a special trade agreement with TNT transport company,
+according to which we provide Free shipping to our Yerevan clients, since the order exceeds
+300€. If order is below 300 €, shipping cost is 15 €.</p>
+<p>15 € for Export Duty is charged in any kind of delivery.</p>
+</div>
+<div style="text-align: center;">
+            <br></br>
+            <br></br>
+            <br></br>
+            _____________________________________________
+            </div>
+        </body>
+    </html>
+</apex:page>

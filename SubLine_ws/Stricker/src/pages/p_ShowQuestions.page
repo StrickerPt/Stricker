@@ -1,0 +1,920 @@
+<apex:page standardController="Relatorio__c" extensions="c_ShowQuestionsController" sidebar="false" showHeader="false" >
+    <head>
+        
+        <apex:includeScript value="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"/>
+        <apex:includeScript value="{!URLFOR($Resource.bs, '/js/bootstrap.js')}"/>
+        <apex:includeScript value="{!URLFOR($Resource.bs, '/js/bootstrap-typeahead.js')}"/>
+        <apex:stylesheet value="{!URLFOR($Resource.bs, '/css/bootstrap.css')}"/>
+        <apex:stylesheet value="{!URLFOR($Resource.bs, '/css/bootstrap-theme.css')}"/>
+        <apex:includeScript value="/support/console/39.0/integration.js"/>
+        <apex:includeScript value="{!URLFOR($Resource.swal2, '/sweetalert2.min.js')}"/>
+
+
+        <script>
+        function setFocusOnLoad() {}
+        
+        function openSubTab(recId){
+            if(sforce.console.isInConsole()){
+                var openSubtab = function openSubtab(result) {
+                    //Now that we have the primary tab ID, we can open a new subtab in it
+                    var primaryTabId = result.id;
+                    sforce.console.openSubtab(primaryTabId , recId, true, 
+                                              'Questions', null);
+                };
+                sforce.console.getEnclosingPrimaryTabId(openSubtab);
+            }else{
+                window.open(recId, "_blank");
+            }
+            
+        }
+        function closeWindow(){
+            if(sforce.console.isInConsole()){
+                
+                var closeSubtab = function closeSubtab(result) {
+                    //Now that we have the tab ID, we can close it
+                    var tabId = result.id;
+                    sforce.console.closeTab(tabId);
+                };
+                sforce.console.getEnclosingTabId(closeSubtab);
+            }else{
+                window.close();
+            }
+        }
+        function showTab(ele){
+            
+            var actives = document.getElementsByClassName("slds-is-active");
+            for(var i = 0; i < actives.length; i++){
+                actives[i].classList.remove("slds-is-active");
+            }
+            
+            document.getElementById(ele.parentElement.id).classList.add("slds-is-active");
+            
+            var actives2 = document.getElementsByClassName("slds-show");
+            for(var i = 0; i < actives2.length; i++){
+                var a = actives2[i];
+                a.classList.remove("slds-show");
+                a.classList.add('slds-hide');
+            }
+            
+            var toActivate = document.getElementById(ele.getAttribute("aria-controls"));
+            
+            toActivate.classList.add('slds-show');
+            toActivate.classList.remove('slds-hide');
+        }
+        function buttonsEnabled(enabled) {
+            // retrieve all of the buttons or links on the page
+            // with the css class of btn
+            var $buttons = jQuery('.btn');
+            if (enabled === false) {
+                // add the btnDisabled class to give it the look of being disabled
+                // add the disabled attribute to actually disable interactability
+                $buttons.toggleClass('btnDisabled', true).attr('disabled', 'disabled');
+            } else {
+                // remove the css class and the disabled attribute
+                $buttons.toggleClass('btnDisabled', false).attr('disabled', null);
+            } 
+        }
+        </script>
+        <style>
+            
+            .centered {
+            position: fixed;
+            left: 50%;
+            transform: translate(-50%, 0);
+            z-index: 1000;
+            background-color: white;
+            width: 25%;
+            height: 35px;
+            border-radius: 4px;
+            border: 1px solid #d8dde6;
+            text-align: center;
+            }
+            .message .messageText h4 {
+            font-weight: bold;
+            display: initial;
+            font-size: 8pt;
+            }
+            .messageTable > tbody > tr > td{
+            border: 0 !important;
+            width: 0.1rem;
+            }
+            body{
+            display:flex;
+            font: 13.3333px Arial !important;
+            }
+            .cellHeigth{
+            height:40px !important
+            }
+            .swal-icon{
+            box-sizing: content-box !important;
+            }
+            .swal-styled{
+            background-image: inherit;
+            }
+            .swal-container {
+            z-index: 9001;
+            }
+            .swal-button {
+            background-image: inherit;
+            font-size: 14px !important;
+            }
+        </style>
+    </head>
+    <apex:form id="frm" style="background-color: white;" styleClass="slds-size--1-of-1">
+        <apex:slds />
+        <div class="bs centered">
+            <apex:outputPanel id="centered">
+                <apex:commandButton action="{!updateAccount}" value="{!$Label.Salvar_Conta}" rerender="alertPanel" oncomplete="checkSucess();buttonsEnabled(true);"
+                                    styleClass="btn btn-default btn-xs" style="top: 5px;position: relative;" onclick="buttonsEnabled(false);"/>
+                <apex:outputPanel id="alertPanel">
+                    <script>
+                    function checkSucess(){
+                        if({!isSucess}){
+                            
+                            var callRefreshTab = function callRefreshTab(result) {
+                                for(i=0;i<result.ids.length;i++){
+                                    if(i < result.ids.length-1){
+                                        sforce.console.refreshSubtabById(result.ids[i], false);
+                                    }
+                                }
+                            }
+                            var callRefreshPrimaryTab = function callRefreshPrimaryTab(result) {
+                                sforce.console.refreshPrimaryTabById(result.id, false);
+                                sforce.console.getSubtabIds(result.id, callRefreshTab);
+                            }
+                            sforce.console.getEnclosingPrimaryTabId(callRefreshPrimaryTab);
+                            swal('{!$Label.Sucesso}!','{!sucessMessage}','success');
+                        }else{
+                            swal('{!$Label.Erro}','{!errorMessage}','error');  
+                        }
+                    }
+                    </script>
+                </apex:outputPanel>
+                &nbsp;
+                &nbsp;
+                &nbsp;
+                <apex:commandButton action="{!updateRecord}" value="{!$Label.Botao_Salvar_Respostas}" reRender="questionsTab, progressBar, alertPanel" 
+                                    styleClass="btn btn-default btn-xs" style="top: 5px;position: relative;" oncomplete="checkSucess();buttonsEnabled(true);"
+                                    onclick="buttonsEnabled(false);"/>
+                &nbsp;
+                &nbsp;
+                &nbsp;
+                <apex:commandButton rendered="{!NOT(newWindow)}" onclick="openSubTab('/apex/p_ShowQuestions?id={!visit_report.id}&param1=true')" reRender="frm"
+                                    value="{!$Label.Botao_Abrir_Perguntas}" styleClass="btn btn-primary btn-xs" style="top: 5px;position: relative;"/>
+                <apex:commandButton rendered="{!newWindow}" onclick="closeWindow()" value="{!$Label.Botao_Voltar}" styleClass="btn btn-primary btn-xs"
+                                    style="top: 5px;position: relative;"/>
+            </apex:outputPanel>
+        </div>
+        <div class="slds-m-around--xx-large">
+            <div class="slds-m-bottom--medium">
+                <apex:outputPanel id="progressBar">
+                    <apex:outputLabel for="progress" styleClass="slds-m-right--xx-large">
+                        {!$ObjectType.Relatorio__c.fields.Preechimento_de_relatorio__c.Label}
+                    </apex:outputLabel>
+                    <apex:outputField id="progress" value="{!visit_report.Preechimento_de_relatorio__c}"/>
+                </apex:outputPanel>
+                
+            </div>
+            <div class="slds-tabs_default">
+                <ul class="slds-tabs_default__nav" role="tablist">
+                    <li class="slds-tabs_default__item slds-is-active" title="Account Info" role="presentation" id="li1">
+                        <a class="slds-tabs_default__link" onclick="showTab(this);" role="tab" tabindex="0" aria-selected="true" aria-controls="tab-default-1" id="tab-default-1__item">{!$Label.Informacao_da_conta}</a></li>
+                    <li class="slds-tabs_default__item" title="Questions" role="presentation"  id="li2">
+                        <a class="slds-tabs_default__link" onclick="showTab(this);" role="tab" tabindex="-1" aria-selected="false" aria-controls="tab-default-2" id="tab-default-2__item">{!$Label.Perguntas}</a></li>
+                </ul>
+                <!--------------------------ACCOUNT TAB---------------------------------->
+                <div id="tab-default-1" class="slds-tabs_default__content slds-show" role="tabpanel" aria-labelledby="tab-default-1__item">
+                    <!--------------------------------------------Informação comercial------------------------------------------------------>
+                    <div class="slds-section-title--divider">
+                        {!$Label.Informacao_comercial}
+                    </div>
+                    <table class="slds-table slds-table_bordered slds-table_cell-buffer slds-size--1-of-2 slds-m-around--large">
+                        <thead class="slds-text-heading_medium">
+                            <td width="50%">
+                                
+                            </td>
+                            <td width="50%">
+                                {!$Label.Valor}
+                            </td>
+                            <td>
+                                {!$ObjectType.Account.fields.LastModifiedDate.Label}
+                            </td>
+                        </thead>
+                        <tr class="slds-form-element__row">
+                            <td>
+                                {!$ObjectType.Account.fields.Volume_de_faturacao_global__c.Label}
+                            </td>
+                            <td>
+                                <apex:inputField value="{!conta.Volume_de_faturacao_global__c}" html-placeholder="{!currencyIsoCode}" styleClass="slds-input"/>
+                            </td>
+                            <td>
+                                <apex:outputText value="{0,date,dd-MM-yyyy}"><apex:param value="{!conta.Alt_Volume_de_faturacao_global__c}"/></apex:outputText>
+                            </td>
+                        </tr>
+                        <tr class="slds-form-element__row">
+                            <td>
+                                {!$ObjectType.Account.fields.Volume_de_compras_promocionais__c.Label}
+                            </td>
+                            <td>
+                                <apex:inputField value="{!conta.Volume_de_compras_promocionais__c}" html-placeholder="{!currencyIsoCode}" styleClass="slds-input"/>
+                            </td>
+                            <td>
+                                <apex:outputText value="{0,date,dd-MM-yyyy}"><apex:param value="{!conta.Alt_Volume_de_compras_promocionais__c}"/></apex:outputText>
+                            </td>
+                        </tr>
+                        <tr class="slds-form-element__row">
+                            <td>
+                                {!$ObjectType.Account.fields.Importacao_volume_negocio__c.Label}
+                            </td>
+                            <td>
+                                <apex:inputField value="{!conta.Importacao_volume_negocio__c}" html-placeholder="{!currencyIsoCode}" styleClass="slds-input"/>
+                            </td>
+                            <td>
+                                <apex:outputText value="{0,date,dd-MM-yyyy}"><apex:param value="{!conta.Alt_Importacao_volume_negocio__c}"/></apex:outputText>
+                            </td>
+                        </tr>
+                    </table>
+                    <!--------------------------------------------Fornecedores------------------------------------------------------>
+                    <div class="slds-section-title--divider">
+                        {!$Label.Fornecedores}
+                    </div>
+                    <apex:actionFunction name="rerenderTable" action="{!getPicklists}" rerender="supplyTable"/>
+                    <apex:outputPanel id="supplyTable">
+                        <table class="slds-table slds-table_bordered slds-table_cell-buffer slds-size--2-of-3 slds-m-around--large">
+                            <thead class="slds-text-heading_medium">
+                                <td width="20%"/>
+                                <td width="50%">
+                                    {!$Label.Fornecedor}
+                                </td>
+                                <td width="30%">
+                                    {!$Label.Volume}
+                                </td>
+                                <td colspan="2">
+                                    {!$ObjectType.Account.fields.LastModifiedDate.Label}
+                                </td>
+                            </thead>
+                            <tr class="slds-form-element__row">
+                                <td>
+                                    {!$ObjectType.Account.fields.X1_Fornecedor__c.Label}
+                                </td>
+                                <td class="slds-form-element" width="30%">
+                                    <apex:selectList onchange="rerenderTable()" value="{!conta.X1_Fornecedor__c}" size="1"
+                                                     styleClass="slds-input" style="width:{!If(conta.X1_Fornecedor__c == 'Outro','30%','100%')};">
+                                        <apex:selectOptions value="{!selectFirstSupplier}"/>
+                                    </apex:selectList>
+                                    <apex:inputField value="{!visit_report.Primeiro_Outro_fornecedor__c}" styleClass="slds-input slds-m-left--xxx-small" 
+                                                     rendered="{!conta.X1_Fornecedor__c == 'Outro'}" style="width:70%;"/>
+                                    
+                                </td>
+                                <td>
+                                    <apex:inputField value="{!conta.X1_Fornecedor_Volume_de_compras__c}" html-placeholder="{!currencyIsoCode}" styleClass="slds-input"/>
+                                    
+                                </td>
+                                <td>
+                                    <apex:outputText value="{0,date,dd-MM-yyyy}"><apex:param value="{!conta.Alt_X1_Fornecedor__c}"/></apex:outputText>
+                                </td>
+                                <td>
+                                    <apex:outputText value="{0,date,dd-MM-yyyy}"><apex:param value="{!conta.Alt_X1_Fornecedor_Volume_de_compras__c}"/></apex:outputText>
+                                </td>
+                            </tr>
+                            <tr class="slds-form-element__row">
+                                <td>
+                                    {!$ObjectType.Account.fields.X2_Fornecedor__c.Label}
+                                </td>
+                                <td class="slds-form-element" width="30%">
+                                    <apex:selectList onchange="rerenderTable()" value="{!conta.X2_Fornecedor__c}" size="1"
+                                                     styleClass="slds-input" style="width:{!If(conta.X2_Fornecedor__c == 'Outro','30%','100%')};">
+                                        <apex:selectOptions value="{!selectSecondSupplier}"/>
+                                    </apex:selectList>
+                                    <apex:inputField value="{!visit_report.Segundo_Outro_fornecedor__c}" styleClass="slds-input slds-m-left--xxx-small" 
+                                                     rendered="{!conta.X2_Fornecedor__c == 'Outro'}" style="width:70%;"/>
+                                    
+                                </td>
+                                <td>
+                                    <apex:inputField value="{!conta.X2_Fornecedor_Volume_de_compras__c}" html-placeholder="{!currencyIsoCode}" styleClass="slds-input"/>
+                                    
+                                </td>
+                                <td>
+                                    <apex:outputText value="{0,date,dd-MM-yyyy}"><apex:param value="{!conta.Alt_X2_Fornecedor__c}"/></apex:outputText>
+                                </td>
+                                <td>
+                                    <apex:outputText value="{0,date,dd-MM-yyyy}"><apex:param value="{!conta.Alt_X2_Fornecedor_Volume_de_compras__c}"/></apex:outputText>
+                                </td>
+                            </tr>
+                            <tr class="slds-form-element__row">
+                                <td>
+                                    {!$ObjectType.Account.fields.X3_Fornecedor__c.Label}
+                                </td>
+                                <td class="slds-form-element" width="30%">
+                                    <apex:selectList onchange="rerenderTable()" value="{!conta.X3_Fornecedor__c}" size="1"
+                                                     styleClass="slds-input" style="width:{!If(conta.X3_Fornecedor__c == 'Outro','30%','100%')};">
+                                        <apex:selectOptions value="{!selectThirdSupplier}"/>
+                                    </apex:selectList>
+                                    
+                                    <apex:inputField value="{!visit_report.Terceiro_Outro_fornecedor__c}" styleClass="slds-input slds-m-left--xxx-small" 
+                                                     rendered="{!conta.X3_Fornecedor__c == 'Outro'}" style="width:70%;"/>
+                                    
+                                </td>
+                                <td>
+                                    <apex:inputField value="{!conta.X3_Fornecedor_Volume_de_compras__c}" html-placeholder="{!currencyIsoCode}" styleClass="slds-input"/>
+                                    
+                                </td>
+                                <td>
+                                    <apex:outputText value="{0,date,dd-MM-yyyy}"><apex:param value="{!conta.Alt_X3_Fornecedor__c}"/></apex:outputText>
+                                </td>
+                                <td>
+                                    <apex:outputText value="{0,date,dd-MM-yyyy}"><apex:param value="{!conta.Alt_X3_Fornecedor_Volume_de_compras__c}"/></apex:outputText>
+                                </td>
+                            </tr>
+                        </table>
+                    </apex:outputPanel>
+                    <!--------------------------------------------Segmentação de compras------------------------------------------------------>
+                    <div class="slds-section-title--divider">
+                        {!$Label.Segmentacao_de_compras}
+                    </div>
+                    <apex:actionFunction name="rerenderSegTable" action="{!getSegmentationPicklists}" rerender="segmentationTable"/>
+                    <apex:outputPanel id="segmentationTable">
+                        
+                        <table class="slds-table slds-table_bordered slds-table_cell-buffer slds-size--1-of-2 slds-m-around--large">
+                            <thead class="slds-text-heading_medium">
+                                <td width="10%">
+                                    
+                                </td>
+                                <td width="40%">
+                                    {!$Label.Tipo}
+                                </td>
+                                <td width="50%">
+                                    {!$Label.Valor}
+                                </td>
+                                <td colspan="2">
+                                    {!$ObjectType.Account.fields.LastModifiedDate.Label}
+                                </td>
+                            </thead>
+                            <tr class="slds-form-element__row">
+                                <td>
+                                    {!$ObjectType.Account.fields.X1_Segmentacao__c.Label}
+                                </td>
+                                <td>
+                                    <apex:selectList onchange="rerenderSegTable()" value="{!conta.X1_Segmentacao__c}" size="1" styleClass="slds-input">
+                                        <apex:selectOptions value="{!selectFirstSegmentation}"/>
+                                    </apex:selectList>
+                                </td>
+                                <td>
+                                    <apex:inputField value="{!conta.X1_Segmentacao_Percentagem__c}" html-placeholder="%" styleClass="slds-input"/>
+                                </td>
+                                <td>
+                                    <apex:outputText value="{0,date,dd-MM-yyyy}"><apex:param value="{!conta.Alt_X1_Segmentacao__c}"/></apex:outputText>
+                                </td>
+                                <td>
+                                    <apex:outputText value="{0,date,dd-MM-yyyy}"><apex:param value="{!conta.Alt_X1_Segmentacao_Percentagem__c}"/></apex:outputText>
+                                </td>
+                            </tr>
+                            <tr class="slds-form-element__row">
+                                <td>
+                                    {!$ObjectType.Account.fields.X2_Segmentacao__c.Label}
+                                </td>
+                                <td>
+                                    <apex:selectList onchange="rerenderSegTable()" value="{!conta.X2_Segmentacao__c}" size="1" styleClass="slds-input">
+                                        <apex:selectOptions value="{!selectSecondSegmentation}"/>
+                                    </apex:selectList>
+                                </td>
+                                <td>
+                                    <apex:inputField value="{!conta.X2_Segmentacao_Percentagem__c}" html-placeholder="%" styleClass="slds-input"/>
+                                </td>
+                                <td>
+                                    <apex:outputText value="{0,date,dd-MM-yyyy}"><apex:param value="{!conta.Alt_X2_Segmentacao__c}"/></apex:outputText>
+                                </td>
+                                <td>
+                                    <apex:outputText value="{0,date,dd-MM-yyyy}"><apex:param value="{!conta.Alt_X2_Segmentacao_Percentagem__c}"/></apex:outputText>
+                                </td>
+                            </tr>
+                            <tr class="slds-form-element__row">
+                                <td>
+                                    {!$ObjectType.Account.fields.X3_Segmentacao__c.Label}
+                                </td>
+                                <td>
+                                    <apex:selectList onchange="rerenderSegTable()" value="{!conta.X3_Segmentacao__c}" size="1" styleClass="slds-input">
+                                        <apex:selectOptions value="{!selectThirdSegmentation}"/>
+                                    </apex:selectList>
+                                </td>
+                                <td>
+                                    <apex:inputField value="{!conta.X3_Segmentacao_Percentagem__c}" html-placeholder="%" styleClass="slds-input"/>
+                                </td>
+                                <td>
+                                    <apex:outputText value="{0,date,dd-MM-yyyy}"><apex:param value="{!conta.Alt_X3_Segmentacao__c}"/></apex:outputText>
+                                </td>
+                                <td>
+                                    <apex:outputText value="{0,date,dd-MM-yyyy}"><apex:param value="{!conta.Alt_X3_Segmentacao_Percentagem__c}"/></apex:outputText>
+                                </td>
+                            </tr>
+                        </table>
+                        
+                    </apex:outputPanel>
+                    <!--------------------------------------------Qualificação------------------------------------------------------>
+                    <div class="slds-section-title--divider">
+                        {!$Label.Qualificacao}
+                    </div>
+                    <table class="slds-table slds-table_bordered slds-table_cell-buffer slds-size--1-of-2 slds-m-around--large">
+                        <thead class="slds-text-heading_medium">
+                            <td width="50%">
+                                
+                            </td>
+                            <td width="50%">
+                                {!$Label.Valor}
+                            </td>
+                            <td>
+                                {!$ObjectType.Account.fields.LastModifiedDate.Label}
+                            </td>
+                        </thead>
+                        <tr class="slds-form-element__row">
+                            <td>
+                                {!$ObjectType.Account.fields.Classe__c.Label}
+                            </td>
+                            <td>
+                                <apex:inputField value="{!conta.Classe__c}" html-placeholder="{!currencyIsoCode}" styleClass="slds-input"/>
+                            </td>
+                            <td>
+                                <apex:outputText value="{0,date,dd-MM-yyyy}"><apex:param value="{!conta.Alt_Classe__c}"/></apex:outputText>
+                            </td>
+                        </tr>
+                        <tr class="slds-form-element__row">
+                            <td>
+                                {!$ObjectType.Account.fields.Factores_seletivos__c.Label}
+                            </td>
+                            <td>
+                                <apex:repeat value="{!factoresSelectivos}" var="f">
+                                    <div class="slds-form-element__row">
+                                        <div class="slds-form-element">
+                                            <div class="slds-form-element__control">
+                                                <span class="slds-checkbox">
+                                                    <apex:inputCheckbox value="{!f.selected}" id="checkbox"/>
+                                                    <apex:outputLabel styleClass="slds-checkbox__label" for="checkbox">
+                                                        <span class="slds-checkbox--faux"></span>{!f.label}
+                                                    </apex:outputLabel>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </apex:repeat>
+                            </td>
+                            <td>
+                                <apex:outputText value="{0,date,dd-MM-yyyy}"><apex:param value="{!conta.Alt_Factores_seletivos__c}"/></apex:outputText>
+                            </td>
+                        </tr>
+                        <tr class="slds-form-element__row">
+                            <td>
+                                {!$ObjectType.Account.fields.Gama_de_produtos__c.Label}
+                            </td>
+                            <td>
+                                <apex:repeat value="{!gamaProdutos}" var="g">
+                                    <div class="slds-form-element__row">
+                                        <div class="slds-form-element">
+                                            <div class="slds-form-element__control">
+                                                <span class="slds-checkbox">
+                                                    <apex:inputCheckbox value="{!g.selected}" id="checkbox"/>
+                                                    <apex:outputLabel styleClass="slds-checkbox__label" for="checkbox">
+                                                        <span class="slds-checkbox--faux"></span>{!g.label}
+                                                    </apex:outputLabel>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </apex:repeat>
+                            </td>
+                            <td>
+                                <apex:outputText value="{0,date,dd-MM-yyyy}"><apex:param value="{!conta.Alt_Gama_de_produtos__c}"/></apex:outputText>
+                            </td>
+                        </tr>
+                        <tr class="slds-form-element__row">
+                            <td>
+                                {!$ObjectType.Account.fields.Numero_de_comerciais__c.Label}
+                            </td>
+                            <td>
+                                <apex:inputField value="{!conta.Numero_de_comerciais__c}" styleClass="slds-input"/>
+                            </td>
+                            <td>
+                                <apex:outputText value="{0,date,dd-MM-yyyy}"><apex:param value="{!conta.Alt_Numero_de_comerciais__c}"/></apex:outputText>
+                            </td>
+                        </tr>
+                        <tr class="slds-form-element__row">
+                            <td>
+                                {!$ObjectType.Account.fields.Potencial_de_crescimento__c.Label}
+                            </td>
+                            <td>
+                                <apex:inputField value="{!conta.Potencial_de_crescimento__c}" styleClass="slds-input"/>
+                            </td>
+                            <td>
+                                <apex:outputText value="{0,date,dd-MM-yyyy}"><apex:param value="{!conta.Alt_Potencial_de_crescimento__c}"/></apex:outputText>
+                            </td>
+                        </tr>
+                        <tr class="slds-form-element__row">
+                            <td>
+                                {!$ObjectType.Account.fields.Tipologia_de_clientes__c.Label}
+                            </td>
+                            <td>
+                                <apex:inputField value="{!conta.Tipologia_de_clientes__c}" styleClass="slds-input"/>
+                            </td>
+                            <td>
+                                <apex:outputText value="{0,date,dd-MM-yyyy}"><apex:param value="{!conta.Alt_Tipologia_de_clientes__c}"/></apex:outputText>
+                            </td>
+                        </tr>
+                        <tr class="slds-form-element__row">
+                            <td>
+                                {!$ObjectType.Account.fields.Impressao__c.Label}
+                            </td>
+                            <td>
+                                <apex:inputField value="{!conta.Impressao__c}" styleClass="slds-input"/>
+                            </td>
+                            <td>
+                                <apex:outputText value="{0,date,dd-MM-yyyy}"><apex:param value="{!conta.Alt_Impressao__c}"/></apex:outputText>
+                            </td>
+                        </tr>
+                    </table>
+                    <!--------------------------------------------Stock------------------------------------------------------>
+                    <div class="slds-section-title--divider">
+                        {!$Label.Stock}
+                    </div>
+                    <table class="slds-table slds-table_bordered slds-table_cell-buffer slds-size--1-of-2 slds-m-around--large">
+                        <thead class="slds-text-heading_medium">
+                            <td width="50%">
+                                
+                            </td>
+                            <td width="50%">
+                                {!$Label.Valor}
+                            </td>
+                            <td>
+                                {!$ObjectType.Account.fields.LastModifiedDate.Label}
+                            </td>
+                        </thead>
+                        <tr class="slds-form-element__row">
+                            <td>
+                                {!$ObjectType.Account.fields.Armazem_proprio__c.Label}
+                            </td>
+                            <td>
+                                <div class="slds-form-element__control">
+                                    <span class="slds-checkbox">
+                                        <apex:inputField value="{!conta.Armazem_proprio__c}" id="checkbox" onchange="changeCheckboxes(this.checked)"/>
+                                        <apex:outputLabel styleClass="slds-checkbox__label" for="checkbox">
+                                            <span class="slds-checkbox--faux"></span>
+                                        </apex:outputLabel>
+                                    </span>
+                                </div>
+                                <script>
+                                j$ = jQuery.noConflict();
+                                
+                                //Modal Open
+                                j$(document).ready(function() {
+                                    changeCheckboxes({!conta.Armazem_proprio__c});
+                                });
+                                
+                                function changeCheckboxes(checked){
+                                    var eles = document.getElementsByClassName("checkDisable");
+                                    
+                                    if(checked){
+                                        for(var i = 0 ; i < eles.length ; i++){
+                                            eles[i].removeAttribute("disabled");
+                                        }
+                                    }else{
+                                        for(var i = 0 ; i < eles.length ; i++){
+                                            eles[i].setAttribute("disabled", "true");
+                                            eles[i].checked = false;
+                                        }
+                                    }
+                                }
+                                </script>
+                            </td>
+                            <td>
+                                <apex:outputText value="{0,date,dd-MM-yyyy}"><apex:param value="{!conta.Alt_Armazem_proprio__c}"/></apex:outputText>
+                            </td>
+                        </tr>
+                        <tr class="slds-form-element__row">
+                            <td>
+                                {!$ObjectType.Account.fields.Principais_produtos_em_stock__c.Label}
+                            </td>
+                            <td>
+                                <apex:repeat value="{!principaisProdutos}" var="p">
+                                    <div class="slds-form-element__row">
+                                        <div class="slds-form-element">
+                                            <div class="slds-form-element__control">
+                                                <span class="slds-checkbox">
+                                                    <apex:inputCheckbox value="{!p.selected}" id="checkbox" styleClass="checkDisable"/>
+                                                    <apex:outputLabel styleClass="slds-checkbox__label" for="checkbox">
+                                                        <span class="slds-checkbox--faux"></span>{!p.label}
+                                                    </apex:outputLabel>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </apex:repeat>
+                            </td>
+                            <td>
+                                <apex:outputText value="{0,date,dd-MM-yyyy}"><apex:param value="{!conta.Alt_Principais_produtos_em_stock__c}"/></apex:outputText>
+                            </td>
+                        </tr>
+                        <tr class="slds-form-element__row">
+                            <td>
+                                {!$ObjectType.Account.fields.Valor_em_stock_proprio__c.Label}
+                            </td>
+                            <td>
+                                <apex:inputField value="{!conta.Valor_em_stock_proprio__c}" styleClass="slds-input"/>
+                            </td>
+                            <td>
+                                <apex:outputText value="{0,date,dd-MM-yyyy}"><apex:param value="{!conta.Alt_Valor_em_stock_proprio__c}"/></apex:outputText>
+                            </td>
+                        </tr>
+                        <tr class="slds-form-element__row">
+                            <td>
+                                {!$ObjectType.Account.fields.Origem_do_stock__c.Label}
+                            </td>
+                            <td>
+                                <apex:inputField value="{!conta.Origem_do_stock__c}" styleClass="slds-input"/>
+                            </td>
+                            <td>
+                                <apex:outputText value="{0,date,dd-MM-yyyy}"><apex:param value="{!conta.Alt_Origem_do_stock__c}"/></apex:outputText>
+                            </td>
+                        </tr>
+                    </table>
+                    
+                    <!--------------------------------------------Marketing------------------------------------------------------>
+                    <div class="slds-section-title--divider">
+                        {!$Label.Marketing}
+                    </div>
+                    <table class="slds-table slds-table_bordered slds-table_cell-buffer slds-size--1-of-2 slds-m-around--large">
+                        <thead class="slds-text-heading_medium">
+                            <td width="50%">
+                                
+                            </td>
+                            <td width="50%">
+                                {!$Label.Valor}
+                            </td>
+                            <td>
+                                {!$ObjectType.Account.fields.LastModifiedDate.Label}
+                            </td>
+                        </thead>
+                        <tr class="slds-form-element__row">
+                            <td>
+                                {!$ObjectType.Account.fields.Acoes_de_marketing_proprias__c.Label}
+                            </td>
+                            <td>
+                                <apex:repeat value="{!marketingProprio}" var="m">
+                                    <div class="slds-form-element__row">
+                                        <div class="slds-form-element">
+                                            <div class="slds-form-element__control">
+                                                <span class="slds-checkbox">
+                                                    <apex:inputCheckbox value="{!m.selected}" id="checkbox"/>
+                                                    <apex:outputLabel styleClass="slds-checkbox__label" for="checkbox">
+                                                        <span class="slds-checkbox--faux"></span>{!m.label}
+                                                    </apex:outputLabel>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </apex:repeat>
+                            </td>
+                            <td>
+                                <apex:outputText value="{0,date,dd-MM-yyyy}"><apex:param value="{!conta.Alt_Acoes_de_marketing_proprias__c}"/></apex:outputText>
+                            </td>
+                        </tr>
+                        <tr class="slds-form-element__row">
+                            <td>
+                                &nbsp;
+                            </td>
+                            <td>
+                                
+                            </td>
+                        </tr>
+                        <tr class="slds-form-element__row">
+                            <td>
+                                {!$ObjectType.Account.fields.Catalogo_proprio__c.Label}
+                            </td>
+                            <td>
+                                <div class="slds-form-element__control">
+                                    <span class="slds-checkbox">
+                                        <apex:inputCheckbox styleClass="checkBox" value="{!conta.Catalogo_proprio__c}" id="checkbox2"/>
+                                        <apex:outputLabel styleClass="slds-checkbox__label"  for="checkbox2" >
+                                            <span class="slds-checkbox--faux"></span>
+                                        </apex:outputLabel>
+                                    </span>
+                                </div>
+                            </td>
+                            <td>
+                                <apex:outputText value="{0,date,dd-MM-yyyy}"><apex:param value="{!conta.Alt_Catalogo_proprio__c}"/></apex:outputText>
+                            </td>
+                        </tr>
+                        <tr class="slds-form-element__row">
+                            <td>
+                                {!$ObjectType.Account.fields.Data_de_selecao__c.Label}
+                            </td>
+                            <td>
+                                <apex:inputField value="{!conta.Data_de_selecao__c}" styleClass="slds-input"/>
+                            </td>
+                            <td>
+                                <apex:outputText value="{0,date,dd-MM-yyyy}"><apex:param value="{!conta.Alt_Data_de_selecao__c}"/></apex:outputText>
+                            </td>
+                        </tr>
+                        <tr class="slds-form-element__row">
+                            <td>
+                                {!$ObjectType.Account.fields.Numero_de_produtos_Stricker__c.Label}
+                            </td>
+                            <td>
+                                <apex:inputField value="{!conta.Numero_de_produtos_Stricker__c}" styleClass="slds-input"/>
+                            </td>
+                            <td>
+                                <apex:outputText value="{0,date,dd-MM-yyyy}"><apex:param value="{!conta.Alt_Numero_de_produtos_Stricker__c}"/></apex:outputText>
+                            </td>
+                        </tr>
+                    </table>
+                    
+                </div>
+                <!--------------------------QUESTION TAB---------------------------------->
+                <div id="tab-default-2" class="slds-tabs_default__content slds-hide" role="tabpanel" aria-labelledby="tab-default-2__item">
+                    <apex:outputPanel id="questionsTab">
+                        
+                        <!-------------------------------------------DURING THE VISIT----------------------------------------------->
+                        <div class="slds-section-title--divider slds-m-bottom--large">
+                            {!$Label.Durante_a_visita}
+                        </div>
+                        <apex:dataTable value="{!duringQuestions}" var="question" rowClasses="cellHeigth" headerClass="slds-text-heading--small" styleClass="slds-table slds-table_bordered slds-table_cell-buffer">
+                            <apex:column headerValue="{!$ObjectType.Pergunta__c.fields.Pergunta__c.Label}" value="{!question.Pergunta__c}" style="width:30%"/>
+                            <apex:column headerValue="{!$Label.Coluna_Resposta}" id="thePanels">
+                                <apex:outputPanel rendered="{!question.RecordType.Name == 'Texto'}">
+                                    <!-- painel de texto-->
+                                    <apex:inputTextarea disabled="{!OR(reportApproved, question.N_A__c)}" value="{!answers[question.id].Resposta_em_texto__c}"
+                                                        style="width:95%; resize: none" styleClass="slds-input"/>
+                                </apex:outputPanel>
+                                <apex:outputPanel rendered="{!AND(question.RecordType.Name == 'Número',NOT(reportApproved))}">
+                                    <!-- painel de numero-->
+                                    <apex:inputField html-disabled="{!OR(reportApproved, question.N_A__c)}" value="{!answers[question.id].Resposta_em_numero__c}"
+                                                     style="width:95%; resize: none" styleClass="slds-input" id="number"/>
+                                    <script>
+                                    var ele = checkDisabled();
+                                    
+                                    function checkDisabled(){
+                                        if(!{!OR(reportApproved, question.N_A__c)}){
+                                            document.getElementById('{!$Component.number}').removeAttribute("disabled");
+                                        }
+                                    };
+                                    </script>
+                                </apex:outputPanel>
+                                <apex:outputPanel rendered="{!question.RecordType.Name == 'Picklist'}">
+                                    <!-- painel de dropdown-->
+                                    <apex:selectList disabled="{!OR(reportApproved, question.N_A__c)}" value="{!answers[question.id].Resposta_em_picklist__c}" size="1"
+                                                     styleClass="slds-input" style="width:95%; resize: none">
+                                        <apex:selectOptions value="{!dropDownAnswers[question.id]}"/>
+                                    </apex:selectList>
+                                </apex:outputPanel>
+                                <apex:outputPanel rendered="{!question.RecordType.Name == 'Moeda'}">
+                                    <apex:inputField value="{!answers[question.id].Resposta_em_moeda__c}" style="width:95%; resize: none" styleClass="slds-input"
+                                                     html-placeholder="{!currencyIsoCode}" html-disabled="{!OR(reportApproved, question.N_A__c)}" id="coin"/>
+                                    
+                                    <script>
+                                    var ele = checkDisabled();
+                                    
+                                    function checkDisabled(){
+                                        if(!{!OR(reportApproved, question.N_A__c)}){
+                                            document.getElementById('{!$Component.coin}').removeAttribute("disabled");
+                                        }
+                                    };
+                                    </script>
+                                </apex:outputPanel>
+                                <apex:outputPanel rendered="{!question.RecordType.Name == 'Multi picklist'}">
+                                    <!-- painel de multidropdown-->
+                                    <fieldset class="slds-form--compound" >
+                                        <div class="slds-form-element__group ">
+                                            <apex:repeat value="{!multipicklistvalues[question.Id]}" var="s">
+                                                <div class="slds-form-element__row">
+                                                    <div class="slds-form-element">
+                                                        <div class="slds-form-element__control">
+                                                            <span class="slds-checkbox">
+                                                                <apex:inputCheckbox disabled="{!OR(reportApproved, question.N_A__c)}" value="{!s.selected}" id="checkbox"/>
+                                                                <apex:outputLabel styleClass="slds-checkbox__label" for="checkbox">
+                                                                    <span class="slds-checkbox--faux"  style="{!If(OR(reportApproved, question.N_A__c),'cursor: not-allowed;', '')}"></span>{!s.value}
+                                                                </apex:outputLabel>
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </apex:repeat>
+                                        </div>
+                                    </fieldset>
+                                </apex:outputPanel>
+                            </apex:column>
+                            <apex:column headerValue="{!$Label.Coluna_Respondida}" value="{!answers[question.id].Resposta_preenchida__c}" style="width:6%"/>
+                            <apex:column headerValue="N/A" style="width:6%">
+                                <span class="slds-checkbox">
+                                    <apex:inputCheckbox value="{!question.N_A__c}" id="checkbox"/>
+                                    <apex:outputLabel styleClass="slds-checkbox__label" for="checkbox">
+                                        <span class="slds-checkbox--faux"></span>
+                                    </apex:outputLabel>
+                                </span>
+                            </apex:column>
+                            <apex:column headerValue="{!$Label.Coluna_Estado}" style="width:2%">
+                                <apex:image url="{!IF(question.N_A__c, URLFOR($Resource.exclamation) , 
+                                                 IF(answers[question.id].Resposta_preenchida__c, URLFOR($Resource.check), URLFOR($Resource.wrong)))}" width="20px" 
+                                            height="20px"></apex:image>
+                            </apex:column>
+                        </apex:dataTable>
+                        
+                        <div align="right" class="slds-m-around--small">
+                            <apex:image url="{!URLFOR($Resource.exclamation)}" width="1%" height="1%"/>&nbsp; = N/A &nbsp;
+                            <apex:image url="{!URLFOR($Resource.wrong)}" width="1%" height="1%"/>&nbsp; = Not Answered &nbsp;
+                            <apex:image url="{!URLFOR($Resource.check)}" width="1%" height="1%"/>&nbsp; = Answered &nbsp;
+                        </div>
+                        <!-------------------------------------------AFTER THE VISIT----------------------------------------------->
+                        <div class="slds-section-title--divider slds-m-bottom--large slds-m-top--large">
+                            {!$Label.Apos_a_visita}
+                        </div>
+                        <apex:dataTable value="{!afterQuestions}" var="question" rowClasses="cellHeigth" headerClass="slds-text-heading--small" styleClass="slds-table slds-table_bordered slds-table_cell-buffer">
+                            <apex:column headerValue="{!$ObjectType.Pergunta__c.fields.Pergunta__c.Label}" value="{!question.Pergunta__c}" style="width:30%"/>
+                            <apex:column headerValue="{!$Label.Coluna_Resposta}" id="thePanels">
+                                <apex:outputPanel rendered="{!question.RecordType.Name == 'Texto'}">
+                                    <!-- painel de texto-->
+                                    <apex:inputTextarea disabled="{!OR(reportApproved, question.N_A__c)}" value="{!answers[question.id].Resposta_em_texto__c}"
+                                                        style="width:95%; resize: none" styleClass="slds-input"/>
+                                </apex:outputPanel>
+                                <apex:outputPanel rendered="{!AND(question.RecordType.Name == 'Número',NOT(reportApproved))}">
+                                    <!-- painel de numero-->
+                                    <apex:inputField html-disabled="{!OR(reportApproved, question.N_A__c)}" value="{!answers[question.id].Resposta_em_numero__c}"
+                                                     style="width:95%; resize: none" styleClass="slds-input" id="number"/>
+                                    <script>
+                                    var ele = checkDisabled();
+                                    
+                                    function checkDisabled(){
+                                        if(!{!OR(reportApproved, question.N_A__c)}){
+                                            document.getElementById('{!$Component.number}').removeAttribute("disabled");
+                                        }
+                                    };
+                                    </script>
+                                </apex:outputPanel>
+                                <apex:outputPanel rendered="{!question.RecordType.Name == 'Picklist'}">
+                                    <!-- painel de dropdown-->
+                                    <apex:selectList disabled="{!OR(reportApproved, question.N_A__c)}" value="{!answers[question.id].Resposta_em_picklist__c}" size="1"
+                                                     styleClass="slds-input" style="width:95%; resize: none">
+                                        <apex:selectOptions value="{!dropDownAnswers[question.id]}"/>
+                                    </apex:selectList>
+                                </apex:outputPanel>
+                                <apex:outputPanel rendered="{!question.RecordType.Name == 'Moeda'}">
+                                    <apex:inputField value="{!answers[question.id].Resposta_em_moeda__c}" style="width:95%; resize: none" styleClass="slds-input"
+                                                     html-placeholder="{!currencyIsoCode}" html-disabled="{!OR(reportApproved, question.N_A__c)}" id="coin"/>
+                                    
+                                    <script>
+                                    var ele = checkDisabled();
+                                    
+                                    function checkDisabled(){
+                                        if(!{!OR(reportApproved, question.N_A__c)}){
+                                            document.getElementById('{!$Component.coin}').removeAttribute("disabled");
+                                        }
+                                    };
+                                    </script>
+                                </apex:outputPanel>
+                                <apex:outputPanel rendered="{!question.RecordType.Name == 'Multi picklist'}">
+                                    <!-- painel de multidropdown-->
+                                    <fieldset class="slds-form--compound" >
+                                        <div class="slds-form-element__group ">
+                                            <apex:repeat value="{!multipicklistvalues[question.Id]}" var="s">
+                                                <div class="slds-form-element__row">
+                                                    <div class="slds-form-element">
+                                                        <div class="slds-form-element__control">
+                                                            <span class="slds-checkbox">
+                                                                <apex:inputCheckbox disabled="{!OR(reportApproved, question.N_A__c)}" value="{!s.selected}" id="checkbox"/>
+                                                                <apex:outputLabel styleClass="slds-checkbox__label" for="checkbox">
+                                                                    <span class="slds-checkbox--faux"  style="{!If(OR(reportApproved, question.N_A__c),'cursor: not-allowed;', '')}"></span>{!s.value}
+                                                                </apex:outputLabel>
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </apex:repeat>
+                                        </div>
+                                    </fieldset>
+                                </apex:outputPanel>
+                            </apex:column>
+                            <apex:column headerValue="{!$Label.Coluna_Respondida}" value="{!answers[question.id].Resposta_preenchida__c}" style="width:6%"/>
+                            <apex:column headerValue="N/A" style="width:6%">
+                                <span class="slds-checkbox">
+                                    <apex:inputCheckbox value="{!question.N_A__c}" id="checkbox"/>
+                                    <apex:outputLabel styleClass="slds-checkbox__label" for="checkbox">
+                                        <span class="slds-checkbox--faux"></span>
+                                    </apex:outputLabel>
+                                </span>
+                            </apex:column>
+                            <apex:column headerValue="{!$Label.Coluna_Estado}" style="width:2%">
+                                <apex:image url="{!IF(question.N_A__c, URLFOR($Resource.exclamation) , 
+                                                 IF(answers[question.id].Resposta_preenchida__c, URLFOR($Resource.check), URLFOR($Resource.wrong)))}" width="20px" 
+                                            height="20px"></apex:image>
+                            </apex:column>
+                        </apex:dataTable>
+                        
+                        <div align="right" class="slds-m-around--small">
+                            <apex:image url="{!URLFOR($Resource.exclamation)}" width="1%" height="1%"/>&nbsp; = N/A &nbsp;
+                            <apex:image url="{!URLFOR($Resource.wrong)}" width="1%" height="1%"/>&nbsp; = Not Answered &nbsp;
+                            <apex:image url="{!URLFOR($Resource.check)}" width="1%" height="1%"/>&nbsp; = Answered &nbsp;
+                        </div>
+                        
+                    </apex:outputPanel>
+                </div>
+            </div>
+            
+        </div>
+    </apex:form>
+</apex:page>

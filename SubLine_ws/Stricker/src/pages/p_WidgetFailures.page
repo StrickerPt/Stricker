@@ -1,0 +1,165 @@
+<apex:page controller="c_WidgetFailures">
+    <apex:slds />
+    <apex:includeScript value="/support/console/43.0/integration.js"/>
+    <style>
+        .newRow > td{
+        background-color:#ff9400;//rgb(194, 57, 52);
+        color: white;
+        }
+        .newRow > td > a{
+        color: white;
+        }
+
+        .newRow:hover > td{
+        background-color: rgb(194, 57, 52);
+        color: white;
+        }
+        .hasMotif{
+        margin:0;
+        }
+    </style>
+    <apex:outputPanel id="checkBlinkButton">
+        <script>
+        function checkBlink(){
+            if({!showAlert}){
+                sforce.console.setCustomConsoleComponentButtonStyle('background:rgb(194, 57, 52);');
+                sforce.console.blinkCustomConsoleComponentButtonText('{!$Label.Novo}', 1000);
+            }
+        }
+        </script>
+    </apex:outputPanel>
+    <apex:outputPanel id="checkSendSucess">
+        <script>
+        function checkSend(){
+            if({!hasError}){
+                showAlert("{!errorMsg}", "Erros");
+            }else{
+                hideAlert();
+            }
+        }
+        </script>
+    </apex:outputPanel>
+    <apex:form >
+        <apex:actionFunction name="checkNewDossier" action="{!checkNewErrors}" rerender="checkBlinkButton, painelDossiers" oncomplete="checkBlink();runTimeout();">
+            <apex:param assignTo="{!showAlert}" name="p1" value="false"/>
+        </apex:actionFunction>
+        <apex:actionFunction name="resendDos" action="{!resendDossier}" rerender="painelDossiers, checkSendSucess" oncomplete="spinnerOn(false);checkSend();">
+            <apex:param assignTo="{!sendId}" name="p1" value=""/>
+        </apex:actionFunction>
+    </apex:form>
+    <div class="slds-scope">
+        <div class="slds-notify slds-notify_alert slds-theme_alert-texture slds-theme_error" role="alert">
+            <span class="slds-icon_container slds-icon-utility-error slds-m-right_x-small">
+                <svg class="slds-icon" aria-hidden="true">
+                    <use xmlns:xlink="http://www.w3.org/1999/xlink" 
+                         xlink:href="{!URLFOR($Asset.SLDS , '/assets/icons/utility-sprite/svg/symbols.svg#error')}"></use>
+                </svg>
+            </span>
+            <h2 class="slds-text-heading--large">{!$Label.Dossiers_erro_integracao}
+            </h2>
+        </div>
+        <div class="slds-notify slds-notify_alert slds-theme_alert-texture slds-theme_error slds-hide alerta" id="alertasErros" role="alert" onclick="hideAlert();">
+            <h2 id="alertasErrosMensagem">
+                
+            </h2>
+        </div>
+        <div style="height: 325px;" class="slds-scrollable">
+            <apex:outputPanel id="painelDossiers">
+                <apex:outputPanel rendered="{!myDossiers.empty}">
+                    <div class="slds-align--absolute-center slds-p-around--large">
+                        {!$Label.Sem_dossiers}
+                    </div>
+                </apex:outputPanel>
+                <apex:outputPanel rendered="{!!myDossiers.empty}">
+                    <table class="slds-table slds-table_bordered slds-table_cell-buffer slds-no-row-hover">
+                        <thead>
+                            <tr>
+                                <th>
+                                    {!$ObjectType.Opportunity.Label}
+                                </th>
+                                <th>
+                                    {!$ObjectType.Account.Label}
+                                </th>
+                                <th>
+                                    &nbsp;
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <apex:repeat value="{!myDossiers}" var="dossier"> 
+                                <tr class="{!if(dossier.isNew, 'newRow' ,'')}">
+                                    <td><a onclick="openDossier('{!dossier.opp.Id}')">{!dossier.opp.Name}</a></td>
+                                    <td><a onclick="openDossier('{!dossier.opp.AccountId}')">{!dossier.opp.Account.Name}</a></td>
+                                    <td class="slds-p-right--none slds-p-vertical--small">
+                                        <a onclick="hideAlert();spinnerOn(true);resendDos('{!dossier.opp.Id}')" class="slds-button slds-button_neutral">
+                                            {!$Label.Reenviar}
+                                        </a>
+                                    </td>
+                                </tr>
+                            </apex:repeat>
+                        </tbody>
+                    </table>    
+                </apex:outputPanel>
+            </apex:outputPanel>
+            <div class="slds-spinner_container" style="display: none; position: fixed;" id="spinner">
+                <div role="status" class="slds-spinner slds-spinner--medium">
+                    <span class="slds-assistive-text">Loading</span>
+                    <div class="slds-spinner__dot-a"></div>
+                    <div class="slds-spinner__dot-b"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+    function spinnerOn(activated){
+        if(activated){
+            document.getElementById("spinner").style.display = "block";   
+        }else{
+            document.getElementById("spinner").style.display = "none";
+        }
+    }
+    function showAlert(message, component){
+        var divAlert = document.getElementById("alertas" + component);
+        var mensagem = document.getElementById("alertas" + component + "Mensagem");
+        divAlert.classList.remove("slds-hide");
+        
+        mensagem.innerHTML = message;
+    }
+    
+    function hideAlert(){
+        var divAlert = document.getElementsByClassName("alerta");
+        for(var i = 0; i < divAlert.length; i++){
+            divAlert[i].classList.add("slds-hide");
+        }
+        
+        var inputs = document.getElementsByClassName("slds-has-error");
+        for(var i = 0; i < inputs.length; i++){
+            inputs[i].classList.remove("slds-has-error");
+        }
+    }
+    
+    var timeout = runTimeout();
+    
+    function runTimeout(){
+        setTimeout("checkNewDossier();",10000);
+    }
+    
+    var clickHandler = function (result) {
+        sforce.console.setCustomConsoleComponentButtonStyle('background:none;');
+        sforce.console.removeBlinkCustomConsoleComponentButtonText();
+    };
+    
+    sforce.console.onCustomConsoleComponentButtonClicked(clickHandler);
+    
+    function openUrl(result) {
+        sforce.console.openConsoleUrl(null, result.consoleUrl, true);
+    }
+    function openDossier(aux_oppId){
+        if(sforce.console.isInConsole()){
+            sforce.console.generateConsoleUrl(["/" + aux_oppId], openUrl);
+        }else{
+            window.open("/" + oppId, "_self");
+        }
+    }
+    </script>
+</apex:page>

@@ -1,0 +1,16 @@
+{
+    "projectName": "Stricker",
+    "username": "marcoramos@stricker.pt",
+    "id": "7754cd90-eccc-11e8-9254-1b202c46784b",
+    "namespace": "",
+    "environment": "developer",
+    "loginUrl": "https://login.salesforce.com/",
+    "workspace": "C:\\SubLine_ws",
+    "subscription": [
+        "ApexClass",
+        "ApexComponent",
+        "ApexPage",
+        "ApexTrigger",
+        "StaticResource"
+    ]
+}

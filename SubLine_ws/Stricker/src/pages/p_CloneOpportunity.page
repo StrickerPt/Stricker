@@ -1,0 +1,251 @@
+<apex:page standardController="Opportunity" extensions="c_CloneOpportunity">
+    <head>
+        <apex:includeScript value="{!URLFOR($Resource.bs, '/jQuery_2_0_3.js')}"/>
+        <apex:includeScript value="/support/console/39.0/integration.js"/>
+        
+        <apex:includeScript value="{!URLFOR($Resource.bs, '/js/bootstrap.js')}"/>
+        <apex:includeScript value="{!URLFOR($Resource.bs, '/js/bootstrap-typeahead.js')}"/>
+        <apex:stylesheet value="{!URLFOR($Resource.bs, '/css/bootstrap.css')}"/>
+        <apex:stylesheet value="{!URLFOR($Resource.bs, '/css/bootstrap-theme.css')}"/>
+        <style>
+            .slds-scope .slds-modal__container{
+            max-width: fit-content;
+            }
+        </style>
+    </head>
+    <apex:slds />
+    <script>
+    window.onload = function() {
+        var setTabTitle= function setTabTitle(result) {
+            console.log(result);
+            sforce.console.setTabTitle('Clonar Dossier', null);
+        };
+        
+        sforce.console.getFocusedSubtabId(setTabTitle);
+    }
+    </script>
+    <div class="slds-scope">
+        <apex:form id="frm">
+            <div class="slds-page-header">
+                <div class="slds-media">
+                    <div class="slds-media__figure">
+                        <span class="slds-icon_container slds-icon-standard-opportunity" title="Description of icon when needed">
+                            <svg class="slds-icon" aria-hidden="true">
+                                <use xmlns:xlink="http://www.w3.org/1999/xlink" 
+                                     xlink:href="{!URLFOR($Asset.SLDS , '/assets/icons/standard-sprite/svg/symbols.svg#opportunity')}"></use>
+                            </svg>
+                        </span>
+                    </div>
+                    <div class="slds-media__body">
+                        <h1 class="slds-page-header__title slds-truncate slds-align-middle">{!Opportunity.Name}</h1>
+                        <p class="slds-text-body_small slds-line-height_reset">{!$Label.Clonar_dossier}</p>
+                        
+                    </div>
+                    
+                    <apex:outputPanel id="messages">
+                        <apex:pageMessages escape="true"/>
+                    </apex:outputPanel>
+                    <div class="slds-form-element">
+                        <button class="slds-button slds-button--destructive slds-float--right" type="button"
+                                onclick="doRedirect(true, false, '{!Opportunity.Id}');">{!$Label.Cancelar}</button>
+                    </div>
+                </div>
+            </div>
+            <apex:variable id="index" value="{!0}" var="c"/>
+            <apex:actionFunction name="saveRt" reRender="" >
+                <apex:param assignTo="{!pickedRt}" name="p1" value=""/>
+            </apex:actionFunction>
+            <apex:actionFunction name="clonarDossier" action="{!clonarDossier}" rerender="messages, scripts" 
+                                 oncomplete="completeClonarDossier('{!Opportunity.Id}', false, true);"/>
+            <apex:actionFunction name="clonarDossierNovo" action="{!clonarDossier}" rerender="messages, scripts"
+                                 oncomplete="completeClonarDossier('/apex/p_CloneOpportunity?id={!Opportunity.Id}', true, false);"/>
+            <fieldset class="slds-form-element slds-m-around--small">
+                <div class="slds-form-element__control slds-align_absolute-center">
+                    <apex:repeat value="{!allowedRts}" var="rt">
+                        <apex:variable id="index" value="{!c + 1}" var="c"/>
+                        <div class="slds-visual-picker slds-visual-picker_medium slds-m-right--small">
+                            <input type="radio" id="visual-picker-1{!c}" name="options" value="on" onclick="saveRt('{!rt}')" class="toggleBtn"/>
+                            <label for="visual-picker-1{!c}">
+                                <span class="slds-visual-picker__figure slds-visual-picker__icon slds-align_absolute-center">
+                                    <span class="slds-is-selected">
+                                        <span class="slds-icon_container" title="{!rt}">
+                                            <svg class="slds-icon slds-icon_large slds-icon-action-check" aria-hidden="true">
+                                                <use xmlns:xlink="http://www.w3.org/1999/xlink"
+                                                     xlink:href="{!URLFOR($Asset.SLDS , '/assets/icons/utility-sprite/svg/symbols.svg#check')}"></use>
+                                            </svg>
+                                        </span>
+                                    </span>
+                                    <span class="slds-is-not-selected">
+                                        <span class="slds-icon_container" title="{!rt}">
+                                            <svg class="slds-icon slds-icon-utility-custom_apps slds-icon_large slds-icon-text-default" aria-hidden="true">
+                                                <use xmlns:xlink="http://www.w3.org/1999/xlink"
+                                                     xlink:href="{!URLFOR($Asset.SLDS , '/assets/icons/utility-sprite/svg/symbols.svg#' + rtIcons[rt])}"></use>
+                                            </svg>
+                                        </span>
+                                    </span>
+                                </span>
+                                <div class="slds-m-top--xx-small">
+                                    <span class="slds-text-heading_small ">{!$Label[rt]}</span>
+                                </div>
+                            </label>
+                        </div>
+                    </apex:repeat>
+                </div>
+            </fieldset>
+            <div class="slds-modal" aria-hidden="false" role="dialog" id="modal">
+                <div class="slds-modal__container">
+                    <div class="slds-modal__header">
+                        <button class="slds-button slds-button--icon-inverse slds-modal__close" onclick="closeModal();" type="button">
+                            <div class="slds-icon_container slds-icon-utility-close">
+                                <svg class="slds-icon slds-icon-text-default" aria-hidden="false">
+                                    <use xmlns:xlink="http://www.w3.org/1999/xlink"
+                                         xlink:href="{!URLFOR($Asset.SLDS , '/assets/icons/utility-sprite/svg/symbols.svg#close')}"></use>
+                                </svg>
+                            </div>
+                        </button>
+                        <h2 class="slds-text-heading--medium">{!$ObjectType.Product2.labelPlural}</h2>
+                    </div>
+                    <div class="slds-modal__content">
+                        
+                        <apex:dataTable value="{!olis}" var="oli" styleClass="slds-table slds-table_bordered slds-table_cell-buffer">
+                            <apex:column headerValue="{!$Label.Selecionado}">
+                                <div class="slds-form-element__control">
+                                    <span class="slds-checkbox">
+                                        <apex:inputCheckbox value="{!oli.selected}" id="checkbox"/>
+                                        <apex:outputLabel styleClass="slds-checkbox__label" for="checkbox">
+                                            <span class="slds-checkbox--faux"></span>
+                                        </apex:outputLabel>
+                                    </span>
+                                </div>
+                            </apex:column>
+                            <apex:column value="{!oli.item.Product2Id}" headerValue="{!$ObjectType.OpportunityLineItem.Fields.Name.Label}"/>
+                            <apex:column headerValue="{!$ObjectType.OpportunityLineItem.Fields.Quantity.Label}">
+                                <apex:outputText value="{0,number,#################}">
+                                    <apex:param value="{!oli.item.Quantity}" />
+                                </apex:outputText>
+                            </apex:column>
+                            <apex:column headerValue="{!$ObjectType.OpportunityLineItem.Fields.UnitPrice.Label}">
+                                <apex:outputText >
+                                    {!oli.item.CurrencyIsoCode} {!if(oli.item.UnitPrice != null, oli.item.UnitPrice, '0.00')}
+                                </apex:outputText>
+                            </apex:column>
+                            <apex:column headerValue="{!$ObjectType.OpportunityLineItem.Fields.TotalPrice.Label}">
+                                <apex:outputText >
+                                    {!oli.item.CurrencyIsoCode} {!if(oli.item.TotalPrice != null, oli.item.TotalPrice, '0.00')}
+                                </apex:outputText>
+                            </apex:column>
+                        </apex:dataTable>
+                    </div>
+                    <div class="slds-modal__footer">
+                        
+                        <fieldset class="slds-form--compound" >
+                            <div class="slds-form-element__group ">
+                                <div class="slds-form-element__row">
+                                    <div class="slds-form-element slds-align-middle">
+                                        
+                                        <div class="slds-form-element__control">
+                                            <span class="slds-checkbox">
+                                                <apex:inputCheckbox value="{!calcPrecos}" id="checkbox"/>
+                                                <apex:outputLabel styleClass="slds-checkbox__label" for="checkbox">
+                                                    <span class="slds-checkbox--faux slds-m-bottom_xxx-small"></span>{!$Label.Clonar_com_precos_atuais}
+                                                </apex:outputLabel>
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="slds-form-element">
+                                        <button class="slds-button slds-button--neutral" onclick="closeModal();" type="button">{!$Label.Cancelar}</button>
+                                        <button class="slds-button slds-button--brand" type="button"
+                                                onclick="spinnerOn(true);clonarDossier();closeModal();">{!$Label.Gravar}</button>
+                                        <button class="slds-button slds-button--brand" type="button"
+                                                onclick="spinnerOn(true);clonarDossierNovo();closeModal();">{!$Label.Gravar_e_Novo}</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </fieldset>
+                    </div>
+                </div>
+            </div>
+            <div class="slds-backdrop" id="backdrop"></div>
+            <div class="slds-spinner_container" style="display:none;" id="spinner">
+                <div role="status" class="slds-spinner slds-spinner--medium">
+                    <span class="slds-assistive-text">Loading</span>
+                    <div class="slds-spinner__dot-a"></div>
+                    <div class="slds-spinner__dot-b"></div>
+                </div>
+            </div>
+        </apex:form>
+    </div>
+    <apex:outputPanel id="scripts">
+        
+        <script>
+        function completeClonarDossier(url, focusSelf, focusNew){
+            if({!success}){
+                doRedirect(focusSelf, focusNew, url);
+            }else{
+                spinnerOn(false);
+            }
+        }
+        
+        function doRedirect(focusSelf, focusNew, url){
+            if(sforce.console.isInConsole()){
+                var checkTabObj = function checkTabObj(result){
+                    if("{!Opportunity.AccountId}".includes(result.id)){//se a conta já estiver aberta
+                        var redirectSubTab = function redirectSubTab(result3){
+                            //abre propria tab
+                            var closeSubTab = function closeSubTab(result2){
+                                sforce.console.openSubtab(result3.id, url, focusSelf, "{!Opportunity.Name}", result2.id);
+                            };
+                            sforce.console.getFocusedSubtabId(closeSubTab);
+                            
+                            //abre nova opp
+                            if("{!newOpp.Id}" != "")sforce.console.openSubtab(result3.id, "{!newOpp.Id}", focusNew, "{!newOpp.Name}", null);
+                        };
+                        sforce.console.getFocusedPrimaryTabId(redirectSubTab);
+                        
+                        //fecha página de clone                        
+                    }else{
+                        var currentTab;
+                        var openSubtab = function openSubtab(result2) {
+                            sforce.console.openSubtab(result2.id,url, focusSelf, "{!Opportunity.Name}", null);
+                            //abre nova opp
+                            if("{!newOpp.Id}" != "")sforce.console.openSubtab(result2.id, "{!newOpp.Id}", focusNew, "{!newOpp.Name}", null);
+                            if(currentTab != null) sforce.console.closeTab(currentTab);
+                        };
+                        var openPrimTab = function openPrimTab(result) {
+                            currentTab = result.id;
+                            sforce.console.openPrimaryTab(null, "{!Opportunity.AccountId}", true, "",openSubtab);
+                            
+                        };
+                        sforce.console.getFocusedPrimaryTabId(openPrimTab);
+                    }
+                };
+                
+                sforce.console.getFocusedPrimaryTabObjectId(checkTabObj);
+            }else{
+                window.open("/" + url, "_self");
+            }
+        }
+        j$ = jQuery.noConflict();
+        
+        //Modal Open
+        j$('.toggleBtn').click(function(){
+            j$('#backdrop').addClass('slds-backdrop--open');
+            j$('#modal').addClass('slds-fade-in-open');
+        });
+        
+        //Modal Close
+        function closeModal(){
+            j$('#modal').removeClass('slds-fade-in-open');
+            j$('#backdrop').removeClass('slds-backdrop--open');
+        }
+        
+        function spinnerOn(activated){
+            if(activated){
+                j$("#spinner").css("display", "block");   
+            }else{
+                j$("#spinner").css("display", "none");   
+            }
+        }
+        </script>
+    </apex:outputPanel>
+</apex:page>

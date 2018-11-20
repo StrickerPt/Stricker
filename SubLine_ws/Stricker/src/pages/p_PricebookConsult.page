@@ -1,0 +1,120 @@
+<apex:page standardController="Product2" extensions="c_PricebookConsult">
+    <head>
+        
+        <style>
+            .slds-scope .slds-table:not(.slds-no-row-hover) tbody tr:hover>td, .slds-scope .slds-table:not(.slds-no-row-hover) tbody tr:hover>th {
+            background-color: inherit;
+            }
+            table{
+            font-size: 0.65rem;
+            }
+            .tableHover{
+            border: 2px solid transparent;
+            }
+            .tableHover:hover{
+            border-top: 2px solid #d8dde6;
+            border-bottom: 2px solid #d8dde6;
+            
+            }
+        </style>
+    </head>
+    <apex:slds />
+    <apex:form >
+        <div class="slds-scope">
+            <apex:actionFunction name="rerenderTable" rerender="priceTable"/>
+            <div class="slds-page-header">
+                
+                <fieldset class="slds-form--compound" >
+                    <div class="slds-form-element__group ">
+                        <div class="slds-form-element__row">
+                            <div class="slds-form-element">
+                                
+                                <div class="slds-media">
+                                    <div class="slds-media__figure">
+                                        <span class="slds-icon_container slds-icon-standard-product">
+                                            <svg class="slds-icon" aria-hidden="true">
+                                                <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{!URLFOR($Asset.SLDS , '/assets/icons/standard-sprite/svg/symbols.svg#product')}"></use>
+                                            </svg>
+                                        </span>
+                                    </div>
+                                    <div class="slds-media__body">  
+                                        <h1 class="slds-page-header__title slds-truncate slds-align-middle">{!$Label.Consulta_precos}</h1>
+                                        <p class="slds-text-body_small slds-line-height_reset">{!Product2.Name}</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="slds-form-element">
+                                <apex:selectList value="{!selectFiltro}" styleClass="slds-input slds-size--1-of-2" size="1" onchange="rerenderTable();" rendered="{!!isCustomizacao}">
+                                    <apex:selectOptions value="{!filtros}"/>
+                                </apex:selectList>
+                            </div>
+                            <div class="slds-form-element">
+                                
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+            <apex:outputPanel id="priceTable">
+                <div class="slds-scrollable">
+                    
+                    <apex:dataTable value="{!prodId}" var="var" id="dataTable1" styleClass="slds-table slds-table_bordered slds-table_cell-buffer" headerClass="slds-text-body_small">
+                        
+                        <apex:repeat value="{!pbes}" var="pbe">
+                            <apex:column headerClass="slds-text-align--center">
+                                <apex:facet name="header">
+                                    <apex:outputPanel >
+                                        <apex:outputText value="{!$ObjectType.Account.fields.Tabela_de_precos__c.Label} {!pbe.Pricebook2.Mercado__c}" style="font-weight: bold;"/>
+                                        <br/>
+                                        <apex:outputText value="(Custos adicionais - {!pbe.CurrencyIsoCode} {!pbe.Custo_adicional__c})" rendered="{!isCustomizacao}"/>
+                                    </apex:outputPanel>
+                                </apex:facet>
+                                <table class="tableHover">
+                                    <apex:repeat value="{!nPrices}" var="int" rendered="{!selectFiltro == '1'}">
+                                        <tr>
+                                            <td>
+                                                <apex:outputText >{!Text(pbe['Minimo_' + int + '__c'])} - {!if(pbe['Maximo_' + int + '__c'] != 9999999,Text(pbe['Maximo_' + int + '__c']),'MAX')}</apex:outputText>
+                                            </td>
+                                            <td>
+                                                <apex:outputText value="{!pbe.CurrencyIsoCode} {!pbe['Preco_' + int + '__c']}"/>
+                                            </td>
+                                        </tr>
+                                    </apex:repeat>
+                                    
+                                    <apex:repeat value="{!nPrices}" var="int" rendered="{!selectFiltro == '2'}">
+                                        <tr>
+                                            <td>
+                                                <apex:outputText >{!$ObjectType.PricebookEntry.Fields['Preco_' + intEscalaoMap[int] + '__c'].Label}</apex:outputText>
+                                            </td>
+                                            <td>
+                                                <apex:outputText value="{!pbe.CurrencyIsoCode} {!pbe['Preco_' + intEscalaoMap[int] + '__c']}"/>
+                                            </td>
+                                        </tr>
+                                    </apex:repeat>
+                                </table>
+                            </apex:column>
+                        </apex:repeat>
+                    </apex:dataTable>
+                    
+                </div>
+            </apex:outputPanel>
+                <!--apex:variable id="index" value="{!0}" var="c"/>
+            <apex:dataTable value="{!pbes}" var="pbe" id="dataTable1" styleClass="slds-table slds-table_bordered slds-table_cell-buffer" headerClass="slds-text-body_small">
+                <apex:column >
+                    <apex:variable id="index" value="{!c + 1}" var="c"/>
+                    {!c}
+                </apex:column>
+                <apex:repeat value="{!nPrices}" var="int">
+                    <apex:column headerValue="{!$ObjectType.PricebookEntry.Fields['Preco_' + int + '__c'].Label}">
+                    <apex:column headerValue="{!Text(pbe['Minimo_' + int + '__c'])}">
+                        <apex:outputField value="{!pbe['Preco_' + int + '__c']}"/>
+                        
+                    </apex:column>
+                </apex:repeat>
+
+            </apex:dataTable-->
+            
+        </div>
+    </apex:form>
+</apex:page>

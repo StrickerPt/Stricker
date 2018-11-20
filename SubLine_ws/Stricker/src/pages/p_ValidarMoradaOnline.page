@@ -1,0 +1,56 @@
+<apex:page standardController="Opportunity">
+    <head>
+        <apex:includeScript value="{!URLFOR($Resource.bs, '/jQuery_2_0_3.js')}"/>
+        <apex:includeScript value="/support/console/40.0/integration.js"/>
+        <style>
+            .apexp {margin-left: -10px !important;}
+            .btn {
+            border: 1px solid #e0e5ee !important;
+            border-radius: 3px !important;
+            box-shadow: none !important;
+            cursor: default !important;
+            font-size: 12px !important;
+            height: auto !important;
+            outline: 0 !important;
+            font-weight: normal !important;
+            font-family: 'SalesforceSans-Regular',Helvetica,Arial,sans-serif !important;
+            color: #0070d2 !important;
+            text-align: center !important;
+            white-space: nowrap !important;
+            line-height: 24px !important;
+            padding: 0 9px !important;
+            background-color: #f4f5f7 !important;
+            background-image: none !important;
+            }
+            .btn:hover{
+            background-color: #e7edf4 !important;
+            text-decoration: none !important;
+            }
+            .empty{
+            display:none;
+            }
+        </style>
+        <script>
+        function abrirTab(){
+            if(sforce.console.isInConsole()){
+                var openSubTab = function openSubTab(result) {
+                    var primaryTabId = result.id;
+                    sforce.console.openSubtab(primaryTabId,"/apex/p_ValidaMorada?id={!Opportunity.Id}", true, "Valida Morada", null);
+                };
+                sforce.console.getFocusedPrimaryTabId(openSubTab);
+                return false;
+            }else{
+                window.open("/apex/p_ValidaMorada?id={!Opportunity.Id}","_blank");
+            }
+        }
+        </script>
+    </head>
+    <apex:pageBlock mode="maindetail">
+        <apex:pageBlockSection collapsible="false">
+            <apex:pageBlockSectionItem labelStyle="color: #54698d;font-weight: normal;" dataStyle="font-family: SalesforceSans-Regular,Arial,sans-serif;color: #16325c;">
+                <apex:outputLabel for="link"><a style="color: #006cb5; cursor:pointer;" id="link" onclick="abrirTab()">Validar Morada</a></apex:outputLabel>
+                <a id="link"></a>
+            </apex:pageBlockSectionItem>
+        </apex:pageBlockSection>
+    </apex:pageBlock>
+</apex:page>

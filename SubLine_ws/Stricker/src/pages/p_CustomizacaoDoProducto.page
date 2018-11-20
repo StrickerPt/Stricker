@@ -1,0 +1,55 @@
+<apex:page standardController="Product2" extensions="c_CustomizacaoDoProduto">
+
+    <apex:slds />
+    <apex:includeScript value="{!URLFOR($Resource.bs, '/jQuery_2_0_3.js')}"/>
+    <apex:includeScript value="/support/console/39.0/integration.js"/>
+    <div class="slds-scope">
+        
+        <div class="slds-page-header">
+            <div class="slds-media">
+                <div class="slds-media__figure">
+                    <span class="slds-icon_container slds-icon-standard-product" title="Description of icon when needed">
+                        <svg class="slds-icon" aria-hidden="true">
+                            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{!URLFOR($Asset.SLDS , '/assets/icons/standard-sprite/svg/symbols.svg#product')}"></use>
+                        </svg>
+                    </span>
+                </div>
+                <div class="slds-media__body">
+                    <h1 class="slds-page-header__title slds-truncate slds-align-middle">{!$Label.Customizacoes_disponiveis}</h1>
+                    <p class="slds-text-body_small slds-line-height_reset">{!Product2.Nome_para_user__c}</p>
+                </div>
+            </div>
+        </div>
+        <div class="slds-scrollable" style="height:230px">
+            <script>
+            function openCustom(id){
+                if(sforce.console.isInConsole()){
+                    
+                    var openTab = function openTab(result) {
+                        //Now that we have the primary tab ID, we can close it
+                        var primaryTabId = result.id;
+                        sforce.console.openSubtab(primaryTabId , '/' + id, true, "", null);
+                    };
+                    sforce.console.getEnclosingPrimaryTabId(openTab);
+                }else{
+                    window.open("/" + id, "_self");   
+                }
+            }
+            </script>
+            <apex:variable id="index" value="{!0}" var="c"/>
+            <apex:dataTable value="{!listProductC}" var="task" styleClass="slds-table slds-table--bordered slds-size--1-of-1" headerClass="slds-text-body_small">
+                <apex:column >
+                    <apex:variable id="index" value="{!c + 1}" var="c"/>
+                    {!c}
+                </apex:column>
+                <apex:Column headerValue="{!$Label.Produto}">
+                    <a onclick="openCustom('{!listProductC[task].id}');">{!listProductC[task].Name}</a>
+                </apex:Column>
+                <apex:column value="{!listProductC[task].Tecnica__c}" headerValue="{!$Label.Tecnica}"/>
+                <apex:column value="{!listProductC[task].Componente_da_impressao__c}" headerValue="{!$Label.Componente_da_impressao}"/>
+                <apex:column value="{!listProductC[task].Dimensoes_maximas_de_impressao__c}" headerValue="{!$Label.Dimensoes_maximas_de_impressao}"/>
+                <apex:column value="{!listProductC[task].Cores_de_customizacao__c}" headerValue="{!$Label.Coluna}"/>                
+            </apex:dataTable>
+        </div>
+    </div>
+</apex:page>

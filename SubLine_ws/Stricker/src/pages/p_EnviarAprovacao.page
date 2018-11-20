@@ -1,0 +1,166 @@
+<apex:page standardController="Opportunity" extensions="c_EnviarAprovacao" showHeader="false">
+    
+    <apex:includeScript value="{!URLFOR($Resource.bs, '/jQuery_2_0_3.js')}"/>
+    <apex:includeScript value="/support/console/42.0/integration.js"/>
+    <apex:slds />
+    <apex:form >
+        <div class="slds-scope">
+            <article class="slds-card">
+                <div class="slds-card__header slds-grid">
+                    <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                        <div class="slds-media__figure">
+                            <span class="slds-icon_container slds-icon-standard-file" title="Description of icon when needed">
+                                <svg class="slds-icon" aria-hidden="true">
+                                    <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{!URLFOR($Asset.SLDS , '/assets/icons/standard-sprite/svg/symbols.svg#file')}"></use>
+                                </svg>
+                            </span>
+                        </div>
+                        <div class="slds-media__body">
+                            <h1 class="slds-page-header__title slds-truncate slds-align-middle">{!$Label.Escolher_ficheiro}</h1>
+                            <p class="slds-text-body_small slds-line-height_reset">{!Opportunity.Name}</p>
+                        </div>
+                        <div class="slds-form-element">
+                            <button class="slds-button slds-button--destructive slds-float--right" type="button"
+                                    onclick="closeWindow('{!Opportunity.Id}');">{!$Label.Cancelar}</button>
+                        </div>
+                    </header>
+                </div>
+                <div class="slds-card__body slds-card__body_inner">
+                    <apex:outputPanel rendered="{!Opportunity.Designer__c != ''}">
+                        <apex:outputPanel rendered="{!Opportunity.Estado_da_maquete__c != 'Em aprovação do cliente'}">
+                            <apex:outputPanel rendered="{!Opportunity.Email_para_envio_de_maquete__c != ''}">
+                                <fieldset class="slds-form--compound slds-m-around_medium slds-size--1-of-2">
+                                    <div class="slds-form-element__group ">
+                                        <div class="slds-form-element__row">
+                                            <div class="slds-form-element">
+                                                <label class="slds-form-element__label slds-size--1-of-1" for="vSent">{!$ObjectType.Opportunity.fields.Versao_de_maquete_enviada__c.Label}</label>
+                                                <apex:inputText id="vSent" styleClass="slds-input slds-size--1-of-4" value="{!Opportunity.Versao_de_maquete_enviada__c}"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </fieldset>
+                                <apex:outputPanel id="tablePanel">
+                                    <apex:dataTable value="{!docs}" var="doc" styleClass="slds-table slds-table_bordered slds-table_cell-buffer">
+                                        <apex:column headerValue=" "> 
+                                            <div class="slds-form-element__control">
+                                                <span class="slds-checkbox">
+                                                    <apex:inputCheckbox value="{!doc.selected}" id="checkbox" styleClass="checkDisable"
+                                                                        onchange="changeCheckboxes(this.checked)"/>
+                                                    <apex:outputLabel styleClass="slds-checkbox__label" for="checkbox">
+                                                        <span class="slds-checkbox--faux"></span>
+                                                    </apex:outputLabel>
+                                                </span>
+                                            </div>
+                                        </apex:column>
+                                        <apex:column value="{!doc.doc.Title}" headerValue="{!$ObjectType.ContentDocument.Fields.Title.Label}"/>
+                                        <apex:column value="{!doc.doc.CreatedDate}" headerValue="{!$ObjectType.ContentDocument.Fields.CreatedDate.Label}"/>
+                                        <apex:column >
+                                            <a onclick="openCustom('{!doc.doc.id}');">{!$Label.Previsualizar}</a>
+                                        </apex:column>
+                                    </apex:dataTable>
+                                    
+                                    <script>
+                                    function changeCheckboxes(checked){
+                                        var eles = document.getElementsByClassName("checkDisable");
+                                        if(checked){
+                                            buttonsEnabled(true);
+                                            for(var i = 0 ; i < eles.length ; i++){
+                                                if(!eles[i].checked){
+                                                    eles[i].setAttribute("disabled", "true");
+                                                    eles[i].checked = false;
+                                                }
+                                            }
+                                        }else{
+                                            buttonsEnabled(false);
+                                            for(var i = 0 ; i < eles.length ; i++){
+                                                eles[i].removeAttribute("disabled");
+                                            }
+                                        }
+                                    }
+                                    
+                                    function openCustom(id){
+                                        window.open("/" + id, "_blank");   
+                                    }
+                                    
+                                    window.onload = function(){
+                                        buttonsEnabled(false);
+                                    }
+                                    function buttonsEnabled(enabled) {
+                                        // retrieve all of the buttons or links on the page
+                                        // with the css class of btn
+                                        var $buttons = jQuery('.thisBtn');
+                                        console.log($buttons);
+                                        if (enabled === false) {
+                                            // add the btnDisabled class to give it the look of being disabled
+                                            // add the disabled attribute to actually disable interactability
+                                            $buttons.toggleClass('btnDisabled', true).attr('disabled', 'disabled');
+                                        } else {
+                                            // remove the css class and the disabled attribute
+                                            $buttons.toggleClass('btnDisabled', false).attr('disabled', null);
+                                        } 
+                                    }
+                                    </script>
+                                </apex:outputPanel>
+                                <div class="slds-align_absolute-center slds-m-top--small">
+                                    <apex:commandButton value="Enviar" styleClass="slds-button slds-button--brand thisBtn" onclick="changeCheckboxes(false);" action="{!updateOpp}" oncomplete="changeCheckboxes(true);closeWindow('{!Opportunity.Id}');" reRender="dummy"/>
+                                </div>       
+                            </apex:outputPanel>
+                            <apex:outputPanel rendered="{!Opportunity.Email_para_envio_de_maquete__c = ''}">
+                                {!$Label.Dossier_sem_email}
+                            </apex:outputPanel>
+                        </apex:outputPanel>
+                        <apex:outputPanel rendered="{!Opportunity.Estado_da_maquete__c = 'Em aprovação do cliente'}">
+                            <div class="slds-text-color_error slds-text-heading_small slds-m-around_medium">
+                                {!$Label.Maquete_ja_em_aprovacao}
+                            </div>
+                        </apex:outputPanel>
+                    </apex:outputPanel>
+                    <apex:outputPanel rendered="{!Opportunity.Designer__c = ''}">
+                        <div class="slds-text-color_error slds-text-heading_small slds-m-around_medium">
+                            {!$Label.Aceitar_maquete}
+                        </div>
+                    </apex:outputPanel>
+                </div>
+            </article>
+            <script>
+            function closeWindow(url){
+                if(sforce.console.isInConsole()){
+                    var checkTabObj = function checkTabObj(result){
+                        if("{!Opportunity.AccountId}".includes(result.id)){//se a conta já estiver aberta
+                            var redirectSubTab = function redirectSubTab(result3){
+                                //abre propria tab
+                                var closeSubTab = function closeSubTab(result2){
+                                    sforce.console.openSubtab(result3.id, url, true, "{!Opportunity.Name}", result2.id);
+                                };
+                                sforce.console.getFocusedSubtabId(closeSubTab);
+                                
+                                
+                            };
+                            sforce.console.getFocusedPrimaryTabId(redirectSubTab);
+                            
+                        }else{
+                            var currentTab;
+                            var openSubtab = function openSubtab(result2) {
+                                sforce.console.openSubtab(result2.id,url, true, "{!Opportunity.Name}", null);
+                                //abre nova opp
+                                
+                                if(currentTab != null) sforce.console.closeTab(currentTab);
+                            };
+                            var openPrimTab = function openPrimTab(result) {
+                                currentTab = result.id;
+                                sforce.console.openPrimaryTab(null, "{!Opportunity.AccountId}", true, "",openSubtab);
+                                
+                            };
+                            sforce.console.getFocusedPrimaryTabId(openPrimTab);
+                        }
+                    };
+                    
+                    sforce.console.getFocusedPrimaryTabObjectId(checkTabObj);
+                }else{
+                    window.open("/" + url, "_self");
+                }
+            }
+            </script>
+        </div>
+    </apex:form>
+</apex:page>

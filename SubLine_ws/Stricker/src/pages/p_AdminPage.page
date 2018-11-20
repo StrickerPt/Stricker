@@ -1,0 +1,178 @@
+<apex:page controller="c_AdminPage">
+    <apex:slds />
+    <apex:form >
+        <div class="slds-scope">
+            <div class="slds-form" role="list">
+                <div class="slds-grid slds-gutters_small">
+                    <div class="slds-col slds-has-flexi-truncate" role="listitem">
+                        <div class="slds-form-element">
+                            <div class="slds-section slds-is-open">
+                                <h3 class="slds-section__title">
+                                    <a aria-controls="expando-unique-id" aria-expanded="true" class="slds-button slds-section__title-action" onclick="changeSection(this, this.parentElement.parentElement);">
+                                        <span class="slds-truncate" style="width: 100%; text-align: left;">
+                                            <div class="slds-icon_container slds-m-right--medium">
+                                                <svg class="slds-section__title-action-icon slds-button__icon" aria-hidden="false">
+                                                    <use xmlns:xlink="http://www.w3.org/1999/xlink"
+                                                         xlink:href="{!URLFOR($Asset.SLDS , '/assets/icons/utility-sprite/svg/symbols.svg#switch')}"></use>
+                                                </svg>
+                                            </div>
+                                            Controlo de batches
+                                        </span>
+                                    </a>
+                                </h3>
+                                <div aria-hidden="true" class="slds-section__content" id="expando-unique-id">
+                                    <apex:outputPanel id="sectionContent">
+                                        
+                                        <div class="slds-form" role="list">
+                                            <div class="slds-grid slds-gutters_small">
+                                                <div class="slds-col slds-has-flexi-truncate slds-align--absolute-center slds-p-vertical--xx-small" role="listitem">
+                                                    <div class="slds-form-element slds-text-heading--large">
+                                                        Detalhes
+                                                    </div>
+                                                </div>
+                                                <div class="slds-col slds-has-flexi-truncate slds-align--absolute-center slds-p-vertical--xx-small" role="listitem">
+                                                    <div class="slds-form-element slds-text-heading--large">
+                                                        Estado
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="slds-grid slds-gutters_small">
+                                                <div class="slds-col slds-has-flexi-truncate slds-p-vertical--xx-small" role="listitem">
+                                                    <div class="slds-form-element slds-text-heading--medium">
+                                                        Dossiers
+                                                    </div>
+                                                </div>
+                                                <div class="slds-col slds-has-flexi-truncate slds-p-vertical--xx-small" role="listitem">
+                                                    <div class="slds-form-element">
+                                                        <span class="slds-checkbox">
+                                                            <apex:inputCheckbox value="{!dossiers.running}" id="checkbox" disabled="true"/>
+                                                            <apex:outputLabel styleClass="slds-checkbox__label" for="checkbox">
+                                                                running <span class="slds-checkbox--faux"></span>
+                                                            </apex:outputLabel>
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="slds-grid slds-gutters_small">
+                                                <div class="slds-col slds-has-flexi-truncate slds-p-vertical--xx-small" role="listitem">
+                                                    <div class="slds-form-element">
+                                                        Correr página: <apex:inputText value="{!dossiers.pagina}" styleClass="slds-input slds-m-left--small" style="width:auto;"/>
+                                                    </div>
+                                                </div>
+                                                <div class="slds-col slds-has-flexi-truncate slds-p-vertical--xx-small" role="listitem">
+                                                    <div class="slds-form-element">
+                                                        <p>
+                                                            Agendado para
+                                                        </p>
+                                                        <apex:repeat value="{!dossiers.agendamentos}" var="agend">
+                                                            <p>
+                                                                <span class="slds-checkbox">
+                                                                    <apex:inputCheckbox value="{!agend.selected}" id="checkbox2"/>
+                                                                    <apex:outputLabel styleClass="slds-checkbox__label" for="checkbox2">
+                                                                        <span class="slds-checkbox--faux"></span>{!agend.dataAgend}
+                                                                    </apex:outputLabel>
+                                                                </span>
+                                                            </p>
+                                                        </apex:repeat>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="slds-grid slds-gutters_small">
+                                                <div class="slds-col slds-has-flexi-truncate slds-align--absolute-center slds-p-vertical--xx-small" role="listitem">
+                                                    <div class="slds-form-element">
+                                                        <a class="slds-button slds-button_neutral" onclick="correrBatchDossier();">
+                                                            Correr
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                                <div class="slds-col slds-has-flexi-truncate slds-align--absolute-center slds-p-vertical--xx-small" role="listitem">
+                                                    <div class="slds-form-element">
+                                                        <a class="slds-button slds-button_destructive" onclick="terminarBatchDossiers();">
+                                                            Terminar
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="slds-grid slds-gutters_small">
+                                                <div class="slds-col slds-has-flexi-truncate slds-p-vertical--xx-small" role="listitem">
+                                                    <div class="slds-form-element slds-text-heading--medium">
+                                                        Dossiers Web
+                                                    </div>
+                                                </div>
+                                                <div class="slds-col slds-has-flexi-truncate slds-p-vertical--xx-small" role="listitem">
+                                                    <div class="slds-form-element">
+                                                        <span class="slds-checkbox">
+                                                            <apex:inputCheckbox value="{!dossiersWeb.running}" id="checkbox2" disabled="true"/>
+                                                            <apex:outputLabel styleClass="slds-checkbox__label" for="checkbox">
+                                                                running <span class="slds-checkbox--faux"></span>
+                                                            </apex:outputLabel>
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="slds-grid slds-gutters_small">
+                                                <div class="slds-col slds-has-flexi-truncate slds-p-vertical--xx-small" role="listitem">
+                                                    <div class="slds-form-element">
+                                                        Correr página: <apex:inputText value="{!dossiersWeb.pagina}" styleClass="slds-input slds-m-left--small" style="width:auto;"/>
+                                                    </div>
+                                                </div>
+                                                <div class="slds-col slds-has-flexi-truncate slds-p-vertical--xx-small" role="listitem">
+                                                    <div class="slds-form-element">
+                                                        <p>
+                                                            Agendado para
+                                                        </p>
+                                                        <apex:repeat value="{!dossiersWeb.agendamentos}" var="agend"> 
+                                                             <p>
+                                                                <span class="slds-checkbox">
+                                                                    <apex:inputCheckbox value="{!agend.selected}" id="checkbox2"/>
+                                                                    <apex:outputLabel styleClass="slds-checkbox__label" for="checkbox2">
+                                                                        <span class="slds-checkbox--faux"></span>{!agend.dataAgend}
+                                                                    </apex:outputLabel>
+                                                                </span>
+                                                            </p>
+                                                        </apex:repeat>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="slds-grid slds-gutters_small">
+                                                <div class="slds-col slds-has-flexi-truncate slds-align--absolute-center slds-p-vertical--xx-small" role="listitem">
+                                                    <div class="slds-form-element">
+                                                        <a class="slds-button slds-button_neutral" onclick="correrBatchDossierWeb();">
+                                                            Correr
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                                <div class="slds-col slds-has-flexi-truncate slds-align--absolute-center slds-p-vertical--xx-small" role="listitem">
+                                                    <div class="slds-form-element">
+                                                        <a class="slds-button slds-button_destructive" onclick="terminarBatchDossiersWeb();">
+                                                            Terminar
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </apex:outputPanel>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <apex:actionFunction name="correrBatchDossier" action="{!correrBatchDossier}" rerender="sectionContent" oncomplete="spinnerOn(false);"/>
+        <apex:actionFunction name="terminarBatchDossiers" action="{!terminarBatchDossier}" rerender="sectionContent" oncomplete="spinnerOn(false);"/>
+        <apex:actionFunction name="correrBatchDossierWeb" action="{!correrBatchDossierWeb}" rerender="sectionContent" oncomplete="spinnerOn(false);"/>
+        <apex:actionFunction name="terminarBatchDossiersWeb" action="{!terminarBatchDossierWeb}" rerender="sectionContent" oncomplete="spinnerOn(false);"/>
+    </apex:form>
+    <script>
+    function changeSection(ele, parEle){
+        var classList = parEle.classList.value;
+        if(classList.includes("slds-is-open")){
+            parEle.classList.remove("slds-is-open");
+        }else{
+            parEle.classList.add("slds-is-open");
+        }
+        
+    }
+    </script>
+</apex:page>

@@ -1,0 +1,470 @@
+<apex:page standardController="Account" extensions="c_ViewerUtilizadores">
+    <head>
+        <apex:includeScript value="{!URLFOR($Resource.bs, '/jQuery_2_0_3.js')}"/>
+        <apex:includeScript value="{!URLFOR($Resource.swal2, '/sweetalert2.min.js')}"/>
+        
+        <apex:includeScript value="{!URLFOR($Resource.DataTables_1100, 'DataTables-1.10.12/media/js/jquery.dataTables.js')}"/>
+        <apex:includeScript value="{!URLFOR($Resource.jQueryDataTables_TableToolsZip, 'TableTools-2.2.4/js/dataTables.tableTools.js')}"/>
+        
+        <apex:stylesheet value="{!URLFOR($Resource.DataTables_1100, 'DataTables-1.10.12/media/css/jquery.dataTables.css')}"/>
+        <apex:stylesheet value="{!URLFOR($Resource.jQueryDataTables_TableToolsZip, 'TableTools-2.2.4/css/dataTables.tableTools.css')}"/>
+        <style>
+            .swal-icon{
+            box-sizing: content-box !important;
+            }
+            .swal-styled{
+            background-image: inherit;
+            }
+            .swal-container {
+            z-index: 9001;
+            }
+            .swal-button {
+            background-image: inherit;
+            font-size: 14px !important;
+            }
+            .dataTables_wrapper .dataTables_paginate .paginate_button.current{
+            border-radius: 2px;
+            color: #005fb2 !important;
+            transition: color 0.05s linear, background-color 0.05s linear !important;
+            background: linear-gradient(to bottom, white 0%, #f4f6f9 100%);
+            background-color: #f4f6f9;
+            border: 1px solid #d8dde6;
+            }
+            .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover{
+            background: linear-gradient(to bottom, white 0%, #f4f6f9 100%);
+            }
+            .dataTables_wrapper .dataTables_paginate .paginate_button:hover{
+            background: linear-gradient(to bottom, #005fb2 0%, #0070d2 100%);
+            border: 1px solid transparent;
+            }
+            table.dataTable.no-footer {
+            border-bottom: none;
+            }
+            table.dataTable thead th, table.dataTable thead td {
+            border-bottom: none;
+            }
+            
+            .dataTables_filter{
+            margin: 1rem;
+            }
+            
+            .dataTables_filter input{
+            background-color: white;
+            color: #16325c;
+            border: 1px solid #d8dde6;
+            border-radius: 0.25rem;
+            width: 100%;
+            transition: border 0.1s linear, background-color 0.1s linear;
+            display: inline-block;
+            padding: 0 1rem 0 0.75rem;
+            line-height: 1.875rem;
+            min-height: calc(1.875rem + (1px * 2));
+            }
+            .dataTables_filter input:focus, input:active{
+            outline: 0;
+            border-color: #1589ee;
+            background-color: white;
+            box-shadow: 0 0 3px #0070D2;
+            }
+            .dataTables_length select{
+            background-color: white;
+            color: #16325c;
+            border: 1px solid #d8dde6;
+            border-radius: 0.25rem;
+            width: 5rem;
+            transition: border 0.1s linear, background-color 0.1s linear;
+            display: inline-block;
+            padding: 0 1rem 0 0.75rem;
+            line-height: 1.875rem;
+            min-height: calc(1.875rem + (1px * 2));
+            }
+            .dataTables_length select:focus, select:active{
+            outline: 0;
+            border-color: #1589ee;
+            background-color: white;
+            box-shadow: 0 0 3px #0070D2;
+            }
+            .dataTables_length{
+            //margin-top: 1.5rem;
+            //width: 12rem;
+            display:none;
+            }  
+            table.dataTable thead .sorting::after{
+            display:none;
+            }
+            table.dataTable thead .sorting_asc::after {
+            display:none;
+            }
+            table.dataTable thead .sorting_desc::after {
+            display:none;
+            } 
+        </style>
+        <!-- Modal Toggle Script -->
+        <script>
+        j$ = jQuery.noConflict();
+        
+        //Modal Open
+        function openModal(modal){
+            j$('#backdrop').addClass('slds-backdrop--open');
+            j$('#modal_'+modal).addClass('slds-fade-in-open');
+        }//);
+        
+        //Modal Close
+        function closeModal(modal){
+            j$('#modal_' + modal).removeClass('slds-fade-in-open');
+            j$('#backdrop').removeClass('slds-backdrop--open');
+        }        
+        function spinnerOn(activated){
+            if(activated){
+                document.getElementById("spinner").style.display = "block";   
+            }else{
+                document.getElementById("spinner").style.display = "none";
+            }
+        }
+        function buttonsEnabled(enabled) {
+            // retrieve all of the buttons or links on the page
+            // with the css class of btn
+            var $buttons = jQuery('.btn');
+            if (enabled === false) {
+                // add the btnDisabled class to give it the look of being disabled
+                // add the disabled attribute to actually disable interactability
+                $buttons.toggleClass('btnDisabled', true).attr('disabled', 'disabled');
+            } else {
+                // remove the css class and the disabled attribute
+                $buttons.toggleClass('btnDisabled', false).attr('disabled', null);
+            } 
+        }
+        function tablesort(){
+            j$("[id$='dataTable1']").dataTable({
+                scrollY: 250,
+                "bDestroy": true,
+                "sPaginationType": "full_numbers",
+                "iDisplayLength": 5,
+                "aLengthMenu": [[5, 10, 25, 50, 100, 150, -1], [5, 10, 25, 50, 100, 150, "All"]],
+                "aoColumnDefs" : [],
+                "oLanguage": {
+                    "sProcessing":   "Processing...",
+                    "sLengthMenu":   "Show _MENU_ records",
+                    "sZeroRecords":  "No results found",
+                    "sInfo":         "_START_ to _END_ of _TOTAL_ total records",
+                    "sInfoEmpty":    "0 of 0 records",
+                    "sInfoFiltered": "(filtered of _MAX_ total records)",
+                    "sInfoPostFix":  "",
+                    "sSearch":       "Search:",
+                    "sUrl":          "",
+                    "oPaginate": {
+                        "sFirst":    "<<",
+                        "sPrevious": "<",
+                        "sNext":     ">",
+                        "sLast":     ">>"
+                    }
+                }
+            });
+        }
+        </script>
+    </head>
+    <apex:outputPanel id="errorMessages">
+        <apex:pageMessages escape="false"></apex:pageMessages>
+    </apex:outputPanel>
+    <apex:slds />
+    <apex:form >            
+        <apex:actionFunction name="resetPass" reRender="panelContent,errorMessages" action="{!clearPass}">
+            <apex:param assignTo="{!utilizador}" name="p1" value=""/>
+        </apex:actionFunction>
+        <div class="slds-scope">
+            <div class="slds-page-header">
+                <div class="slds-media">
+                    <div class="slds-media__figure">
+                        <span class="slds-icon_container slds-icon-standard-account">
+                            <svg class="slds-icon" aria-hidden="true">
+                                <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{!URLFOR($Asset.SLDS , '/assets/icons/standard-sprite/svg/symbols.svg#account')}"></use>
+                            </svg>
+                        </span>
+                    </div>
+                    <div class="slds-media__body">  
+                        <h1 class="slds-page-header__title slds-truncate slds-align-middle">{!$Label.Utilizadores_do_Site}</h1>
+                        <p class="slds-text-body_small slds-line-height_reset">{!Account.Name}</p>
+                    </div>
+                    <div class="slds-form-element">
+                        <a class="slds-button slds-button_brand" onclick="openModal('newUser');">{!$Label.Novo_Utilizador}</a>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <apex:actionFunction name="init" action="{!init}" rerender="tablePanel, newUserContent,errorMessages" oncomplete="tablesort();"/>
+                <apex:actionFunction name="submitUserServer" action="{!submitUser}" reRender="newUserSucessPanel,errorMessages" oncomplete="spinnerOn(false);newUserSucess();"/>
+                <script>
+                document.addEventListener("DOMContentLoaded", function(event) {
+                    init();
+                });
+
+                </script>
+                <apex:outputPanel id="newUserSucessPanel">
+                    <script>
+                    function newUserSucess(){
+                        if({!sucessNewUser}){
+                            swal('{!$Label.Sucesso}!','{!newUserMessage}','success').then((value) => {
+                                init();
+                            });
+                        }else{
+                            swal('{!$Label.Erro}','{!newUserMessage}','error').then((value) => {
+                                openModal('newUser');
+                            });
+                        }
+                    }
+                    </script>
+                </apex:outputPanel>
+                <apex:outputPanel id="tablePanel">
+                    
+                    <apex:variable id="index" value="{!0}" var="c"/>
+                    <apex:dataTable value="{!utilizadores}" var="user" id="dataTable1" styleClass="slds-table slds-table_bordered slds-table_cell-buffer" headerClass="slds-text-body_small">
+                        <apex:column >
+                            <apex:variable id="index" value="{!c + 1}" var="c"/>
+                            {!c}
+                        </apex:column>
+                        <apex:column value="{!user.idClienteERP}" headerValue="{!$ObjectType.Account.Fields.Numero_de_cliente__c.Label}"/>
+                        <apex:column value="{!user.clienteUsername}" headerValue="{!$Label.Utilizador}"/>
+                        <apex:column value="{!user.clienteEmail}" headerValue="{!$ObjectType.Contact.Fields.Email.Label}"/>
+                        <apex:column headerValue="{!$Label.Ativo}">
+                            <div class="slds-form-element__control">
+                                <span class="slds-checkbox">
+                                    <apex:inputCheckbox disabled="true" value="{!user.activo}" id="checkbox"/>
+                                    <apex:outputLabel styleClass="slds-checkbox__label" for="checkbox">
+                                        <span class="slds-checkbox--faux"></span>
+                                    </apex:outputLabel>
+                                </span>
+                            </div>
+                        </apex:column>
+                        <apex:column headerValue="{!$Label.Pode_encomendar}">
+                            <div class="slds-form-element__control">
+                                <span class="slds-checkbox">
+                                    <apex:inputCheckbox disabled="true" value="{!user.podeEncomendar}" id="checkbox2"/>
+                                    <apex:outputLabel styleClass="slds-checkbox__label" for="checkbox2">
+                                        <span class="slds-checkbox--faux"></span>
+                                    </apex:outputLabel>
+                                </span>
+                            </div>
+                        </apex:column>
+                        <apex:column >
+                            <button class="toggleBtn slds-button slds-button--neutral slds-float--right" type="button" onclick="resetPass('{!user.clienteUsername}');openModal('modal');">{!$Label.Repor_password}</button>
+                            <a class="slds-button slds-button--neutral slds-float--right slds-m-right--x-small" onclick="spinnerOn(true);confirmaInactivar('{!user.clienteUsername}');">{!$Label.Inativar}</a>
+                        </apex:column>
+                    </apex:dataTable>
+                </apex:outputPanel>
+            </div>
+            <div class="slds-modal" aria-hidden="false" role="dialog" id="modal_modal">
+                <div class="slds-modal__container">
+                    <div class="slds-modal__header">
+                        <button class="slds-button slds-button--icon-inverse slds-modal__close" onclick="closeModal('modal')" type="button">
+                            <div class="slds-icon_container slds-icon-utility-close">
+                                <svg class="slds-icon slds-icon-text-default" aria-hidden="false">
+                                    <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{!URLFOR($Asset.SLDS , '/assets/icons/utility-sprite/svg/symbols.svg#close')}"></use>
+                                </svg>
+                                <span class="slds-assistive-text"></span>
+                            </div>
+                        </button>
+                        <h2 class="slds-text-heading--medium">{!$Label.Nova_password}</h2>
+                    </div>
+                    <div class="slds-modal__content slds-p-around--medium">
+                        <apex:outputPanel id="panelContent">
+                            <fieldset class="slds-form--compound" >
+                                <div class="slds-form-element__group ">
+                                    <div class="slds-form-element__row">
+                                        <div class="slds-form-element">
+                                            <apex:outputLabel styleClass="slds-form-element__label slds-size--1-of-1" for="userName">{!$Label.Utilizador}</apex:outputLabel>
+                                            <apex:outputText id="userName" styleClass="slds-text-heading_small">{!utilizador}</apex:outputText> 
+                                        </div>
+                                        <div class="slds-form-element">
+                                            <apex:outputLabel styleClass="slds-form-element__label" for="userName">{!$Label.Nova_password}</apex:outputLabel>
+                                            <apex:inputText value="{!newPassword}" styleClass="slds-input"/>
+                                        </div>
+                                    </div>
+                                    
+                                </div>
+                            </fieldset>
+                            
+                        </apex:outputPanel>
+                    </div>
+                    <div class="slds-modal__footer">
+                        <button class="slds-button slds-button--neutral" onclick="closeModal('modal')" type="button">{!$Label.Cancelar}</button>
+                        <apex:commandButton reRender="sucessPanel" value="{!$Label.Restabelecer}" styleClass="slds-button slds-button--brand" onclick="buttonsEnabled(false);"
+                                            action="{!resetPassword}" oncomplete="closeModal('modal');checksucess();buttonsEnabled(true);"/>
+                        <apex:outputPanel id="sucessPanel">
+                            <script>
+                            function checksucess(){
+                                if({!sucessReset}){
+                                    swal('{!$Label.Sucesso}!','{!$Label.Password_alterada}','success');
+                                }else{
+                                    swal('{!$Label.Erro}','{!$Label.Password_nao_alterada}','error');  
+                                }
+                            }
+                            </script>
+                        </apex:outputPanel>
+                    </div>
+                </div>
+            </div>
+            <div class="slds-modal" aria-hidden="false" role="dialog" id="modal_newUser">
+                <div class="slds-modal__container">
+                    <div class="slds-modal__header">
+                        <button class="slds-button slds-button--icon-inverse slds-modal__close" onclick="closeModal('newUser')" type="button">
+                            <div class="slds-icon_container slds-icon-utility-close">
+                                <svg class="slds-icon slds-icon-text-default" aria-hidden="false">
+                                    <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{!URLFOR($Asset.SLDS , '/assets/icons/utility-sprite/svg/symbols.svg#close')}"></use>
+                                </svg>
+                                <span class="slds-assistive-text"></span>
+                            </div>
+                        </button>
+                        <h2 class="slds-text-heading--medium">{!$Label.Novo_Utilizador}</h2>
+                    </div>
+                    <div class="slds-modal__content slds-p-around--medium">
+                        <apex:outputPanel id="newUserContent">
+                            <div class="slds-notify slds-notify_alert slds-theme_alert-texture slds-theme_error slds-hide" role="alert" id="modal_alertCampos">
+                                <h2>
+                                    {!$Label.Campos_obrigatorios}
+                                </h2>
+                            </div>
+                            <div class="slds-form" role="list">
+                                <div class="slds-grid slds-gutters_small">
+                                    <div class="slds-col slds-has-flexi-truncate" role="listitem">
+                                        <div class="slds-form-element slds-form-element_edit slds-hint-parent">
+                                            <span class="slds-form-element__label">Username</span>
+                                            <div class="slds-form-element__control">
+                                                <span class="slds-form-element__static">
+                                                    <apex:inputText value="{!novoUser.username}" styleClass="slds-input mandatoryInput"/>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="slds-col slds-has-flexi-truncate" role="listitem">
+                                        <div class="slds-form-element slds-form-element_edit slds-hint-parent">
+                                            <span class="slds-form-element__label">Password</span>
+                                            <div class="slds-form-element__control">
+                                                <span class="slds-form-element__static">
+                                                    <apex:inputText value="{!novoUser.password}" styleClass="slds-input mandatoryInput"/>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="slds-grid slds-gutters_small">
+                                    <div class="slds-col slds-has-flexi-truncate" role="listitem">
+                                        <div class="slds-form-element slds-form-element_edit slds-hint-parent">
+                                            <span class="slds-form-element__label">{!$ObjectType.Account.fields.Email__c.Label}</span>
+                                            <div class="slds-form-element__control">
+                                                <span class="slds-form-element__static">
+                                                    <apex:inputText value="{!novoUser.email}" styleClass="slds-input mandatoryInput"/>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="slds-grid slds-gutters_small">
+                                    <div class="slds-col slds-has-flexi-truncate" role="listitem">
+                                        <div class="slds-form-element slds-form-element_edit slds-hint-parent">
+                                            <span class="slds-form-element__label">{!$ObjectType.Account.fields.Idioma__c.Label}</span>
+                                            <div class="slds-form-element__control">
+                                                <span class="slds-form-element__static">
+                                                    <apex:selectList value="{!novoUser.lingua}" size="1" styleClass="slds-input mandatoryInput">
+                                                        <apex:selectOptions value="{!linguas}"/>
+                                                    </apex:selectList>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="slds-col slds-has-flexi-truncate" role="listitem">
+                                        <div class="slds-form-element slds-form-element_edit slds-hint-parent">
+                                            <span class="slds-form-element__label">{!$Label.Tipo_de_acesso}</span>
+                                            <div class="slds-form-element__control">
+                                                <span class="slds-form-element__static">
+                                                    <apex:selectList value="{!novoUser.tipoDeAcesso}" size="1" styleClass="slds-input mandatoryInput">
+                                                        <apex:selectOptions value="{!acessos}"/>
+                                                    </apex:selectList>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </apex:outputPanel>
+                    </div>
+                    <div class="slds-modal__footer">
+                        <button class="slds-button slds-button--destructive" onclick="closeModal('newUser')" type="button">{!$Label.Cancelar}</button>
+                        <button class="slds-button slds-button--success" style="color:white;" onclick="submitUserJS()" type="button">{!$Label.Submeter}</button>
+                    </div>
+                    <script>
+                    function submitUserJS(){
+                        var eles = document.getElementsByClassName("mandatoryInput");
+                        
+                        var alert = document.getElementById("modal_alertCampos");
+                        alert.classList.add("slds-hide");
+                        
+                        var valid = true;
+                        
+                        for(var i = 0; i < eles.length ; i++){
+                            eles[i].parentElement.classList.remove("slds-has-error");
+                            if(eles[i].value == '' || eles[i].value == null){
+                                eles[i].parentElement.classList.add("slds-has-error");
+                                valid = false;
+                            }
+                        }
+                        
+                        if(valid){
+                            spinnerOn(true);
+                            closeModal('newUser');
+                            submitUserServer();
+                        }else{
+                            alert.classList.remove("slds-hide");
+                        }
+                    }
+                    </script>
+                </div>
+            </div>
+            <div class="slds-backdrop" id="backdrop"></div>
+            <div class="slds-spinner_container" style="display: none; position: fixed;" id="spinner">
+                <div role="status" class="slds-spinner slds-spinner--medium">
+                    <span class="slds-assistive-text">Loading</span>
+                    <div class="slds-spinner__dot-a"></div>
+                    <div class="slds-spinner__dot-b"></div>
+                </div>
+            </div>
+        </div>
+        <apex:actionFunction name="inactivarUser" action="{!inactivarUser}" rerender="inativarSucesso,errorMessages" oncomplete="checkAutorizarSucess();">
+            <apex:param name="p1" assignTo="{!utilizador}" value=""/>
+        </apex:actionFunction>
+        <apex:outputPanel id="inativarSucesso">
+        	<script>
+            function checkAutorizarSucess(){
+                spinnerOn(false);
+                console.log({!sucessInactivar});
+                if({!sucessInactivar}){
+                    swal("{!$Label.Sucesso}")
+                    .then((willSend) => {
+                        location.reload();
+                    });
+                    }else{
+                        swal("", "{!newUserMessage}", "error");
+                    }
+                }
+            </script>
+        </apex:outputPanel>
+    </apex:form>
+    <script>
+    function confirmaInactivar(user){
+        swal({
+            title: "{!$Label.Tem_a_certeza}",
+            text: "{!$Label.Este_user_ficara_inativo}",
+            icon: "warning",
+            buttons: true,
+            dangerMode: true,
+        })
+        .then((willSend) => {
+            if (willSend) {
+                spinnerOn(true);
+            	inactivarUser(user);
+        	}else{
+                spinnerOn(false);
+            }
+        });
+    }
+    </script>
+</apex:page>

@@ -1,0 +1,78 @@
+<apex:page standardController="Lead" extensions="c_OutboundCall">
+    <style type="text/css">
+        .btn {
+        border: 1px solid #e0e5ee !important;
+        border-radius: 3px !important;
+        box-shadow: none !important;
+        cursor: default !important;
+        font-size: 12px !important;
+        height: auto !important;
+        outline: 0 !important;
+        font-weight: normal !important;
+        font-family: 'SalesforceSans-Regular',Helvetica,Arial,sans-serif !important;
+        color: #0070d2 !important;
+        text-align: center !important;
+        white-space: nowrap !important;
+        line-height: 24px !important;
+        padding: 0 9px !important;
+        background-color: #f4f5f7 !important;
+        background-image: none !important;
+        }
+        .btn:hover{
+        background-color: #e7edf4 !important;
+        text-decoration: none !important;
+        }
+        .bPageBlock {
+        border-top-width: 0px !important;
+        }
+        body .bPageBlock {
+        margin: 0px !important;
+        background-color: white !important;
+        /*border-width: 0px !important;*/
+        }
+        .bPageBlock.apexDefaultPageBlock .pbHeader>table{
+        border-bottom-width: 0px !important;
+        padding: 0px !important;
+        }
+        .apexp .bPageBlock.apexDefaultPageBlock .pbBottomButtons {
+        border-top-width: 0px !important;
+        margin-top: 0px !important;
+        }
+        .apexp .bPageBlock.apexDefaultPageBlock .pbBody {
+        font-size: 10pt !important;
+        }
+        font {
+        font-family: Arial,Helvetica,sans-serif !important;
+        font-weight: bold !important;
+        }
+    </style>
+    <div>
+        <flow:interview rendered="{!userLang = 'pt_BR'}" name="Outbound_lead_pt_Br">
+            <apex:param name="LeadID" value="{!ContaID}"/>
+        </flow:interview>
+        <flow:interview rendered="{!userLang = 'de'}" name="Outbound_lead_de">
+            <apex:param name="LeadID" value="{!ContaID}"/>
+        </flow:interview>
+        <flow:interview rendered="{!userLang = 'en_US'}" name="Outbound_lead_en_US">
+            <apex:param name="LeadID" value="{!ContaID}"/>
+        </flow:interview>
+        <flow:interview rendered="{!userLang = 'es'}" name="Outbound_lead_es">
+            <apex:param name="LeadID" value="{!ContaID}"/>
+        </flow:interview>
+        <flow:interview rendered="{!userLang = 'fr'}" name="Outbound_lead_fr">
+            <apex:param name="LeadID" value="{!ContaID}"/>
+        </flow:interview>
+        <flow:interview rendered="{!userLang = 'it'}" name="Outbound_lead_it">
+            <apex:param name="LeadID" value="{!ContaID}"/>
+        </flow:interview>
+        <flow:interview rendered="{!userLang = 'nl'}" name="Outbound_lead_nl">
+            <apex:param name="LeadID" value="{!ContaID}"/>
+        </flow:interview>
+        <flow:interview rendered="{!userLang = 'pl'}" name="Outbound_lead_pl">
+            <apex:param name="LeadID" value="{!ContaID}"/>
+        </flow:interview>
+        <flow:interview rendered="{!userLang = 'ru'}" name="Outbound_lead_ru">
+            <apex:param name="LeadID" value="{!ContaID}"/>
+        </flow:interview>
+    </div>
+</apex:page>

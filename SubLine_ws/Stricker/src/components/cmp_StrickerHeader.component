@@ -1,0 +1,76 @@
+<apex:component >
+    <style>
+        .slds-scope .cmp .slds-page-header{
+        width: 100%;
+        display: block;
+        background: rgba(0,130,190,0.8);
+        padding: 0.6rem;
+        }
+        .colMenu > a {
+        align-self: center;
+        margin: auto;
+        padding: 0.5rem;
+        color: #FFFFFF;
+        font: 700 0.71vw/100% "Montserrat",font70108,Arial,Helvetica,sans-serif;
+        letter-spacing: 1pt;
+        text-transform: uppercase;
+        }
+        .colMenu {
+        text-align: center;
+        }
+        .slds-scope a:hover, .slds-scope a:focus {
+        text-decoration: inherit;
+        color: #FFFFFF;
+        opacity: 0.75;
+        cursor: pointer;
+        }
+    </style>
+    <div class="cmp">
+        
+        <div class="slds-page-header">
+            <div class="slds-media">
+                <div class="slds-media__body">
+                    <div class="slds-grid slds-wrap">
+                        <div class="slds-size_3-of-12">
+                            &nbsp;
+                        </div>
+                        <div class="slds-size_6-of-12">
+                            <table>
+                                <tr>
+                                    <td class="colMenu slds-size_1-of-6">
+                                        <a href="https://www.stricker-europe.com/en/">
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 176 47" style="background-color:#ffffff00;height: 41px;width: 154px;fill: #FFFFFF;">
+                                                <g id="Layer%201" style="fill: #FFFFFF;">
+                                                    <path style="fill: #FFFFFF;" d="M 44.5252 0 L 2.9673 0 C 1.3308 0 0 1.3174 0 2.9388 L 0 44.0605 C 0 45.6823 1.3308 47 2.9673 47 L 44.5252 47 C 46.1672 47 47.4971 45.6823 47.4971 44.0605 L 47.4971 2.9388 C 47.4971 1.3174 46.1672 0 44.5252 0 ZM 13.0309 20.5369 C 13.0309 20.5369 13.0309 16.4751 16.0283 13.5155 L 24.9354 4.7012 L 32.6505 4.7012 L 21.3708 15.8603 C 21.3708 15.8603 18.9434 18.2645 18.9434 21.7081 L 18.9434 23.5004 L 13.0309 23.5004 L 13.0309 20.5369 ZM 34.4343 26.4631 C 34.4343 26.4631 34.4343 30.5217 31.4399 33.4876 L 22.5321 42.3016 L 14.8148 42.3016 L 26.0999 31.1343 C 26.0999 31.1343 28.5214 28.7324 28.5214 25.2887 L 28.5214 23.5004 L 34.4343 23.5004 L 34.4343 26.4631 ZM 28.5001 18.796 C 28.5001 18.796 26.7168 20.5861 26.7168 22.9112 L 26.7168 23.5004 L 26.7168 25.2865 C 26.7168 25.2865 26.7168 28.2008 24.3405 30.5483 L 12.4687 42.3016 L 4.7484 42.3016 L 18.9979 28.2008 C 18.9979 28.2008 20.7784 26.4115 20.7784 24.0856 L 20.7784 23.5004 L 20.7784 21.7105 C 20.7784 21.7105 20.7784 18.8014 23.1545 16.4506 L 35.0284 4.7012 L 42.7471 4.7012 L 28.5001 18.796 Z"></path>
+                                                </g>
+                                            </svg>
+                                        </a>
+                                    </td>
+                                    <td class="colMenu slds-size_1-of-6">
+                                        <a href="https://www.stricker-europe.com/en/stricker/">{!$Label.Stricker}</a>
+                                    </td>
+                                    <td class="colMenu slds-size_1-of-6">
+                                        <a href="http://www.hideagifts.com/">{!$Label.CATALOGO}</a>
+                                    </td>
+                                    <td class="colMenu slds-size_1-of-6">
+                                        <a href="https://www.stricker-europe.com/en/idyourself/">{!$Label.IDYOURSELF}</a>
+                                    </td>
+                                    <td class="colMenu slds-size_1-of-6">
+                                        <a href="https://www.stricker-europe.com/en/client-area/downloads/">{!$Label.DESCARREGAMENTOS}</a>
+                                    </td>
+                                    <td class="colMenu slds-size_1-of-6">
+                                        <a href="https://www.stricker-europe.com/en/contacts/">{!$Label.CONTACTOS}</a>
+                                    </td>
+                                </tr>
+                            </table>
+                            
+                        </div>
+                        <div class="slds-size_3-of-12">
+                            &nbsp;
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</apex:component>

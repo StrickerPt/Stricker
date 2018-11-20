@@ -1,0 +1,164 @@
+<apex:page standardController="Lead" extensions="c_FindDuplicates" tabStyle="Lead">
+    <head>
+        <apex:includeScript value="{!URLFOR($Resource.bs, '/jQuery_2_0_3.js')}"/>
+        <apex:includeScript value="/support/console/39.0/integration.js"/>
+        
+        <apex:includeScript value="{!URLFOR($Resource.bs, '/js/bootstrap.js')}"/>
+        <apex:includeScript value="{!URLFOR($Resource.bs, '/js/bootstrap-typeahead.js')}"/>
+        <apex:stylesheet value="{!URLFOR($Resource.bs, '/css/bootstrap.css')}"/>
+        <apex:stylesheet value="{!URLFOR($Resource.bs, '/css/bootstrap-theme.css')}"/>
+        <style>
+            .messageTable{
+            width : auto !important;
+            }
+        </style>
+    </head>
+    <apex:slds />
+    <div class="slds-scope">
+        <apex:form id="frm">
+            <div class="slds-page-header">
+                <div class="slds-media">
+                    <div class="slds-media__figure">
+                        <span class="slds-icon_container slds-icon-standard-lead" title="Description of icon when needed">
+                            <svg class="slds-icon" aria-hidden="true">
+                                <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{!URLFOR($Asset.SLDS , '/assets/icons/standard-sprite/svg/symbols.svg#lead')}"></use>
+                            </svg>
+                        </span>
+                    </div>
+                    <div class="slds-media__body">
+                        <h1 class="slds-page-header__title slds-truncate slds-align-middle">{!Lead.Name}</h1>
+                        <p class="slds-text-body_small slds-line-height_reset">{!$Label.Encontrar_Duplicados}</p>
+                    </div>
+                </div>
+            </div>
+            <apex:actionFunction name="assignValue" action="{!assignValue}" rerender="dummy">
+                <apex:param name="p1" assignTo="{!fieldToChange}" value=""/>
+                <apex:param name="p2" assignTo="{!leadValue}" value=""/>
+            </apex:actionFunction>
+            <apex:actionFunction name="mergeLeads" action="{!mergeLeads}" rerender="dummy" oncomplete="redirect();"/>
+            <apex:variable id="index" value="{!0}" var="c"/>
+            
+            <apex:outputPanel id="dummy">
+                <apex:pageMessages escape="true"/>
+                <script>
+                function redirect(){
+                    if({!isSucess}){
+                        doRedirect();
+                    }else{
+                        console.log("nop");
+                    }
+                }
+                function doRedirect(){
+                    if(sforce.console.isInConsole()){
+                        var openPrimaryTab = function openPrimaryTab(result) {
+                            sforce.console.openPrimaryTab(result.id, "{!finalLead.Id}", true);
+                        };
+                        sforce.console.getFocusedPrimaryTabId(openPrimaryTab);
+                        
+                    }else{
+                        window.open("{!finalLead.Id}", "_self");
+                    }
+                }
+                </script>
+            </apex:outputPanel>
+            <apex:dataTable value="{!fields}" var="field" styleClass="slds-table slds-table_bordered slds-table_cell-buffer"
+                            headerClass="slds-text-title_caps">
+                <apex:column headerValue="{!$Label.Nome_do_campo}">
+                    <apex:variable id="index" value="{!c + 1}" var="c"/>
+                    {!field.Label}
+                </apex:column>
+                <apex:repeat value="{!leads}" var="lead">
+                    <apex:column headerValue="{!lead.Name}">
+                        
+                        <span class="slds-radio">
+                            <input type="radio" id="radio-{!c}{!lead.Id}" name="{!c}" onclick="assignValue('{!field}', '{!lead.Id}');"/>
+                            
+                            <label class="slds-radio__label" for="radio-{!c}{!lead.Id}">
+                                <span class="slds-radio_faux"></span>
+                                <span class="slds-form-element__label">{!lead[field]}</span>
+                            </label>
+                        </span>
+                        <script>
+                        var a = checkDisabled();
+                        function checkDisabled(){
+                            if({!existsNewRecord}){
+                                if({!lead.RecordType.Name == 'Novo registo site'}){
+                                    if({!And(lead.Id != finalLead.Id, finalLead.RecordType.Name != 'Novo registo site')}){
+                                        if("{!If(CONTAINS(lockedFields, field), 'true', 'false')}" == "true"){
+                                            var ele = document.getElementById('radio-{!c}{!lead.Id}');
+                                            ele.setAttribute("checked", "true");
+                                        }
+                                    }else if({!lead.Id = finalLead.Id}){
+                                        if("{!If(CONTAINS(lockedFields, field), 'true', 'false')}" == "true"){
+                                            var ele = document.getElementById('radio-{!c}{!lead.Id}');
+                                            ele.setAttribute("checked", "true");
+                                        }
+                                    }
+                                }else if("{!If(CONTAINS(lockedFields, field), 'true', 'false')}" == "true"){
+                                    document.getElementById('radio-{!c}{!lead.Id}').setAttribute("disabled", "true");
+                                }
+                            }
+                        };
+                        </script>
+                    </apex:column>
+                    
+                </apex:repeat>
+            </apex:dataTable>
+            <apex:commandButton value="{!$Label.Fundir}" rerender="dummy" id="toggleBtn"
+                                styleClass="toggleBtn slds-button slds-button--brand slds-float--right slds-m-around--xx-large slds-size_1-of-8 slds-text-body_regular"/>
+            <apex:commandButton value="{!$Label.Cancelar}" onclick="doRedirect();"
+                                styleClass="slds-button slds-button--destructive slds-float--right slds-m-around--xx-large slds-size_1-of-8 slds-text-body_regular"/>
+            
+            <div class="slds-modal" aria-hidden="false" role="dialog" id="modal">
+                <div class="slds-modal__container">
+                    <div class="slds-modal__header">
+                        <button class="slds-button slds-button--icon-inverse slds-modal__close" onclick="closeModal()" type="button">
+                            <div class="slds-icon_container slds-icon-utility-close">
+                                <svg class="slds-icon slds-icon-text-default" aria-hidden="false">
+                                    <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{!URLFOR($Asset.SLDS , '/assets/icons/utility-sprite/svg/symbols.svg#close')}"></use>
+                                </svg>
+                            </div>
+                        </button>
+                        <h2 class="slds-text-heading--medium"></h2>
+                    </div>
+                    <div class="slds-modal__content slds-p-around--medium">
+                        <apex:dataTable value="{!mergeLeads}" var="var" styleClass="slds-table slds-table_bordered slds-table_cell-buffer">
+                            <apex:column headerValue="{!$Label.Selecionado}">
+                                <div class="slds-form-element__control">
+                                    <span class="slds-checkbox">
+                                        <apex:inputCheckbox disabled="{!var.lead.Id = Lead.Id}" value="{!var.selected}" id="checkbox"/>
+                                        <apex:outputLabel styleClass="slds-checkbox__label" for="checkbox">
+                                            <span class="slds-checkbox--faux"></span>
+                                        </apex:outputLabel>
+                                    </span>
+                                </div>
+                            </apex:column>
+                            <apex:column value="{!var.lead.Name}" headerValue="{!$ObjectType.Lead.Fields.Name.Label}"/>
+                        </apex:dataTable>
+                    </div>
+                    <div class="slds-modal__footer">
+                        <button class="slds-button slds-button--neutral" onclick="closeModal()" type="button">{!$Label.Cancelar}</button>
+                        <button class="slds-button slds-button--neutral slds-button--brand" type="button" onclick="mergeLeads();closeModal();">{!$Label.Gravar}</button>
+                    </div>
+                </div>
+            </div>
+            <div class="slds-backdrop" id="backdrop"></div>
+            <!-- Modal Toggle Script -->
+            <script>
+            j$ = jQuery.noConflict();
+            
+            //Modal Open
+            j$('.toggleBtn').click(function(){
+                j$('#backdrop').addClass('slds-backdrop--open');
+                j$('#modal').addClass('slds-fade-in-open');
+            });
+            
+            //Modal Close
+            function closeModal(){
+                j$('#modal').removeClass('slds-fade-in-open');
+                j$('#backdrop').removeClass('slds-backdrop--open');
+            }
+            </script>
+        </apex:form>
+    </div>
+</apex:page>

@@ -1,0 +1,616 @@
+<apex:page controller="c_MaquetesPipeline" readOnly="true">
+    
+    <apex:includeScript value="/support/console/39.0/integration.js"/>
+    <apex:includeScript value="{!URLFOR($Resource.bs, '/jQuery_2_0_3.js')}"/>
+    <apex:slds />
+    <style>
+        .subLine > td{
+        background-color:#efefef;
+        }
+        .subLine:hover > td{
+        background-color:#efefef !important;
+        
+        }
+        .subLine:hover{
+        background-color:#efefef;
+        }
+        t{
+        cursor:pointer;
+        }
+        .colorRed{
+        color:red;
+        }
+        .colorOrange{
+        color:orange;
+        }
+        .colorGreen{
+        color:green;
+        }
+    </style>
+    <script>
+    window.onload =  function() {
+        startTime();
+        
+        var currentCookie = getCookie(cookieName);
+        if(currentCookie == null){
+            setTabs("1");
+        }else{
+            setTabs(currentCookie);
+        }
+        
+        var setTabTitle= function setTabTitle(result) {
+            
+            sforce.console.setTabTitle('Pipeline Maquetes', null);
+        };
+        
+        sforce.console.getFocusedSubtabId(setTabTitle);
+    }
+    var timeout = setTimeout("location.reload(true);",30000);
+    
+    function startTime() {
+        var today = new Date();
+        
+        var h = today.getHours();
+        var m = today.getMinutes();
+        var s = today.getSeconds();
+        m = checkTime(m);
+        s = checkTime(s);
+        document.getElementById('txt').innerHTML =
+            h + ":" + m + ":" + s;
+        var t = setTimeout(startTime, 500);
+    }
+    function checkTime(i) {
+        if (i < 10) {i = "0" + i};  // add zero in front of numbers < 10
+        return i;
+    }
+    function showTab(ele){
+        var actives = document.getElementsByClassName("slds-is-active");
+        for(var i = 0; i < actives.length; i++){
+            actives[i].classList.remove("slds-is-active");
+        }
+        
+        var activeHeader = document.getElementById(ele.parentElement.id).classList.add("slds-is-active");
+        
+        var actives2 = document.getElementsByClassName("slds-show");
+        for(var i = 0; i < actives2.length; i++){
+            var a = actives2[i];
+            a.classList.remove("slds-show");
+            a.classList.add('slds-hide');
+        }
+        
+        var toActivate = document.getElementById(ele.getAttribute("aria-controls"));
+        
+        toActivate.classList.add('slds-show');
+        toActivate.classList.remove('slds-hide');
+        setCookie();
+    }
+    j$ = jQuery.noConflict();
+    var cookieName = "nTab";
+    function setTabs(nTab){
+        var header = j$('.li'+nTab)[0];
+        showTab(header);
+    }
+    function setCookie(){
+        var text = j$('.slds-show')[0].id.slice(-1);
+        document.cookie= cookieName + "=" + text + ";";
+    }
+    function getCookie(name){
+        var value = "; " + document.cookie;
+        var parts = value.split("; " + name + "=");
+        if (parts.length == 2) return parts.pop().split(";").shift();
+    }
+    </script>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js">
+    </script>
+    <script type="text/javascript">
+    google.charts.load('current', {'packages':['gauge']});
+    google.charts.setOnLoadCallback(drawChart);
+    
+    function drawChart() {
+        //grafico manometro
+        var data = google.visualization.arrayToDataTable([
+            ['Label', 'Value'],
+            ['Ritmo', {!nMaqsTotal}]
+        ]);
+        
+        var options = {
+            width: {!manometro.Width__c}, height: {!manometro.Height__c},
+            redFrom: {!manometro.Red_From__c}, redTo: {!manometro.Red_To__c},
+            yellowFrom:{!manometro.Yellow_From__c}, yellowTo: {!manometro.Yellow_To__c},
+            greenFrom: {!manometro.Green_From__c}, greenTo: {!manometro.Green_To__c},
+            minorTicks: 5, max: {!manometro.Green_To__c}
+        };
+        
+        var chart = new google.visualization.Gauge(document.getElementById('chart_div'));
+        
+        chart.draw(data, options);
+    }
+    google.charts.load('current', {'packages':['line']});
+    google.charts.setOnLoadCallback(drawChart2);
+    
+    function drawChart2() {
+        //grafico linhas
+        var data = new google.visualization.DataTable();
+        data.addColumn('number', 'Day');
+        data.addColumn('number', 'Line 1');
+        data.addColumn('number', 'Line 2');
+        data.addColumn('number', 'Line 3');
+        
+        data.addRows([
+            [1,  37.8, 80.8, 41.8],
+            [2,  30.9, 69.5, 32.4],
+            [3,  25.4,   57, 25.7],
+            [4,  11.7, 18.8, 10.5],
+            [5,  11.9, 17.6, 10.4],
+            [6,   8.8, 13.6,  7.7],
+            [7,   7.6, 12.3,  9.6],
+            [8,  12.3, 29.2, 10.6],
+            [9,  16.9, 42.9, 14.8],
+            [10, 12.8, 30.9, 11.6],
+            [11,  5.3,  7.9,  4.7],
+            [12,  6.6,  8.4,  5.2],
+            [13,  4.8,  6.3,  3.6],
+            [14,  4.2,  6.2,  3.4]
+        ]);
+        
+        var options = {
+            chart: {
+                title: 'Box Office Earnings in First Two Weeks of Opening',
+                subtitle: 'in millions of dollars (USD)'
+            },
+            width: 1000,
+            height: 200,
+            axes: {
+                x: {
+                    0: {side: 'top'}
+                }
+            }
+        };
+        
+        var chart = new google.charts.Line(document.getElementById('line_top_x'));
+        
+        //chart.draw(data, google.charts.Line.convertOptions(options));
+    }
+    </script>
+    
+    <script>
+    j$ = jQuery.noConflict();
+    
+    //Modal Open
+    function openModal(){
+        j$('#backdrop').addClass('slds-backdrop--open');
+        j$('#modal').addClass('slds-fade-in-open');
+    }
+    
+    //Modal Close
+    function closeModal(){
+        j$('#modal').removeClass('slds-fade-in-open');
+        j$('#backdrop').removeClass('slds-backdrop--open');
+    }
+    </script>
+    <div class="slds-scope">
+        <apex:form >
+            <apex:actionFunction name="buildShowList" action="{!buildShowList}" rerender="modalHeader, modalContent, modalFooter" oncomplete="openModal();">
+                <apex:param name="p1" value="" assignTo="{!param1}"/>
+                <apex:param name="p2" value="" assignTo="{!param2}"/>
+            </apex:actionFunction>
+        </apex:form>
+        <div class="slds-page-header slds-p-around--x-small">
+            <div class="slds-media">
+                <div class="slds-media__figure">
+                    <apex:image style="height:50px" value="{!LogoUrl}"/>
+                </div>
+                <div class="slds-media__body slds-p-left_xx-large slds-m-left_xx-large">
+                    <h1 class="slds-page-header__title slds-truncate slds-align-middle">Pipeline Maquetes</h1>
+                    <p class="slds-text-body_small slds-line-height_reset">Design</p>
+                </div>
+                <apex:outputText value="{0,date,dd-MM-yyyy}" style="font-size:1rem; font-weight:bold;">
+                    <apex:param value="{!TODAY()}"/>
+                </apex:outputText>&nbsp;
+                <div style="font-size:1rem; font-weight:bold;" id="txt"></div>
+            </div>
+        </div>
+        <div class="slds-tabs_default" style="">
+            <ul class="slds-tabs_default__nav" role="tablist">
+                <li class="slds-tabs_default__item" title="Info" role="presentation" id="li1">
+                    <a class="slds-tabs_default__link li1" onclick="showTab(this);" role="tab" tabindex="1" aria-selected="true" aria-controls="tab-default-1" id="tab-default-1__item">Info</a></li>
+                <li class="slds-tabs_default__item" title="Geral" role="presentation"  id="li2">
+                    <a class="slds-tabs_default__link li2" onclick="showTab(this);" role="tab" tabindex="2" aria-selected="false" aria-controls="tab-default-2" id="tab-default-2__item">Geral</a></li>
+                <li class="slds-tabs_default__item" title="FOs" role="presentation"  id="li3">
+                    <a class="slds-tabs_default__link li3" onclick="showTab(this);" role="tab" tabindex="3" aria-selected="false" aria-controls="tab-default-3" id="tab-default-3__item">FOs</a></li>
+                <li class="slds-tabs_default__item" title="FOIs" role="presentation"  id="li4">
+                    <a class="slds-tabs_default__link li4" onclick="showTab(this);" role="tab" tabindex="4" aria-selected="false" aria-controls="tab-default-4" id="tab-default-4__item">FOIs</a></li>
+                <li class="slds-tabs_default__item" title="Tudo" role="presentation"  id="li5">
+                    <a class="slds-tabs_default__link li5" onclick="showTab(this);" role="tab" tabindex="5" aria-selected="false" aria-controls="tab-default-5" id="tab-default-5__item">Tudo</a></li>
+            </ul>
+            <!--------------------------Info TAB---------------------------------->
+            <div id="tab-default-1" class="slds-tabs_default__content tab-default-1 slds-hide" role="tabpanel" aria-labelledby="tab-default-1__item">
+                <div class="slds-section-title--divider">
+                    Informação do dia
+                </div>
+                <fieldset class="slds-form--compound">
+                    <div class="slds-form-element__group ">
+                        <div class="slds-form-element__row">
+                            <div class="slds-form-element">
+                                <table class="slds-table slds-table_bordered slds-table_cell-buffer ">
+                                    <thead class="slds-text-heading_label">
+                                        <tr>
+                                            <th>
+                                                &nbsp;
+                                            </th>
+                                            <th>
+                                                Maq.
+                                            </th>
+                                            <th>
+                                                Ret.Maq.
+                                            </th>
+                                            <th>
+                                                Total Dia
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <apex:repeat value="{!geralList}" var="a">
+                                            <tr>
+                                                <td style="text-decoration: underline;padding-left: 0.5rem;">
+                                                    <t onclick="buildShowList('header', '{!a.name}')">{!a.name}</t>
+                                                </td>
+                                                <td>
+                                                    {!a.current}
+                                                </td>
+                                                <td>
+                                                    {!a.ret}
+                                                </td>
+                                                <td>
+                                                    {!a.current + a.ret}
+                                                </td>
+                                            </tr>
+                                            <tr class="subLine">
+                                                <td>
+                                                    &nbsp;&nbsp;&nbsp;<t style="text-decoration: underline;" onclick="buildShowList('{!a.name}', '{!a.dia.name}')">{!a.dia.name}</t>
+                                                </td>
+                                                <td>
+                                                    {!a.dia.current}
+                                                </td>
+                                                <td>
+                                                    {!a.dia.ret}
+                                                </td>
+                                                <td>
+                                                    {!a.dia.current + a.dia.ret}
+                                                </td>
+                                            </tr>
+                                            <tr class="subLine">
+                                                <td>
+                                                    &nbsp;&nbsp;&nbsp;<t style="text-decoration: underline;" onclick="buildShowList('{!a.name}', '{!a.atraso.name}')">{!a.atraso.name}</t>
+                                                </td>
+                                                <td>
+                                                    {!a.atraso.current}
+                                                </td>
+                                                <td>
+                                                    {!a.atraso.ret}
+                                                </td>
+                                                <td>
+                                                    {!a.atraso.current + a.atraso.ret}
+                                                </td>
+                                            </tr>
+                                        </apex:repeat>
+                                        <tr>
+                                            <td colspan="3">
+                                                Média Entregue
+                                            </td>
+                                            <td>
+                                                {!IF(meanHours > 10, meanHours, '0' + Text(meanHours))}h{!IF(meanMinutes > 10, meanMinutes, '0' + Text(meanMinutes))}
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="slds-form-element slds-align_absolute-center" style="width:20%">
+                                <div id="chart_div" align="right"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="slds-form-element__row">
+                            <div class="slds-form-element">
+                                <div id="line_top_x"></div>
+                            </div>
+                            <div class="slds-form-element slds-align_absolute-center" style="width:20%">
+                                <analytics:reportChart size="tiny" reportId="{!report1Id}"/>
+                            </div>
+                            
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+            <!--------------------------Geral TAB---------------------------------->
+            <div id="tab-default-2" class="slds-tabs_default__content tab-default-2 slds-hide" role="tabpanel" aria-labelledby="tab-default-2__item">
+                <fieldset class="slds-form--compound">
+                    <div class="slds-form-element__group ">
+                        <div class="slds-form-element__row">
+                            <div class="slds-form-element">
+                                <div class="slds-section-title--divider">
+                                    FO
+                                </div>
+                                <apex:dataTable value="{!fosList}" var="fo" styleClass="slds-table slds-table_bordered slds-table_cell-buffer " rendered="{!fosList.size > 0}">
+                                    <apex:column width="5%" style="padding-left:0.5rem;" styleClass="slds-align-middle">
+                                        <apex:image value="{!URLFOR($Resource.flags, 'png/' + LOWER(fo.Account.BillingCountryCode) + '.png')}" />
+                                    </apex:column>
+                                    <apex:column headerValue="FO" value="{!fo.Referencia_PHC__c}" width="1%" styleClass="slds-align-middle"/>
+                                    <apex:column headerValue="Designer" value="{!fo.Designer__c}" width="5%" styleClass="slds-align-middle"/>
+                                    <apex:column width="1%" styleClass="slds-align-middle">
+                                        <span class="slds-icon_container {!IF(fo.Estado_da_maquete__c = 'Suspenso','slds-icon-action-more',IF(fo.Maquete_em_pausa__c,'slds-icon-action-priority','slds-icon-action-quote'))}" id="icon" style="{!if(fo.Designer__c != null,'display:block;','display:none;')}">
+                                            <svg class="slds-icon slds-icon_xx-small" aria-hidden="true">
+                                                <use  class="slds-icon_xx-small" xmlns:xlink="http://www.w3.org/1999/xlink" 
+                                                     xlink:href="{!if(fo.Estado_da_maquete__c = 'Suspenso',URLFOR($Asset.SLDS , '/assets/icons/action-sprite/svg/symbols.svg#more'),
+                                                                 IF(fo.Maquete_em_pausa__c , URLFOR($Asset.SLDS , '/assets/icons/utility-sprite/svg/symbols.svg#pause'),URLFOR($Asset.SLDS , '/assets/icons/action-sprite/svg/symbols.svg#check')))}"></use>
+                                            </svg>
+                                        </span>
+                                    </apex:column>
+                                    <apex:column styleClass="slds-align-middle" width="5%" style="font-weight:bold;text-align: -webkit-center;font-size:1rem;">
+                                        <apex:outputPanel rendered="{!fo.Estado_da_maquete__c != 'Suspenso'}">
+                                            <apex:variable var="min" value="{!FLOOR(maphours[fo.Id]-(FLOOR(maphours[fo.Id]/60)*60))}"/>
+                                            <t style="color:{!IF(maphours[fo.Id] < 0,'red', IF(maphours[fo.Id]  <= 15, 'orange','green'))}">
+                                                {!FLOOR(ABS(maphours[fo.Id]/60))}:{!If(And(ABS(min) < 10, ABS(min) >= 0), '0' + Text(ABS(min)), ABS(min))}
+                                            </t>
+                                        </apex:outputPanel>
+                                        <apex:outputPanel rendered="{!fo.Estado_da_maquete__c = 'Suspenso'}">
+                                            <div class="{!IF(fo.Snapshot_em_atraso__c,'colorRed', IF(HOUR(fo.Snapshot_de_maquete__c) = 0, IF(MINUTE(fo.Snapshot_de_maquete__c) > 15, 'colorOrange','colorGreen'),'colorGreen'))}" >
+                                                <apex:outputField value="{!fo.Snapshot_de_maquete__c}"/>
+                                            </div>
+                                        </apex:outputPanel>
+                                    </apex:column>
+                                    <apex:column headerValue="Tipo" styleClass="slds-align-middle">{!IF(!fo.Auxiliar_retificacao__c , 'Maq', 'MaqRet')}</apex:column>
+                                    <apex:column headerValue="Cliente" value="{!fo.Account.Name}" styleClass="slds-align-middle"/>
+                                    <apex:column headerValue="Entrada" styleClass="slds-align-middle">
+                                        <apex:outputText value="{0,date,dd'.'MM '-' HH':'mm}"><apex:param value="{!fo.Data_do_pedido_de_maquete__c}"/></apex:outputText>
+                                    </apex:column>
+                                </apex:dataTable>
+                                <apex:outputPanel rendered="{!fosList.size = 0}">
+                                    Sem registos a apresentar
+                                </apex:outputPanel>
+                            </div>
+                            <div class="slds-form-element">
+                                <div class="slds-section-title--divider">
+                                    FOI
+                                </div>
+                                <apex:dataTable value="{!foisList}" var="fo" styleClass="slds-table slds-table_bordered slds-table_cell-buffer " rendered="{!foisList.size > 0}">
+                                    <apex:column width="5%" style="padding-left:0.5rem;" styleClass="slds-align-middle">
+                                        <apex:image value="{!URLFOR($Resource.flags, 'png/' + LOWER(fo.Account.BillingCountryCode) + '.png')}" />
+                                    </apex:column>
+                                    <apex:column headerValue="FO" value="{!fo.Referencia_PHC__c}" width="1%" styleClass="slds-align-middle"/>
+                                    <apex:column headerValue="Designer" value="{!fo.Designer__c}" width="5%" styleClass="slds-align-middle"/>
+                                    <apex:column width="1%" styleClass="slds-align-middle">
+                                        <span class="slds-icon_container {!IF(fo.Estado_da_maquete__c = 'Suspenso','slds-icon-action-more',IF(fo.Maquete_em_pausa__c,'slds-icon-action-priority','slds-icon-action-quote'))}" id="icon" style="{!if(fo.Designer__c != null,'display:block;','display:none;')}">
+                                            <svg class="slds-icon slds-icon_xx-small" aria-hidden="true">
+                                                <use  class="slds-icon_xx-small" xmlns:xlink="http://www.w3.org/1999/xlink" 
+                                                     xlink:href="{!if(fo.Estado_da_maquete__c = 'Suspenso',URLFOR($Asset.SLDS , '/assets/icons/action-sprite/svg/symbols.svg#more'),
+                                                                 IF(fo.Maquete_em_pausa__c , URLFOR($Asset.SLDS , '/assets/icons/utility-sprite/svg/symbols.svg#pause'),URLFOR($Asset.SLDS , '/assets/icons/action-sprite/svg/symbols.svg#check')))}"></use>
+                                            </svg>
+                                        </span>
+                                    </apex:column>
+                                    <apex:column styleClass="slds-align-middle" width="5%" style="font-weight:bold;text-align: -webkit-center;font-size:1rem;">
+                                        <apex:outputPanel rendered="{!fo.Estado_da_maquete__c != 'Suspenso'}">
+                                            <apex:variable var="min" value="{!FLOOR(maphours[fo.Id]-(FLOOR(maphours[fo.Id]/60)*60))}"/>
+                                            <t style="color:{!IF(maphours[fo.Id] < 0,'red', IF(maphours[fo.Id]  <= 15, 'orange','green'))}">
+                                                {!FLOOR(ABS(maphours[fo.Id]/60))}:{!If(And(ABS(min) < 10, ABS(min) >= 0), '0' + Text(ABS(min)), ABS(min))}
+                                            </t>
+                                        </apex:outputPanel>
+                                        <apex:outputPanel rendered="{!fo.Estado_da_maquete__c = 'Suspenso'}">
+                                            <div class="{!IF(fo.Snapshot_em_atraso__c,'colorRed', IF(HOUR(fo.Snapshot_de_maquete__c) = 0, IF(MINUTE(fo.Snapshot_de_maquete__c) > 15, 'colorOrange','colorGreen'),'colorGreen'))}" >
+                                                <apex:outputField value="{!fo.Snapshot_de_maquete__c}"/>
+                                            </div>
+                                        </apex:outputPanel>
+                                    </apex:column>
+                                    <apex:column headerValue="Tipo" styleClass="slds-align-middle">{!IF(!fo.Auxiliar_retificacao__c , 'Maq', 'MaqRet')}</apex:column>
+                                    <apex:column headerValue="Cliente" value="{!fo.Account.Name}" styleClass="slds-align-middle"/>
+                                    <apex:column headerValue="Entrada" styleClass="slds-align-middle">
+                                        <apex:outputText value="{0,date,dd'.'MM '-' HH':'mm}"><apex:param value="{!fo.Data_do_pedido_de_maquete__c}"/></apex:outputText>
+                                    </apex:column>
+                                </apex:dataTable>
+                                <apex:outputPanel rendered="{!foisList.size = 0}">
+                                    Sem registos a apresentar
+                                </apex:outputPanel>
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+            <!--------------------------FO TAB---------------------------------->
+            <div id="tab-default-3" class="slds-tabs_default__content tab-default-3 slds-hide" role="tabpanel" aria-labelledby="tab-default-3__item">
+                
+                <div class="slds-section-title--divider">
+                    FOs em pipeline
+                </div>
+                <apex:dataTable value="{!fosList}" var="fo" styleClass="slds-table slds-table_bordered slds-table_cell-buffer " rendered="{!fosList.size > 0}">
+                    <apex:column width="5%" styleClass="slds-align-middle">
+                        <apex:image value="{!URLFOR($Resource.flags, 'png/' + LOWER(fo.Account.BillingCountryCode) + '.png')}" />
+                    </apex:column>
+                    <apex:column headerValue="FO" value="{!fo.Referencia_PHC__c}" width="1%" styleClass="slds-align-middle"/>
+                    <apex:column headerValue="Designer" value="{!fo.Designer__c}" width="5%" styleClass="slds-align-middle"/>
+                    <apex:column width="1%" styleClass="slds-align-middle">
+                        <span class="slds-icon_container {!IF(fo.Estado_da_maquete__c = 'Suspenso','slds-icon-action-more',IF(fo.Maquete_em_pausa__c,'slds-icon-action-priority','slds-icon-action-quote'))}" id="icon" style="{!if(fo.Designer__c != null,'display:block;','display:none;')}">
+                            <svg class="slds-icon slds-icon_xx-small" aria-hidden="true">
+                                <use  class="slds-icon_xx-small" xmlns:xlink="http://www.w3.org/1999/xlink" 
+                                     xlink:href="{!if(fo.Estado_da_maquete__c = 'Suspenso',URLFOR($Asset.SLDS , '/assets/icons/action-sprite/svg/symbols.svg#more'),
+                                                 IF(fo.Maquete_em_pausa__c , URLFOR($Asset.SLDS , '/assets/icons/utility-sprite/svg/symbols.svg#pause'),URLFOR($Asset.SLDS , '/assets/icons/action-sprite/svg/symbols.svg#check')))}"></use>
+                            </svg>
+                        </span>
+                    </apex:column>
+                    <apex:column styleClass="slds-align-middle" width="5%" style="font-weight:bold;text-align: -webkit-center;font-size:1rem;">
+                        <apex:outputPanel rendered="{!fo.Estado_da_maquete__c != 'Suspenso'}">
+                            <apex:variable var="min" value="{!FLOOR(maphours[fo.Id]-(FLOOR(maphours[fo.Id]/60)*60))}"/>
+                            <t style="color:{!IF(maphours[fo.Id] < 0,'red', IF(maphours[fo.Id]  <= 15, 'orange','green'))}">
+                                {!FLOOR(ABS(maphours[fo.Id]/60))}:{!If(And(ABS(min) < 10, ABS(min) >= 0), '0' + Text(ABS(min)), ABS(min))}
+                            </t>
+                        </apex:outputPanel>
+                        <apex:outputPanel rendered="{!fo.Estado_da_maquete__c = 'Suspenso'}">
+                            <div class="{!IF(fo.Snapshot_em_atraso__c,'colorRed', IF(HOUR(fo.Snapshot_de_maquete__c) = 0, IF(MINUTE(fo.Snapshot_de_maquete__c) > 15, 'colorOrange','colorGreen'),'colorGreen'))}" >
+                                <apex:outputField value="{!fo.Snapshot_de_maquete__c}"/>
+                            </div>
+                        </apex:outputPanel>
+                    </apex:column>
+                    <apex:column headerValue="Tipo" styleClass="slds-align-middle">{!IF(!fo.Auxiliar_retificacao__c , 'Maq', 'MaqRet')}</apex:column>
+                    <apex:column headerValue="Cliente" value="{!fo.Account.Name}" styleClass="slds-align-middle"/>
+                    <apex:column headerValue="Entrada" styleClass="slds-align-middle">
+                        <apex:outputText value="{0,date,dd'.'MM '-' HH':'mm}"><apex:param value="{!fo.Data_do_pedido_de_maquete__c}"/></apex:outputText>
+                    </apex:column>
+                </apex:dataTable>
+                <apex:outputPanel rendered="{!fosList.size = 0}">
+                    Sem registos a apresentar
+                </apex:outputPanel>
+            </div>
+            <!--------------------------FOI TAB---------------------------------->
+            <div id="tab-default-4" class="slds-tabs_default__content tab-default-4 slds-hide" role="tabpanel" aria-labelledby="tab-default-4__item">
+                <div class="slds-section-title--divider">
+                    FOIs em pipeline
+                </div>
+                <apex:dataTable value="{!foisList}" var="fo" styleClass="slds-table slds-table_bordered slds-table_cell-buffer " rendered="{!foisList.size > 0}">
+                    <apex:column width="5%" styleClass="slds-align-middle">
+                        <apex:image value="{!URLFOR($Resource.flags, 'png/' + LOWER(fo.Account.BillingCountryCode) + '.png')}" />
+                    </apex:column>
+                    <apex:column headerValue="FO" value="{!fo.Referencia_PHC__c}" width="1%" styleClass="slds-align-middle"/>
+                    <apex:column headerValue="Designer" value="{!fo.Designer__c}" width="5%" styleClass="slds-align-middle"/>
+                    <apex:column width="1%" styleClass="slds-align-middle">
+                        <span class="slds-icon_container {!IF(fo.Estado_da_maquete__c = 'Suspenso','slds-icon-action-more',IF(fo.Maquete_em_pausa__c,'slds-icon-action-priority','slds-icon-action-quote'))}" id="icon" style="{!if(fo.Designer__c != null,'display:block;','display:none;')}">
+                            <svg class="slds-icon slds-icon_xx-small" aria-hidden="true">
+                                <use  class="slds-icon_xx-small" xmlns:xlink="http://www.w3.org/1999/xlink" 
+                                     xlink:href="{!if(fo.Estado_da_maquete__c = 'Suspenso',URLFOR($Asset.SLDS , '/assets/icons/action-sprite/svg/symbols.svg#more'),
+                                                 IF(fo.Maquete_em_pausa__c , URLFOR($Asset.SLDS , '/assets/icons/utility-sprite/svg/symbols.svg#pause'),URLFOR($Asset.SLDS , '/assets/icons/action-sprite/svg/symbols.svg#check')))}"></use>
+                            </svg>
+                        </span>
+                    </apex:column>
+                    <apex:column styleClass="slds-align-middle" width="5%" style="font-weight:bold;text-align: -webkit-center;font-size:1rem;">
+                        <apex:outputPanel rendered="{!fo.Estado_da_maquete__c != 'Suspenso'}">
+                            <apex:variable var="min" value="{!FLOOR(maphours[fo.Id]-(FLOOR(maphours[fo.Id]/60)*60))}"/>
+                            <t style="color:{!IF(maphours[fo.Id] < 0,'red', IF(maphours[fo.Id]  <= 15, 'orange','green'))}">
+                                {!FLOOR(ABS(maphours[fo.Id]/60))}:{!If(And(ABS(min) < 10, ABS(min) >= 0), '0' + Text(ABS(min)), ABS(min))}
+                            </t>
+                        </apex:outputPanel>
+                        <apex:outputPanel rendered="{!fo.Estado_da_maquete__c = 'Suspenso'}">
+                            <div class="{!IF(fo.Snapshot_em_atraso__c,'colorRed', IF(HOUR(fo.Snapshot_de_maquete__c) = 0, IF(MINUTE(fo.Snapshot_de_maquete__c) > 15, 'colorOrange','colorGreen'),'colorGreen'))}" >
+                                <apex:outputField value="{!fo.Snapshot_de_maquete__c}"/>
+                            </div>
+                        </apex:outputPanel>
+                    </apex:column>
+                    <apex:column headerValue="Tipo" styleClass="slds-align-middle">{!IF(!fo.Auxiliar_retificacao__c , 'Maq', 'MaqRet')}</apex:column>
+                    <apex:column headerValue="Cliente" value="{!fo.Account.Name}" styleClass="slds-align-middle"/>
+                    <apex:column headerValue="Entrada" styleClass="slds-align-middle">
+                        <apex:outputText value="{0,date,dd'.'MM '-' HH':'mm}"><apex:param value="{!fo.Data_do_pedido_de_maquete__c}"/></apex:outputText>
+                    </apex:column>
+                </apex:dataTable>
+                <apex:outputPanel rendered="{!foisList.size = 0}">
+                    Sem registos a apresentar
+                </apex:outputPanel>
+            </div>
+            <!--------------------------Tudo TAB---------------------------------->
+            <div id="tab-default-5" class="slds-tabs_default__content tab-default-5 slds-hide" role="tabpanel" aria-labelledby="tab-default-5__item">
+                <div class="slds-section-title--divider">
+                    Tudo
+                </div>
+                <apex:dataTable value="{!tudoList}" var="opp" styleClass="slds-table slds-table_bordered slds-table_cell-buffer " rendered="{!tudoList.size > 0}">
+                    <apex:column width="5%" styleClass="slds-align-middle">
+                        <apex:image value="{!URLFOR($Resource.flags, 'png/' + LOWER(opp.Account.BillingCountryCode) + '.png')}" />
+                    </apex:column>
+                    <apex:column headerValue="Dossier" value="{!opp.Referencia_PHC__c}" width="1%" styleClass="slds-align-middle"/>
+                    <apex:column headerValue="Designer" value="{!opp.Designer__c}" width="5%" styleClass="slds-align-middle"/>
+                    <apex:column width="1%" styleClass="slds-align-middle">
+                        <span class="slds-icon_container {!IF(opp.Estado_da_maquete__c = 'Suspenso','slds-icon-action-more',IF(opp.Maquete_em_pausa__c,'slds-icon-action-priority','slds-icon-action-quote'))}" id="icon" style="{!if(opp.Designer__c != null,'display:block;','display:none;')}">
+                            <svg class="slds-icon slds-icon_xx-small" aria-hidden="true">
+                                <use  class="slds-icon_xx-small" xmlns:xlink="http://www.w3.org/1999/xlink" 
+                                     xlink:href="{!if(opp.Estado_da_maquete__c = 'Suspenso',URLFOR($Asset.SLDS , '/assets/icons/action-sprite/svg/symbols.svg#more'),
+                                                 IF(opp.Maquete_em_pausa__c , URLFOR($Asset.SLDS , '/assets/icons/utility-sprite/svg/symbols.svg#pause'),URLFOR($Asset.SLDS , '/assets/icons/action-sprite/svg/symbols.svg#check')))}"></use>
+                            </svg>
+                        </span>
+                    </apex:column>
+                    <apex:column styleClass="slds-align-middle" width="5%" style="font-weight:bold;text-align: -webkit-center;font-size:1rem;">
+                        <apex:outputPanel rendered="{!opp.Estado_da_maquete__c != 'Suspenso'}">
+                            <apex:variable var="min" value="{!FLOOR(maphours[opp.Id]-(FLOOR(maphours[opp.Id]/60)*60))}"/>
+                            <t style="color:{!IF(maphours[opp.Id] < 0,'red', IF(maphours[opp.Id]  <= 15, 'orange','green'))}">
+                                {!FLOOR(ABS(maphours[opp.Id]/60))}:{!If(And(ABS(min) < 10, ABS(min) >= 0), '0' + Text(ABS(min)), ABS(min))}
+                            </t>
+                        </apex:outputPanel>
+                        <apex:outputPanel rendered="{!opp.Estado_da_maquete__c = 'Suspenso'}">
+                            <div class="{!IF(opp.Snapshot_em_atraso__c,'colorRed', IF(HOUR(opp.Snapshot_de_maquete__c) = 0, IF(MINUTE(opp.Snapshot_de_maquete__c) > 15, 'colorOrange','colorGreen'),'colorGreen'))}" >
+                                <apex:outputField value="{!opp.Snapshot_de_maquete__c}"/>
+                            </div>
+                        </apex:outputPanel>
+                    </apex:column>
+                    <apex:column headerValue="Tipo" styleClass="slds-align-middle">{!IF(!opp.Auxiliar_retificacao__c , 'Maq', 'MaqRet')} {!IF(opp.RecordType.DeveloperName = 'Folha_de_Obra','FO','FOI')}</apex:column>
+                    <apex:column headerValue="Cliente" value="{!opp.Account.Name}" styleClass="slds-align-middle"/>
+                    <apex:column headerValue="Entrada" styleClass="slds-align-middle">
+                        <apex:outputText value="{0,date,dd'.'MM '-' HH':'mm}"><apex:param value="{!opp.Data_do_pedido_de_maquete__c}"/></apex:outputText>
+                    </apex:column>
+                </apex:dataTable>
+                <apex:outputPanel rendered="{!tudoList.size = 0}">
+                    Sem registos a apresentar
+                </apex:outputPanel>
+            </div>
+        </div>
+        <!-------------------------------------------SHOW LIST IN GERAL----------------------------------------------------------->
+        <div class="slds-modal" aria-hidden="false" role="dialog" id="modal">
+            <div class="slds-modal__container" style="max-width: min-content;width: min-content;">
+                <div class="slds-modal__header">
+                    <button class="slds-button slds-button--icon-inverse slds-modal__close" onclick="closeModal();" type="button">
+                        <div class="slds-icon_container slds-icon-utility-close">
+                            <svg class="slds-icon slds-icon-text-default" aria-hidden="false">
+                                <use xmlns:xlink="http://www.w3.org/1999/xlink"
+                                     xlink:href="{!URLFOR($Asset.SLDS , '/assets/icons/utility-sprite/svg/symbols.svg#close')}"></use>
+                            </svg>
+                        </div>
+                    </button>
+                    <apex:outputPanel id="modalHeader">
+                        <h2 class="slds-text-heading--medium">{!IF(param1 = 'header', param2, param1 + ' - ' + param2)}</h2>
+                    </apex:outputPanel>
+                </div>
+                <div class="slds-modal__content slds-p-around_large">
+                    <apex:outputPanel id="modalContent">
+                        <apex:dataTable value="{!showList}" var="opp" styleClass="slds-table slds-table_bordered slds-table_cell-buffer " rendered="{!showList.size > 0}">
+                            <apex:column width="5%" style="padding-left:0.5rem;" styleClass="slds-align-middle">
+                                <apex:image value="{!URLFOR($Resource.flags, 'png/' + LOWER(opp.Account.BillingCountryCode) + '.png')}" />
+                            </apex:column>
+                            <apex:column headerValue="FO" value="{!opp.Referencia_PHC__c}" width="1%" styleClass="slds-align-middle"/>
+                            <apex:column headerValue="Designer" value="{!opp.Designer__c}" width="5%" styleClass="slds-align-middle"/>
+                            <apex:column width="1%" styleClass="slds-align-middle" rendered="{!Or(param1 = 'Pipeline', param2 = 'Pipeline')}">
+                                <span class="slds-icon_container {!IF(opp.Estado_da_maquete__c = 'Suspenso','slds-icon-action-more',IF(opp.Maquete_em_pausa__c,'slds-icon-action-priority','slds-icon-action-quote'))}" id="icon" style="{!if(opp.Designer__c != null,'display:block;','display:none;')}">
+                                    <svg class="slds-icon slds-icon_xx-small" aria-hidden="true">
+                                        <use  class="slds-icon_xx-small" xmlns:xlink="http://www.w3.org/1999/xlink" 
+                                             xlink:href="{!if(opp.Estado_da_maquete__c = 'Suspenso',URLFOR($Asset.SLDS , '/assets/icons/action-sprite/svg/symbols.svg#more'),
+                                                         IF(opp.Maquete_em_pausa__c , URLFOR($Asset.SLDS , '/assets/icons/utility-sprite/svg/symbols.svg#pause'),URLFOR($Asset.SLDS , '/assets/icons/action-sprite/svg/symbols.svg#check')))}"></use>
+                                    </svg>
+                                </span>
+                            </apex:column>
+                            <apex:column styleClass="slds-align-middle" width="5%" style="font-weight:bold;text-align: -webkit-center;font-size:1rem;" rendered="{!Or(param1 = 'Pipeline', param2 = 'Pipeline')}">
+                                <apex:outputPanel rendered="{!opp.Estado_da_maquete__c != 'Suspenso'}">
+                                    <apex:variable var="min" value="{!FLOOR(maphours[opp.Id]-(FLOOR(maphours[opp.Id]/60)*60))}"/>
+                                    <div class="{!IF(opp.Maquete_em_atraso__c,'colorRed', IF(maphours[opp.Id] <= 15, 'colorOrange','colorGreen'))}" >
+                                        {!FLOOR(ABS(maphours[opp.Id]/60))}:{!If(And(ABS(min) < 10, ABS(min) >= 0), '0' + Text(ABS(min)), ABS(min))}
+                                    </div>
+                                </apex:outputPanel>
+                                <apex:outputPanel rendered="{!opp.Estado_da_maquete__c = 'Suspenso'}">
+                                    <div class="{!IF(opp.Snapshot_em_atraso__c,'colorRed', IF(HOUR(opp.Snapshot_de_maquete__c) = 0, IF(MINUTE(opp.Snapshot_de_maquete__c) > 15, 'colorOrange','colorGreen'),'colorGreen'))}" >
+                                        <apex:outputField value="{!opp.Snapshot_de_maquete__c}"/>
+                                    </div>
+                                </apex:outputPanel>
+                            </apex:column>
+                            <apex:column headerValue="Tipo" styleClass="slds-align-middle">{!IF(!opp.Auxiliar_retificacao__c , 'Maq', 'MaqRet')}</apex:column>
+                            <apex:column headerValue="Cliente" value="{!opp.Account.Name}" styleClass="slds-align-middle"/>
+                            <apex:column headerValue="Entrada" styleClass="slds-align-middle">
+                                <apex:outputText value="{0,date,dd'.'MM '-' HH':'mm}"><apex:param value="{!opp.Data_do_pedido_de_maquete__c}"/></apex:outputText>
+                            </apex:column>
+                        </apex:dataTable>
+                        <apex:outputPanel rendered="{!showList.size = 0}">
+                            Sem registos a apresentar
+                        </apex:outputPanel>
+                    </apex:outputPanel>
+                </div>
+                <div class="slds-modal__footer">
+                    <apex:outputPanel id="modalFooter">
+                        
+                    </apex:outputPanel>
+                </div>
+            </div>
+        </div>
+        
+        <div class="slds-backdrop" id="backdrop"></div>
+    </div>
+</apex:page>

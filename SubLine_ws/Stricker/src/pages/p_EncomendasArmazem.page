@@ -1,0 +1,435 @@
+<apex:page controller="c_EncomendasArmazem">
+    <apex:slds />
+    <style>
+        .dateFormat{
+        display:none;
+        }
+        .datePicker {
+        z-index: 9999;/*Changed this css property which was 100 prior*/
+        position: fixed
+        }
+    </style>
+    <script>
+    var timeout = setTimeout("location.reload(true);",30000);
+    
+    function spinnerOn(activated){
+        if(activated){
+            document.getElementById("spinner").style.display = "block";   
+        }else{
+            document.getElementById("spinner").style.display = "none";
+        }
+    }
+    function openModal(modalToOpen){
+        document.getElementById("backdrop").classList.add('slds-backdrop--open');
+        document.getElementById(modalToOpen).classList.add('slds-fade-in-open');
+    }
+    function closeModal(modalToOpen){
+        var ele = document.getElementById(modalToOpen);
+        if(ele != null) ele.classList.remove('slds-fade-in-open');
+        document.getElementById("backdrop").classList.remove('slds-backdrop--open');
+    }
+    
+    
+    </script>
+    <apex:form >
+        <apex:actionFunction name="startOpenModal" action="{!dummy}" rerender="modalContent" oncomplete="spinnerOn(false);openModal('modal_checkPackage');">
+            <apex:param assignTo="{!pickedLine}" name="p1" value=""/>
+        </apex:actionFunction>
+        <apex:actionFunction name="startOpenModalRecolha" action="{!dummy}" rerender="modalRecolhaContent" oncomplete="spinnerOn(false);openModal('modal_devolucaoCheckPackage');">
+            <apex:param assignTo="{!pickedLineDevolucao}" name="p1" value=""/>
+        </apex:actionFunction>
+        <apex:actionFunction name="updateLine" action="{!updateLine}" rerender="pageTable" oncomplete="spinnerOn(false);closeModal('modal_checkPackage');closeModal('modal_devolucaoCheckPackage');"/>
+        <div class="slds-scope">
+            <apex:outputPanel id="pageTable">
+                <div class="slds-page-header">
+                    <div class="slds-media">
+                        <div class="slds-media__body">
+                            <h1 class="slds-page-header__title slds-truncate slds-align-middle" title="Rohde Corp - 80,000 Widgets">Recolhas</h1>
+                        </div>
+                    </div>
+                </div>
+                <table class="slds-table slds-table_bordered slds-table_cell-buffer">
+                    <thead>
+                        <tr>
+                            <th>
+                                {!$ObjectType.OrderItem.fields.Referencia_SKU__c.Label}
+                            </th>
+                            <th>
+                                _Quantidade a receber
+                            </th>
+                            <th>
+                                _Tracking Number
+                            </th>
+                            <th>
+                                {!$ObjectType.OrderItem.fields.Destino_de_Mercadoria__c.Label}
+                            </th>
+                            <th>
+                                {!$ObjectType.OrderItem.fields.Recolha_pedida_por__c.Label}
+                            </th>
+                            <th>
+                                &nbsp;
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <apex:repeat value="{!linhas}" var="linha">
+                            
+                            <tr>
+                                <td>
+                                    {!linhas[linha].Referencia_SKU__c}
+                                </td>
+                                <td>
+                                    {!linhas[linha].Quantidade_recebida_na_recolha__c}
+                                </td>
+                                <td>
+                                    {!linhas[linha].Tracking_Number_de_recolha__c}
+                                </td>
+                                <td>
+                                    {!linhas[linha].Destino_de_Mercadoria__c}
+                                </td>
+                                <td>
+                                    {!linhas[linha].Recolha_pedida_por__c}
+                                </td>
+                                <td>
+                                    <a class="slds-button slds-button_neutral" onclick="spinnerOn(true);startOpenModal('{!linha}');">{!$Label.Confirmar}</a>
+                                </td>
+                            </tr>
+                        </apex:repeat>
+                    </tbody>
+                </table>
+                <div class="slds-page-header slds-m-top--large">
+                    <div class="slds-media">
+                        <div class="slds-media__body">
+                            <h1 class="slds-page-header__title slds-truncate slds-align-middle" title="Rohde Corp - 80,000 Widgets">Devoluções</h1>
+                        </div>
+                    </div>
+                </div>
+                <table class="slds-table slds-table_bordered slds-table_cell-buffer">
+                    <thead>
+                        <tr>
+                            <th>
+                                {!$ObjectType.OrderItem.fields.Referencia_SKU__c.Label}
+                            </th>
+                            <th>
+                                _Quantidade a receber
+                            </th>
+                            <th>
+                                _Tracking Number
+                            </th>
+                            <th>
+                                {!$ObjectType.OrderItem.fields.Devolucao_pedida_por__c.Label}
+                            </th>
+                            <th>
+                                &nbsp;
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <apex:repeat value="{!linhasDevolucao}" var="linha">
+                            <tr>
+                                <td>
+                                    {!linhasDevolucao[linha].Referencia_SKU__c}
+                                </td>
+                                <td>
+                                    {!linhasDevolucao[linha].Quantidade_recebida_na_Devolucao__c}
+                                </td>
+                                <td>
+                                    {!linhasDevolucao[linha].Tracking_Number_de_Devolucao__c}
+                                </td>
+                                <td>
+                                    {!linhasDevolucao[linha].Devolucao_pedida_por__c}
+                                </td>
+                                <td>
+                                    <a class="slds-button slds-button_neutral" onclick="spinnerOn(true);startOpenModalRecolha('{!linha}');">{!$Label.Confirmar}</a>
+                                </td>
+                            </tr>
+                        </apex:repeat>
+                    </tbody>
+                </table>
+            </apex:outputPanel>
+            
+            <!--                             MODAL                              -->
+            
+            <div class="slds-modal" aria-hidden="false" role="dialog" id="modal_checkPackage">
+                <div class="slds-modal__container">
+                    <div class="slds-modal__header">
+                        <h2 class="slds-text-heading--medium">
+                            <button class="slds-button slds-button--icon-inverse slds-modal__close" onclick="closeModal('modal_checkPackage')" type="button">
+                                <div class="slds-icon_container slds-icon-utility-close">
+                                    <svg class="slds-icon" aria-hidden="false">
+                                        <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{!URLFOR($Asset.SLDS , '/assets/icons/utility-sprite/svg/symbols.svg#close')}"></use>
+                                    </svg>
+                                </div>
+                            </button>
+                            <h2 class="slds-text-heading--medium">_Confirmar chegada</h2>
+                        </h2>
+                    </div>
+                    <div class="slds-modal__content slds-p-around--medium">
+                        <apex:outputPanel id="modalContent">
+                            <apex:outputPanel rendered="{!pickedLine != null}">
+                                <div class="slds-notify slds-notify_alert slds-theme_alert-texture slds-theme_error slds-hide" role="alert" id="modal_alert">
+                                    <h2>
+                                        Por favor preencha os campos todos.
+                                    </h2>
+                                </div>
+                                <div class="slds-form" role="list">
+                                    <div class="slds-grid slds-gutters_small">
+                                        <div class="slds-col slds-has-flexi-truncate" role="listitem">
+                                            <div class="slds-form-element slds-form-element_edit slds-hint-parent">
+                                                
+                                                <div class="slds-form-element__control">
+                                                    <span class="slds-form-element__static">
+                                                        <fieldset class="slds-form--compound">
+                                                            <div class="slds-form-element__group ">
+                                                                <div class="slds-form-element__row">
+                                                                    
+                                                                    <div class="slds-form-element">
+                                                                        <span class="slds-form-element__label">{!$ObjectType.OrderItem.Fields.Data_de_chegada_de_recolha__c.Label}</span>
+                                                                        <apex:inputField value="{!dummyLine.Data_de_emissao_do_documento_financeiro__c}" styleClass="slds-input" id="inputData"/>
+                                                                    </div>
+                                                                    <div class="slds-form-element">
+                                                                        <span class="slds-form-element__label">H</span>
+                                                                        <apex:selectList value="{!hora}" multiselect="false" size="1" styleClass="slds-input">
+                                                                            <apex:selectOptions value="{!allHours}"/>
+                                                                        </apex:selectList>
+                                                                    </div>
+                                                                    <div class="slds-form-element">
+                                                                        <span class="slds-form-element__label">M</span>
+                                                                        <apex:selectList value="{!minuto}" multiselect="false" size="1" styleClass="slds-input">
+                                                                            <apex:selectOptions value="{!allMinutes}"/>
+                                                                        </apex:selectList>
+                                                                    </div>
+                                                                    
+                                                                </div>
+                                                            </div>
+                                                        </fieldset>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="slds-grid slds-gutters_small">
+                                        <div class="slds-col slds-has-flexi-truncate" role="listitem">
+                                            <div class="slds-form-element slds-form-element_edit slds-hint-parent">
+                                                <span class="slds-form-element__label">{!$ObjectType.OrderItem.Fields.Local_de_armazenamento_da_recolha__c.Label}</span>
+                                                <div class="slds-form-element__control">
+                                                    <span class="slds-form-element__static">
+                                                        <apex:inputField value="{!linhas[pickedLine].Local_de_armazenamento_da_recolha__c}" styleClass="slds-input" id="inputLocal"/>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="slds-col slds-has-flexi-truncate" role="listitem">
+                                            <div class="slds-form-element slds-form-element_edit slds-hint-parent">
+                                                <span class="slds-form-element__label">{!$ObjectType.OrderItem.Fields.Quantidade_recebida_na_recolha__c.Label}</span>
+                                                <div class="slds-form-element__control">
+                                                    <span class="slds-form-element__static">
+                                                        <apex:inputField value="{!linhas[pickedLine].Quantidade_recebida_na_recolha__c}" styleClass="slds-input" id="inputQtt"/>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="slds-grid slds-gutters_small">
+                                        <div class="slds-col slds-has-flexi-truncate" role="listitem">
+                                            <div class="slds-form-element slds-form-element_edit slds-hint-parent">
+                                                <span class="slds-form-element__label">{!$ObjectType.OrderItem.Fields.Recolha_recebida_por__c.Label}</span>
+                                                <div class="slds-form-element__control">
+                                                    <span class="slds-form-element__static">
+                                                        <apex:inputField value="{!linhas[pickedLine].Recolha_recebida_por__c}" styleClass="slds-input" id="inputReceb"/>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                </div>
+                            </apex:outputPanel>
+                        </apex:outputPanel>
+                    </div>
+                    <div class="slds-modal__footer">
+                        <a class="slds-button slds-button_brand" onclick="validateValues();">{!$Label.Submeter}</a>
+                    </div>
+                </div>
+            </div>
+            <div class="slds-modal" aria-hidden="false" role="dialog" id="modal_devolucaoCheckPackage">
+                <div class="slds-modal__container">
+                    <div class="slds-modal__header">
+                        <h2 class="slds-text-heading--medium">
+                            <button class="slds-button slds-button--icon-inverse slds-modal__close" onclick="closeModal('modal_devolucaoCheckPackage')" type="button">
+                                <div class="slds-icon_container slds-icon-utility-close">
+                                    <svg class="slds-icon" aria-hidden="false">
+                                        <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{!URLFOR($Asset.SLDS , '/assets/icons/utility-sprite/svg/symbols.svg#close')}"></use>
+                                    </svg>
+                                </div>
+                            </button>
+                            <h2 class="slds-text-heading--medium">_Confirmar chegada</h2>
+                        </h2>
+                    </div>
+                    <div class="slds-modal__content slds-p-around--medium">
+                        <apex:outputPanel id="modalRecolhaContent">
+                            <apex:outputPanel rendered="{!pickedLineDevolucao != null}">
+                                <div class="slds-notify slds-notify_alert slds-theme_alert-texture slds-theme_error slds-hide" role="alert" id="modal_alertDevolucao">
+                                    <h2>
+                                        Por favor preencha os campos todos.
+                                    </h2>
+                                </div>
+                                <div class="slds-form" role="list">
+                                    <div class="slds-grid slds-gutters_small">
+                                        <div class="slds-col slds-has-flexi-truncate" role="listitem">
+                                            <div class="slds-form-element slds-form-element_edit slds-hint-parent">
+                                                
+                                                <div class="slds-form-element__control">
+                                                    <span class="slds-form-element__static">
+                                                        <fieldset class="slds-form--compound">
+                                                            <div class="slds-form-element__group ">
+                                                                <div class="slds-form-element__row">
+                                                                    
+                                                                    <div class="slds-form-element">
+                                                                        <span class="slds-form-element__label">{!$ObjectType.OrderItem.Fields.Data_de_chegada_de_recolha__c.Label}</span>
+                                                                        <apex:inputField value="{!dummyLineRecolha.Data_de_emissao_do_documento_financeiro__c}" styleClass="slds-input" id="inputDataDevolucao"/>
+                                                                    </div>
+                                                                    <div class="slds-form-element">
+                                                                        <span class="slds-form-element__label">H</span>
+                                                                        <apex:selectList value="{!hora}" multiselect="false" size="1" styleClass="slds-input">
+                                                                            <apex:selectOptions value="{!allHours}"/>
+                                                                        </apex:selectList>
+                                                                    </div>
+                                                                    <div class="slds-form-element">
+                                                                        <span class="slds-form-element__label">M</span>
+                                                                        <apex:selectList value="{!minuto}" multiselect="false" size="1" styleClass="slds-input">
+                                                                            <apex:selectOptions value="{!allMinutes}"/>
+                                                                        </apex:selectList>
+                                                                    </div>
+                                                                    
+                                                                </div>
+                                                            </div>
+                                                        </fieldset>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="slds-grid slds-gutters_small">
+                                        <div class="slds-col slds-has-flexi-truncate" role="listitem">
+                                            <div class="slds-form-element slds-form-element_edit slds-hint-parent">
+                                                <span class="slds-form-element__label">{!$ObjectType.OrderItem.Fields.Local_de_armazenamento_da_devolucao__c.Label}</span>
+                                                <div class="slds-form-element__control">
+                                                    <span class="slds-form-element__static">
+                                                        <apex:inputField value="{!linhasDevolucao[pickedLineDevolucao].Local_de_armazenamento_da_devolucao__c}" styleClass="slds-input" id="inputLocalDevolucao"/>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="slds-col slds-has-flexi-truncate" role="listitem">
+                                            <div class="slds-form-element slds-form-element_edit slds-hint-parent">
+                                                <span class="slds-form-element__label">{!$ObjectType.OrderItem.Fields.Quantidade_recebida_na_devolucao__c.Label}</span>
+                                                <div class="slds-form-element__control">
+                                                    <span class="slds-form-element__static">
+                                                        <apex:inputField value="{!linhasDevolucao[pickedLineDevolucao].Quantidade_recebida_na_devolucao__c}" styleClass="slds-input" id="inputQttDevolucao"/>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="slds-grid slds-gutters_small">
+                                        <div class="slds-col slds-has-flexi-truncate" role="listitem">
+                                            <div class="slds-form-element slds-form-element_edit slds-hint-parent">
+                                                <span class="slds-form-element__label">{!$ObjectType.OrderItem.Fields.Devolucao_recebida_por__c.Label}</span>
+                                                <div class="slds-form-element__control">
+                                                    <span class="slds-form-element__static">
+                                                        <apex:inputField value="{!linhasDevolucao[pickedLineDevolucao].devolucao_recebida_por__c}" styleClass="slds-input" id="inputRecebDevolucao"/>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                </div>
+                            </apex:outputPanel>
+                        </apex:outputPanel>
+                    </div>
+                    <div class="slds-modal__footer">
+                        <a class="slds-button slds-button_brand" onclick="validateValuesDevolucao();">{!$Label.Submeter}</a>
+                    </div>
+                </div>
+            </div>
+            <div class="slds-spinner_container" style="display: none; position: fixed;" id="spinner">
+                <div role="status" class="slds-spinner slds-spinner--medium">
+                    <span class="slds-assistive-text">Loading</span>
+                    <div class="slds-spinner__dot-a"></div>
+                    <div class="slds-spinner__dot-b"></div>
+                </div>
+            </div>
+            <div class="slds-backdrop" id="backdrop"></div>
+        </div>
+        <script>
+        function validateValues(){
+            
+            var warning = document.getElementById("modal_alert");
+            warning.classList.add("slds-hide");
+            
+            var valid = true;
+            var input1 = document.getElementById("{!$Component.inputData}");
+            if(input1.value == ''){
+                input1.parentElement.classList.add("slds-has-error");
+                valid = false;
+            }
+            var input2 = document.getElementById("{!$Component.inputLocal}");
+            if(input2.value == ''){
+                input2.parentElement.classList.add("slds-has-error");
+                valid = false;
+            }
+            var input3 = document.getElementById("{!$Component.inputQtt}");
+            if(input3.value == ''){
+                input3.parentElement.classList.add("slds-has-error");
+                valid = false;
+            }
+            var input4 = document.getElementById("{!$Component.inputReceb}");
+            if(input4.value == ''){
+                input4.parentElement.classList.add("slds-has-error");
+                valid = false;
+            }
+            if(valid){
+                spinnerOn(true);
+                updateLine();
+            }else{
+                warning.classList.remove("slds-hide");
+            }
+        }
+        function validateValuesDevolucao(){
+            
+            var warning = document.getElementById("modal_alertDevolucao");
+            warning.classList.add("slds-hide");
+            
+            var valid = true;
+            var input1 = document.getElementById("{!$Component.inputDataDevolucao}");
+            if(input1.value == ''){
+                input1.parentElement.classList.add("slds-has-error");
+                valid = false;
+            }
+            var input2 = document.getElementById("{!$Component.inputLocalDevolucao}");
+            if(input2.value == ''){
+                input2.parentElement.classList.add("slds-has-error");
+                valid = false;
+            }
+            var input3 = document.getElementById("{!$Component.inputQttDevolucao}");
+            if(input3.value == ''){
+                input3.parentElement.classList.add("slds-has-error");
+                valid = false;
+            }
+            var input4 = document.getElementById("{!$Component.inputRecebDevolucao}");
+            if(input4.value == ''){
+                input4.parentElement.classList.add("slds-has-error");
+                valid = false;
+            }
+            if(valid){
+                spinnerOn(true);
+                updateLine();
+            }else{
+                warning.classList.remove("slds-hide");
+            }
+        }
+        </script>
+    </apex:form>
+</apex:page>

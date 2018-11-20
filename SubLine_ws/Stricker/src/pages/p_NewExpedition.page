@@ -1,0 +1,1060 @@
+<apex:page standardController="Expedicao__c" extensions="c_NewExpedition" recordSetVar="exp">
+    <head>
+        <apex:includeScript value="{!URLFOR($Resource.bs, '/jQuery_2_0_3.js')}"/>
+        <apex:includeScript value="{!URLFOR($Resource.DataTables_1100, 'DataTables-1.10.12/media/js/jquery.dataTables.js')}"/>
+        <apex:includeScript value="{!URLFOR($Resource.jQueryDataTables_TableToolsZip, 'TableTools-2.2.4/js/dataTables.tableTools.js')}"/>
+        
+        <apex:stylesheet value="{!URLFOR($Resource.DataTables_1100, 'DataTables-1.10.12/media/css/jquery.dataTables.css')}"/>
+        <apex:stylesheet value="{!URLFOR($Resource.jQueryDataTables_TableToolsZip, 'TableTools-2.2.4/css/dataTables.tableTools.css')}"/>
+        <apex:includeScript value="/support/console/39.0/integration.js"/>
+        <style>
+            .lookupHoverDetail{
+            z-index: 100000000;
+            }
+            .dataTables_wrapper .dataTables_paginate .paginate_button.current{
+            border-radius: 2px;
+            color: #005fb2 !important;
+            transition: color 0.05s linear, background-color 0.05s linear !important;
+            background: linear-gradient(to bottom, white 0%, #f4f6f9 100%);
+            background-color: #f4f6f9;
+            border: 1px solid #d8dde6;
+            }
+            .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover{
+            background: linear-gradient(to bottom, white 0%, #f4f6f9 100%);
+            }
+            .dataTables_wrapper .dataTables_paginate .paginate_button:hover{
+            background: linear-gradient(to bottom, #005fb2 0%, #0070d2 100%);
+            border: 1px solid transparent;
+            }
+            table.dataTable.no-footer {
+            border-bottom: none;
+            }
+            table.dataTable thead th, table.dataTable thead td {
+            border-bottom: none;
+            }
+            
+            .dataTables_filter{
+            margin: 1rem;
+            }
+            
+            .dataTables_filter input{
+            background-color: white;
+            color: #16325c;
+            border: 1px solid #d8dde6;
+            border-radius: 0.25rem;
+            width: 100%;
+            transition: border 0.1s linear, background-color 0.1s linear;
+            display: inline-block;
+            padding: 0 1rem 0 0.75rem;
+            line-height: 1.875rem;
+            min-height: calc(1.875rem + (1px * 2));
+            }
+            .dataTables_filter input:focus, input:active{
+            outline: 0;
+            border-color: #1589ee;
+            background-color: white;
+            box-shadow: 0 0 3px #0070D2;
+            }
+            .dataTables_length select{
+            background-color: white;
+            color: #16325c;
+            border: 1px solid #d8dde6;
+            border-radius: 0.25rem;
+            width: 5rem;
+            transition: border 0.1s linear, background-color 0.1s linear;
+            display: inline-block;
+            padding: 0 1rem 0 0.75rem;
+            line-height: 1.875rem;
+            min-height: calc(1.875rem + (1px * 2));
+            }
+            .dataTables_length select:focus, select:active{
+            outline: 0;
+            border-color: #1589ee;
+            background-color: white;
+            box-shadow: 0 0 3px #0070D2;
+            }
+            .dataTables_length{
+            margin-top: 1.5rem;
+            width: 12rem;
+            }       
+            table.dataTable thead .sorting::after{
+            display:none;
+            }
+            table.dataTable thead .sorting_asc::after {
+            display:none;
+            }
+            table.dataTable thead .sorting_desc::after {
+            display:none;
+            }     
+        </style>
+        
+        <script>
+        
+        document.addEventListener("DOMContentLoaded", function(event) {
+            var setTabTitle= function setTabTitle(result) {
+                // console.log(result);
+                sforce.console.setTabTitle('{!$Label.Nova_expedicao}', null);
+            };
+            sforce.console.getFocusedSubtabId(setTabTitle);
+        });
+        
+        j$ = jQuery.noConflict();
+        j$(document).ready(function(){
+            tablesort();
+        });
+        var cookieName = "nExp";
+        function tablesort(){
+            var startLength = 5;
+            var cook = (0 + getCookie(cookieName)-1) * startLength;
+            if(getCookie(cookieName) == null || getCookie(cookieName) <= 0){
+                cook = 0;
+            }
+
+            j$("[id$='dataTable1']").dataTable({
+                "bDestroy": true,
+                "sPaginationType": "full_numbers",
+                "iDisplayLength": startLength,
+                "displayStart": cook,
+                "aLengthMenu": [[5, 10, 25, 50, 100, 150, -1], [5, 10, 25, 50, 100, 150, "All"]],
+                "aoColumnDefs" : [],
+                "oLanguage": {
+                    "sProcessing":   "Processing...",
+                    "sLengthMenu":   "Show _MENU_ records",
+                    "sZeroRecords":  "No results found",
+                    "sInfo":         "_START_ to _END_ of _TOTAL_ total records",
+                    "sInfoEmpty":    "0 of 0 records",
+                    "sInfoFiltered": "(filtered of _MAX_ total records)",
+                    "sInfoPostFix":  "",
+                    "sSearch":       "Search:",
+                    "sUrl":          "",
+                    "oPaginate": {
+                        "sFirst":    "<<",
+                        "sPrevious": "<",
+                        "sNext":     ">",
+                        "sLast":     ">>"
+                    }
+                }
+            });
+        }
+        function setCookie(){
+            var curr = j$('.current');
+            if(curr != null){
+                var text = curr[0].innerText;
+                document.cookie= cookieName + "=" + text + ";";
+            }
+        }
+        function getCookie(name) {
+            var value = "; " + document.cookie;
+            var parts = value.split("; " + name + "=");
+            if (parts.length == 2) return parts.pop().split(";").shift();
+        }
+        </script>
+        
+        <apex:outputPanel id="startScript">
+            <script>
+            function checkStart(){
+                if({!!esperaIntegracao}){
+                    if({!!opp.Erro_comunicacao__c}){
+                        hideModal("modalWait");
+                        showModal("modalMoradas");
+                        tablesort();
+                        disableCuidado();
+                    }else{
+                        hideModal("modalWait");
+                        showModal("modalError");
+                    }
+                }else{
+                    showModal("modalWait");
+                    var nextCheck = function(){
+                        //console.log("checking");
+                        checkAgain();
+                    };
+                    //metodo da página principal
+                    setTimeout(nextCheck, 3000);
+                }
+            }
+            </script>
+        </apex:outputPanel>
+    </head>
+    <apex:form >
+        <apex:actionFunction name="checkAgain" action="{!reCheckIntegration}" rerender="startScript, moradas, moradasFooter" oncomplete="checkStart();"/>
+        <apex:slds />
+        <div class="slds-scope">
+            <div class="slds-backdrop" id="backdrop"></div>
+            <div class="slds-spinner_container" style="display:none;" id="spinner">
+                <div role="status" class="slds-spinner slds-spinner--medium">
+                    <span class="slds-assistive-text">Loading</span>
+                    <div class="slds-spinner__dot-a"></div>
+                    <div class="slds-spinner__dot-b"></div>
+                </div>
+            </div>
+            <div class="slds-modal" aria-hidden="false" role="dialog" id="modalWait">
+                <div class="slds-modal__container slds-size--3-of-4" style="max-width: -webkit-fill-available;">
+                    <div class="slds-modal__header slds-p-around--none">
+                        <div class="slds-page-header">
+                            <div class="slds-media">
+                                <div class="slds-media__body">
+                                    <h1 class="slds-page-header__title slds-truncate slds-align-middle">{!$Label.Nova_expedicao}</h1>
+                                    <p class="slds-text-body_small slds-line-height_reset">{!opp.Name}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="slds-modal__content slds-p-around--medium slds-text-heading--small slds-text-color--error">
+                        <img id="processing_gif_photo" src="{!$Resource.processing_gif}" alt="A processar..." style="margin: auto auto;" class="slds-p-right--large"/>{!$Label.Aguardar_Dados_transportadora}
+                    </div>
+                    <div class="slds-modal__footer">
+                        <apex:commandButton value="{!$Label.Cancelar}" styleClass="slds-button slds-button--destructive" onclick="closeTab()"/>
+                    </div>
+                </div>
+            </div>
+            <div class="slds-modal" aria-hidden="false" role="dialog" id="modalError">
+                <div class="slds-modal__container slds-size--3-of-4" style="max-width: -webkit-fill-available;">
+                    <div class="slds-modal__header slds-p-around--none">
+                        <div class="slds-page-header">
+                            <div class="slds-media">
+                                <div class="slds-media__body">
+                                    <h1 class="slds-page-header__title slds-truncate slds-align-middle">{!$Label.Nova_expedicao}</h1>
+                                    <p class="slds-text-body_small slds-line-height_reset">{!opp.Name}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="slds-modal__content slds-p-around--medium slds-text-heading--small slds-text-color--error">
+                        <div class="slds-text-color_error slds-text-heading_small">
+                            {!$Label.Erro_comunicacao}
+                        </div>
+                    </div>
+                    <div class="slds-modal__footer">
+                        <apex:commandButton value="{!$Label.Cancelar}" styleClass="slds-button slds-button--destructive" onclick="closeTab()"/>
+                    </div>
+                </div>
+            </div>
+            <div class="slds-modal" aria-hidden="false" role="dialog" id="modalMoradas">
+                <div class="slds-modal__container slds-size--3-of-4" style="max-width: -webkit-fill-available;">
+                    <div class="slds-modal__header slds-p-around--none">
+                        <div class="slds-page-header">
+                            <div class="slds-media">
+                                <div class="slds-media__figure">
+                                    <span class="slds-icon_container slds-icon-custom-custom98">
+                                        <svg class="slds-icon" aria-hidden="true">
+                                            <use xmlns:xlink="http://www.w3.org/1999/xlink" 
+                                                 xlink:href="{!URLFOR($Asset.SLDS , '/assets/icons/custom-sprite/svg/symbols.svg#custom98')}"></use>
+                                        </svg>
+                                    </span>
+                                </div>
+                                <div class="slds-media__body">
+                                    <apex:outputPanel rendered="{!opp.Account.Morada_principal__c != null}">
+                                        <div class="slds-float--left">
+                                            <h1 class="slds-page-header__title slds-truncate slds-align-middle slds-text-align--left">{!$Label.Nova_expedicao}</h1>
+                                            <p class="slds-text-body_small slds-line-height_reset">{!opp.Name}</p>
+                                        </div>
+                                        <p class="slds-page-header__title slds-truncate slds-align-middle" style="padding-top: 5px;padding-right: 15px;">{!$ObjectType.Account.Fields.Morada_principal__c.Label} - {!opp.Account.Morada_principal__c}</p>
+                                    </apex:outputPanel>
+                                    
+                                    <apex:outputPanel rendered="{!opp.Account.Morada_principal__c == null}">
+                                        <h1 class="slds-page-header__title slds-truncate slds-align-middle">{!$Label.Nova_expedicao}</h1>
+                                        <p class="slds-text-body_small slds-line-height_reset">{!opp.Name}</p>
+                                    </apex:outputPanel>
+                                </div>
+                                <div class="slds-form-element">
+                                    <apex:outputPanel rendered="{!!existsExp && !isAuthorized}">
+                                        <a class="slds-button slds-button--neutral" onclick="hideModal('modalMoradas');showModal('modalPesquisaMorada');">Pesquisar morada</a>
+                                        <apex:commandButton value="{!$Label.Criar_morada}" styleClass="slds-button slds-button--neutral" rendered="{!linhasOpp.size > 0}"
+                                                            onclick="showSpinner();hideModal('modalMoradas');" action="{!dummyMethod}" reRender=""
+                                                            oncomplete="hideSpinner();showModal('modalCriaMorada');"/>
+                                    </apex:outputPanel>
+                                </div>
+                                
+                                <apex:outputPanel id="messages1">
+                                    <apex:pageMessages escape="true"/>
+                                </apex:outputPanel>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="slds-modal__content slds-p-around--medium slds-p--top-none" style="padding-top: 0px;">
+                        <apex:outputPanel id="moradas">
+                            <apex:outputPanel rendered="{!!isAuthorized}">
+                                <apex:outputPanel id="moradasPanel" rendered="{!And(!existsExp,linhasOpp.size > 0)}">
+                                    <table class="slds-table slds-table_bordered slds-table_cell-buffer" id="dataTable1">
+                                        <thead>
+                                            <tr>
+                                                <th>
+                                                    &nbsp;
+                                                </th>
+                                                <th>
+                                                    {!$ObjectType.Morada_de_entrega__c.Fields.Nome_da_empresa__c.Label}
+                                                </th>
+                                                <th>
+                                                    {!$ObjectType.Morada_de_entrega__c.Fields.Morada_de_entrega__c.Label}
+                                                </th>
+                                                <th>
+                                                    {!$ObjectType.Morada_de_entrega__c.Fields.Codigo_postal__c.Label}
+                                                </th>
+                                                <th>
+                                                    {!$ObjectType.Morada_de_entrega__c.Fields.Localidade__c.Label}
+                                                </th>
+                                                <th>
+                                                    {!$ObjectType.Morada_de_entrega__c.Fields.Pais__c.Label}
+                                                </th>
+                                                <th>
+                                                    {!$ObjectType.Morada_de_entrega__c.Fields.Ao_cuidado_de__c.Label}
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <apex:repeat value="{!moradas}" var="index">
+                                                <apex:repeat value="{!moradas[index]}" var="morada">
+                                                    <tr>
+                                                        <td>
+                                                            <div class="slds-form-element__control">
+                                                                <span class="slds-checkbox">
+                                                                    <apex:inputCheckbox value="{!morada.selected}" id="checkbox" styleClass="checkDisable"
+                                                                                        onchange="changeCheckboxes(this.checked, '{!morada.morada.Id}')"/>
+                                                                    <apex:outputLabel styleClass="slds-checkbox__label" for="checkbox">
+                                                                        <span class="slds-checkbox--faux"></span>
+                                                                    </apex:outputLabel>
+                                                                </span>
+                                                            </div>
+                                                        </td>
+                                                        <td>
+                                                            <apex:outputField value="{!morada.morada.Nome_da_empresa__c}"/>
+                                                        </td>
+                                                        <td>
+                                                            <apex:outputField value="{!morada.morada.Morada_de_entrega__c}"/>
+                                                        </td>
+                                                        <td>
+                                                            <apex:outputField value="{!morada.morada.Codigo_postal__c}"/>
+                                                        </td>
+                                                        <td>
+                                                            <apex:outputField value="{!morada.morada.Localidade__c}"/>
+                                                        </td>
+                                                        <td>
+                                                            <apex:outputField value="{!morada.morada.Pais__c}"/>
+                                                        </td>
+                                                        <td>
+                                                            <apex:inputText value="{!morada.morada.Ao_cuidado_de__c}" styleClass="slds-input slds-hide cuidadoDe cuidInput{!morada.morada.Id}"/>
+                                                            <apex:outputText value="{!morada.morada.Ao_cuidado_de__c}" styleClass="cuidadoDeOutput cuidOutput{!morada.morada.Id}"/>
+                                                        </td>
+                                                    </tr>
+                                                </apex:repeat>
+                                            </apex:repeat>
+                                        </tbody>
+                                    </table>
+                                    <script>
+                                    window.onload =  function() { 
+                                        disableCuidado();
+                                    }
+                                    function disableCuidado(){
+                                        var inputs = document.getElementsByClassName("cuidadoDe");
+                                        for(var i = 0 ; i < inputs.length ; i++){
+                                            inputs[i].classList.add("slds-hide");
+                                        }
+                                        var inputs2 = document.getElementsByClassName("cuidadoDeOutput");
+                                        for(var i = 0 ; i < inputs2.length ; i++){
+                                            inputs2[i].classList.remove("slds-hide");
+                                        }
+                                    }
+                                    function changeCheckboxes(checked, moradaId){
+                                        var eles = document.getElementsByClassName("checkDisable");
+                                        var intDisabled = -1;
+                                        if(checked){
+                                            for(var i = 0 ; i < eles.length ; i++){
+                                                if(!eles[i].checked){
+                                                    eles[i].setAttribute("disabled", "true");
+                                                    eles[i].checked = false;
+                                                }else{
+                                                    intDisabled = i;
+                                                }
+                                            }
+                                        }else{
+                                            for(var i = 0 ; i < eles.length ; i++){
+                                                eles[i].removeAttribute("disabled");
+                                            }
+                                        }
+                                        if(intDisabled != -1){
+                                            var inputs = document.getElementsByClassName("cuidInput"+moradaId);
+                                            if(inputs.length > 0){
+                                                inputs[0].classList.remove("slds-hide");
+                                            }
+                                            var inputs2 = document.getElementsByClassName("cuidOutput"+moradaId);
+                                            if(inputs2.length > 0){
+                                                inputs2[0].classList.add("slds-hide");
+                                            }
+                                        }else{
+                                            disableCuidado();
+                                        }
+                                    }
+                                    </script>
+                                </apex:outputPanel>
+                                <apex:outputPanel id="existeExp" rendered="{!existsExp}">
+                                    <div class="slds-text-color_error slds-text-heading_small slds-m-top--small">
+                                        {!$Label.Expedicao_neste_dossier}&nbsp;
+                                    </div>
+                                </apex:outputPanel>
+                                
+                                <apex:outputPanel id="semProds" rendered="{!linhasOpp.size = 0}">
+                                    <div class="slds-text-color_error slds-text-heading_small slds-m-top--small">
+                                        {!$Label.Sem_produtos}
+                                    </div>
+                                </apex:outputPanel>
+                            </apex:outputPanel>
+                            <apex:outputPanel rendered="{!isAuthorized}">
+                                <apex:outputPanel rendered="{!opp.Autorizada__c != ''}">
+                                    <h2>{!$Label.Dossier_autorizado}</h2>
+                                </apex:outputPanel>
+                                <apex:outputPanel rendered="{!opp.Impresso__c}">
+                                    <h2>{!$Label.Dossier_impresso}</h2>
+                                </apex:outputPanel>
+                            </apex:outputPanel>
+                        </apex:outputPanel>
+                    </div>
+                    <div class="slds-modal__footer">
+                        <apex:outputPanel id="moradasButtons">
+                                <apex:outputPanel rendered="{!!sucess && errorMsg = ''}">{!$Label.Seleccionar_uma_linha}</apex:outputPanel>
+                                <apex:commandButton value="{!$Label.Cancelar}" styleClass="slds-button slds-button--destructive" onclick="closeTab()"/>
+                                <apex:commandButton value="{!$Label.Confirmar}" styleClass="slds-button slds-button--neutral slds-button--brand"
+                                                    onclick="setCookie();showSpinner();hideModal('modalMoradas');" rendered="{!And(!isAuthorized,!existsExp,linhasOpp.size > 0)}"
+                                                    rerender="moradasButtons,transpRec,prodTable,painelTransp, messages1" action="{!checkMoradas}"
+                                                    oncomplete="{!If(sucess, if(opp.RecordType.DeveloperName != 'Orcamento', transpHelpString, linhasHelpString) , moradasHelpString)}"/>
+                                
+                        </apex:outputPanel>
+                    </div>
+                </div>
+            </div>
+            <div class="slds-modal" aria-hidden="false" role="dialog" id="modalPesquisaMorada">
+                <div class="slds-modal__container" style="max-width: -webkit-fill-available;">
+                    <div class="slds-modal__header slds-p-around--none">
+                        <div class="slds-page-header">
+                            <div class="slds-media">
+                                <div class="slds-media__figure">
+                                    <span class="slds-icon_container slds-icon-custom-custom85">
+                                        <svg class="slds-icon" aria-hidden="true">
+                                            <use xmlns:xlink="http://www.w3.org/1999/xlink" 
+                                                 xlink:href="{!URLFOR($Asset.SLDS , '/assets/icons/custom-sprite/svg/symbols.svg#custom85')}"></use>
+                                        </svg>
+                                    </span>
+                                </div>
+                                <div class="slds-media__body">
+                                    <h1 class="slds-page-header__title slds-truncate slds-align-middle">Pesquisa morada</h1>
+                                    <p class="slds-text-body_small slds-line-height_reset">{!opp.Name}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="slds-modal__content slds-p-around--medium">
+                        <div class="slds-form-element__control">
+                            <div class="slds-combobox_container">
+                                <apex:actionFunction name="callFilterDir" action="{!applyFilterDir}" reRender="dirListPanel, dirPanel" oncomplete="renderContact();"/>
+                                <div class="slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click" aria-expanded="false" aria-haspopup="listbox" role="combobox" id="dirCombobox">
+                                    <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right" role="none">
+                                        <apex:inputText html-autocomplete="off" value="{!filterDir}" onfocus="showList('dirCombobox');" onkeyup="callFilterDir();" styleClass="slds-input slds-combobox__input" 
+                                                        id="dirFilter" html-placeholder="Search..." />
+                                        
+                                        <apex:outputPanel id="dirPanel">
+                                            <apex:inputHidden value="{!moradaFilter.Id}" id="hiddenOwner"/>
+                                        </apex:outputPanel>
+                                        <span class="slds-icon_container slds-icon-utility-search slds-input__icon slds-input__icon_right">
+                                            <svg class="slds-icon slds-icon slds-icon_x-small slds-icon-text-default" aria-hidden="true">
+                                                <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{!URLFOR($Asset.SLDS , '/assets/icons/utility-sprite/svg/symbols.svg#search')}" />
+                                            </svg>
+                                        </span>
+                                    </div>
+                                    <apex:outputPanel id="dirListPanel">
+                                        <apex:outputPanel rendered="{!filteredListDir.size > 0}">
+                                            <div id="listbox-id-1" class="slds-dropdown slds-dropdown_length-with-icon-7 slds-dropdown_fluid" role="listbox" style="position: relative;">
+                                                <ul class="slds-listbox slds-listbox_vertical" role="presentation">
+                                                    <!-- REPEAT -->
+                                                    <apex:repeat value="{!filteredListDir}" var="dir">
+                                                        <li role="presentation" class="slds-listbox__item" 
+                                                            onclick="document.getElementById('{!$Component.dirFilter}').value = '{!dir.Ao_cuidado_de__c}' + ' - ' + '{!dir.Nome_da_empresa__c}' + ' - ' + '{!dir.Morada_de_entrega__c}'; 
+                                                                     document.getElementById('{!$Component.hiddenOwner}').value = '{!dir.Id}'; 
+                                                                     hideList('dirCombobox');
+                                                                     callFilterDir();">
+                                                            <div id="option1" class="slds-media slds-listbox__option slds-listbox__option_entity slds-listbox__option_has-meta" role="option">
+                                                                <span class="slds-media__figure">
+                                                                    <span class="slds-icon_container slds-icon-standard-contact contactIcon" id="contact{!dir.Id}">
+                                                                        <!-- AQUI É CRIADO O BOTÃO COM O ICON renderContact() -->
+                                                                    </span>
+                                                                </span>
+                                                                <span class="slds-media__body">
+                                                                    <span class="slds-listbox__option-text slds-listbox__option-text_entity">{!dir.Ao_cuidado_de__c} - {!dir.Nome_da_empresa__c} - {!dir.Morada_de_entrega__c}</span>
+                                                                    <span class="slds-listbox__option-meta slds-listbox__option-meta_entity">
+                                                                         {!dir.Codigo_postal__c} {!dir.Localidade__c} {!dir.Pais__c} - {!dir.Telefone_logistico__c}</span>
+                                                                </span>
+                                                            </div>
+                                                        </li>
+                                                    </apex:repeat>      
+                                                </ul>
+                                            </div>   
+                                        </apex:outputPanel>                                       
+                                    </apex:outputPanel>
+                                </div>
+                            </div>
+                        </div>
+                        <script>
+                        function showList(eleId){
+                            var ele = document.getElementById(eleId);
+                            ele.classList.add("slds-is-open");
+                        }
+                        
+                        function hideList(eleId){
+                            var ele = document.getElementById(eleId);
+                            ele.classList.remove("slds-is-open");
+                        }
+                        var j$ = jQuery.noConflict();
+                        function renderContact(){
+                            var imageURL = "{!URLFOR($Asset.SLDS , '/assets/icons/standard-sprite/svg/symbols.svg#contact')}";
+                            var SVG = j$('<svg/>', {
+                                class: 'slds-icon slds-icon_small',
+                            });
+                            var SVGUse = j$('<use/>');
+                            SVGUse.attr('xlink:href',imageURL);
+                            var eles = document.getElementsByClassName("contactIcon");
+                            console.log(eles);
+                            for(var i = 0; i < eles.length; i++){
+                                var aux ="#"+eles[i].id;
+                                j$(aux).html("");
+                                j$(aux).prepend(SVG.append(SVGUse));
+                                j$(aux).html(j$(aux).html());
+                            }
+                        }
+                        </script>
+                    </div>
+                    <div class="slds-modal__footer">
+                        <a class="slds-button slds-button--destructive"  onclick="hideModal('modalPesquisaMorada');showModal('modalMoradas');">{!$Label.Cancelar}</a>
+                        <a class="slds-button slds-button--neutral slds-button--brand" onclick="showSpinner();hideModal('modalPesquisaMorada');pesquisaCheckMoradas();">{!$Label.Confirmar}</a>
+                        <apex:outputPanel id="pesquisaFunction">
+                            <apex:actionFunction name="pesquisaCheckMoradas" action="{!checkMoradas}" rerender="pesquisaFunction,transpRec,prodTable,painelTransp, messages1" 
+                                                 oncomplete="{!If(sucess, if(opp.RecordType.DeveloperName != 'Orcamento', transpHelpString, linhasHelpString) , moradasHelpString)}"/>
+                        </apex:outputPanel>
+                    </div>
+                </div>
+            </div>
+            <div class="slds-modal" aria-hidden="false" role="dialog" id="modalCriaMorada">
+                <div class="slds-modal__container">
+                    <div class="slds-modal__header slds-p-around--none">
+                        <div class="slds-page-header">
+                            <div class="slds-media">
+                                <div class="slds-media__figure">
+                                    <span class="slds-icon_container slds-icon-custom-custom85">
+                                        <svg class="slds-icon" aria-hidden="true">
+                                            <use xmlns:xlink="http://www.w3.org/1999/xlink" 
+                                                 xlink:href="{!URLFOR($Asset.SLDS , '/assets/icons/custom-sprite/svg/symbols.svg#custom85')}"></use>
+                                        </svg>
+                                    </span>
+                                </div>
+                                <div class="slds-media__body">
+                                    <h1 class="slds-page-header__title slds-truncate slds-align-middle">{!$Label.Criar_morada}</h1>
+                                    <p class="slds-text-body_small slds-line-height_reset">{!opp.Name}</p>
+                                </div>
+                                <div class="slds-form-element">
+                                    <apex:commandButton value="Copiar Morada Online" styleClass="slds-button slds-button--neutral"
+                                                        action="{!copiaMoradaOnline}" reRender="criaPanel"/>
+                                </div>
+                                <apex:outputPanel id="messages4">
+                                    <apex:pageMessages escape="true"/>
+                                </apex:outputPanel>
+                                
+                            </div>
+                        </div>
+                    </div>
+                    <div class="slds-modal__content slds-p-around--medium">
+                        <apex:outputPanel id="criaPanel">
+                            <fieldset class="slds-form--compound" >
+                                <div class="slds-form-element__group ">
+                                    <div class="slds-form-element__row">
+                                        <div class="slds-form-element">
+                                            <apex:outputLabel ><abbr class="slds-required">*</abbr>{!$ObjectType.Morada_de_entrega__c.Fields.Nome_da_empresa__c.Label}</apex:outputLabel><p>
+                                            </p>
+                                            <apex:inputField value="{!novaMorada.Nome_da_empresa__c}" styleClass="slds-input"/>
+                                        </div>
+                                        <div class="slds-form-element">
+                                            <apex:outputLabel >{!$ObjectType.Morada_de_entrega__c.Fields.Conta__c.Label}</apex:outputLabel><p>
+                                            </p>
+                                            <apex:outputField value="{!novaMorada.Conta__c}" styleClass="slds-input"/>
+                                        </div>
+                                    </div>
+                                    <div class="slds-form-element__row">
+                                        <div class="slds-form-element">
+                                            <apex:outputLabel ><abbr class="slds-required">*</abbr>{!$ObjectType.Morada_de_entrega__c.Fields.Morada_de_entrega__c.Label}</apex:outputLabel><p>
+                                            </p>
+                                            <apex:inputField value="{!novaMorada.Morada_de_entrega__c}" styleClass="slds-input"/>
+                                        </div>
+                                        <div class="slds-form-element">
+                                            <apex:outputLabel ><abbr class="slds-required">*</abbr>{!$ObjectType.Morada_de_entrega__c.Fields.Telefone_logistico__c.Label}</apex:outputLabel><p>
+                                            </p>
+                                            <apex:inputField value="{!novaMorada.Telefone_logistico__c}" styleClass="slds-input"/>
+                                        </div>
+                                    </div>
+                                    <div class="slds-form-element__row">
+                                        <div class="slds-form-element">
+                                            <apex:outputLabel ><abbr class="slds-required">*</abbr>{!$ObjectType.Morada_de_entrega__c.Fields.Codigo_postal__c.Label}</apex:outputLabel><p>
+                                            </p>
+                                            <apex:inputField value="{!novaMorada.Codigo_postal__c}" styleClass="slds-input"/>
+                                        </div>
+                                        <div class="slds-form-element">
+                                            <apex:outputLabel ><abbr class="slds-required">*</abbr>{!$ObjectType.Morada_de_entrega__c.Fields.Localidade__c.Label}</apex:outputLabel><p>
+                                            </p>
+                                            <apex:inputField value="{!novaMorada.Localidade__c}" styleClass="slds-input"/>
+                                        </div>
+                                    </div>
+                                    <div class="slds-form-element__row">
+                                        <div class="slds-form-element">
+                                            <apex:outputLabel ><abbr class="slds-required">*</abbr>{!$ObjectType.Morada_de_entrega__c.Fields.Pais__c.Label}</apex:outputLabel><p>
+                                            </p>
+                                            <apex:inputField value="{!novaMorada.Pais__c}" styleClass="slds-input"/>
+                                        </div>
+                                        <div class="slds-form-element">
+                                            <apex:outputLabel >{!$ObjectType.Morada_de_entrega__c.Fields.Ao_cuidado_de__c.Label}</apex:outputLabel><p>
+                                            </p>
+                                            <apex:inputField value="{!novaMorada.Ao_cuidado_de__c}" styleClass="slds-input"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </fieldset>
+                        </apex:outputPanel>
+                    </div>
+                    <div class="slds-modal__footer">
+                        <apex:outputPanel id="criaButtons">
+                            <apex:commandButton value="{!$Label.Cancelar}" styleClass="slds-button slds-button--destructive"
+                                                onclick="showSpinner();hideModal('modalCriaMorada');" action="{!dummyMethod}" reRender=""
+                                                oncomplete="hideSpinner();showModal('modalMoradas');"/>
+                            <apex:commandButton value="{!$Label.Confirmar}" styleClass="slds-button slds-button--neutral slds-button--brand"
+                                                onclick="showSpinner();hideModal('modalCriaMorada');" action="{!criaMorada}"
+                                                rerender="criaButtons, painelTransp,transpRec, messages4" 
+                                                oncomplete="{!If(sucess, if(opp.RecordType.DeveloperName != 'Orcamento', transpHelpString, linhasHelpString)
+                                                            + 'changeCheckboxes(true);rerenderMoradasPanel();' + if(opp.RecordType.DeveloperName != 'Orcamento', 'stopToCall();', ''), criaHelpString)}"/>
+                            <apex:actionFunction name="rerenderMoradasPanel" rerender="moradasPanel"/>
+                            <apex:actionFunction name="stopToCall" action="{!checkLinhas}" rerender="painelTransp,transpRec, messages4" oncomplete="tablesort();"/>
+                        </apex:outputPanel>
+                    </div>
+                </div>
+            </div>
+            <div class="slds-modal" aria-hidden="false" role="dialog" id="modalLinhas">
+                <div class="slds-modal__container slds-size--3-of-4" style="max-width: -webkit-fill-available;">
+                    <div class="slds-modal__header slds-p-around--none">
+                        <div class="slds-page-header">
+                            <div class="slds-media">
+                                <div class="slds-media__figure">
+                                    <span class="slds-icon_container slds-icon-standard-product-item">
+                                        <svg class="slds-icon" aria-hidden="true">
+                                            <use xmlns:xlink="http://www.w3.org/1999/xlink" 
+                                                 xlink:href="{!URLFOR($Asset.SLDS , '/assets/icons/standard-sprite/svg/symbols.svg#product_item')}"></use>
+                                        </svg>
+                                    </span>
+                                </div>
+                                <div class="slds-media__body">
+                                    <h1 class="slds-page-header__title slds-truncate slds-align-middle">Escolher Linhas</h1>
+                                    <p class="slds-text-body_small slds-line-height_reset">{!opp.Name}</p>
+                                </div>
+                                
+                                <apex:outputPanel id="messages2">
+                                    <apex:pageMessages escape="true"/>
+                                </apex:outputPanel>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="slds-modal__content slds-p-around--medium">
+                        <apex:outputPanel id="prodTable">
+                            <apex:dataTable value="{!linhasOpp}" var="linha" styleClass="slds-table slds-table_bordered slds-table_cell-buffer">
+                                <apex:column headerValue="{!$Label.Selecionado}">
+                                    <div class="slds-form-element__control">
+                                        <span class="slds-checkbox">
+                                            <apex:inputCheckbox value="{!linha.selected}" id="checkbox" disabled="{!linha.linha.Expedicao__c != null}"/>
+                                            <apex:outputLabel styleClass="slds-checkbox__label" for="checkbox">
+                                                <span class="slds-checkbox--faux"></span>
+                                            </apex:outputLabel>
+                                        </span>
+                                    </div>
+                                </apex:column>
+                                <apex:column value="{!linha.linha.Referencia_SKU__c}" headerValue="{!$ObjectType.OpportunityLineItem.Fields.ProductCode.Label}"/>
+                                <apex:column value="{!linha.linha.Codigo_de_cor__c}" headerValue="{!$ObjectType.OpportunityLineItem.Fields.Codigo_de_cor__c.Label}"/>
+                                <apex:column value="{!linha.linha.Product2.Name}" headerValue="{!$ObjectType.Product2.Fields.Name.Label}"/>
+                                <apex:column value="{!linha.linha.Quantity}" headerValue="{!$ObjectType.OpportunityLineItem.Fields.Quantity.Label}"/>
+                            </apex:dataTable>
+                        </apex:outputPanel>
+                    </div>
+                    <div class="slds-modal__footer">
+                        <apex:outputPanel id="linhasButtons">
+                            <apex:commandButton action="{!selectProds}" rerender="prodTable" value="{!$Label.Seleccionar_todos}" styleClass="slds-button slds-button--neutral slds-float--left"/>
+                            <apex:outputPanel rendered="{!!sucess}" styleClass="slds-m--right-small">{!$Label.Seleccionar_uma_linha}</apex:outputPanel>
+                            <apex:commandButton value="{!$Label.Cancelar}" styleClass="slds-button slds-button--destructive"
+                                                onclick="showSpinner();hideModal('modalLinhas');" action="{!dummyMethod}" reRender=""
+                                                oncomplete="hideSpinner();showModal('modalMoradas');"/>
+                            <apex:commandButton value="{!$Label.Confirmar}" styleClass="slds-button slds-button--neutral slds-button--brand"
+                                                onclick="showSpinner();hideModal('modalLinhas');"
+                                                rerender="linhasButtons, painelTransp, transpRec" action="{!checkLinhas}" oncomplete="{!If(sucess, transpHelpString, linhasHelpString)}"/>
+                        </apex:outputPanel>
+                    </div>
+                </div>
+            </div>
+            <div class="slds-modal" aria-hidden="false" role="dialog" id="modalTransportadoras">
+                <div class="slds-modal__container"  style="max-width: -webkit-fill-available;width: min-content;">
+                    <div class="slds-modal__header slds-p-around--none">
+                        <div class="slds-page-header">
+                            <div class="slds-media">
+                                <div class="slds-media__figure">
+                                    <span class="slds-icon_container slds-icon-custom-custom98">
+                                        <svg class="slds-icon" aria-hidden="true">
+                                            <use xmlns:xlink="http://www.w3.org/1999/xlink" 
+                                                 xlink:href="{!URLFOR($Asset.SLDS , '/assets/icons/custom-sprite/svg/symbols.svg#custom98')}"></use>
+                                        </svg>
+                                    </span>
+                                </div>
+                                <div class="slds-media__body">
+                                    <h1 class="slds-page-header__title slds-truncate slds-align-middle">{!$Label.Escolher_Transportadora}</h1>
+                                    <p class="slds-text-body_small slds-line-height_reset">{!opp.Name}</p>
+                                </div>
+                                
+                                <apex:outputPanel id="messages3">
+                                    <apex:pageMessages escape="true"/>
+                                </apex:outputPanel>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="slds-modal__content slds-p-around--medium">
+                        <apex:outputPanel id="painelTransp">
+                            
+                            <table class="slds-table slds-table_bordered slds-table_cell-buffer">
+                                <thead>
+                                    <tr><td>
+                                        <div class="slds-form-element__control">
+                                            <span class="slds-checkbox">
+                                                <apex:inputCheckbox value="{!opp.Nao_calcula_portes_automaticos__c}" id="checkbox"/>
+                                                <apex:outputLabel styleClass="slds-checkbox__label" for="checkbox">
+                                                            <span class="slds-checkbox--faux"></span>
+                                                    <span class="slds-form-element__label">&nbsp;&nbsp;{!$ObjectType.Opportunity.Fields.Nao_calcula_portes_automaticos__c.Label}</span>
+                                                        </apex:outputLabel>
+                                            </span>
+                                        </div>
+                                        </td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                    	<th width="5%">
+                                            {!$Label.Selecionado}
+                                        </th>
+                                    	<th>
+                                            {!$ObjectType.Transportadora__c.Fields.Name.Label}
+                                        </th>
+                                    	<th>
+                                            {!$Label.Valor} {!$Label.Transporte}
+                                        </th>
+                                    	<th>
+                                            {!$Label.Valor} {!$Label.Despacho}
+                                        </th>
+                                    	<th>
+                                            {!$Label.Duracao}
+                                        </th>
+                                    	<th>
+                                            {!$ObjectType.Opportunity.Fields.CurrencyIsoCode.Label}
+                                        </th>
+                                    	<th>
+                                            {!$ObjectType.OpportunityLineItem.Fields.Peso__c.Label}
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <apex:repeat value="{!tranportadoras}" var="trans">
+                                    	<tr>
+                                            <td>
+                                                <div class="slds-form-element__control">
+                                                    <span class="slds-checkbox">
+                                                        <apex:inputCheckbox value="{!trans.selected}" id="checkbox" styleClass="checkDisableT"
+                                                                            onchange="changeCheckboxesT(this.checked, this.id)"/>
+                                                        <apex:outputLabel styleClass="slds-checkbox__label" for="checkbox">
+                                                            <span class="slds-checkbox--faux"></span>
+                                                        </apex:outputLabel>
+                                                    </span>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                {!trans.nome}
+                                            </td>
+                                            <td>
+                                                {!trans.valor_transporte}
+                                            </td>
+                                            <td>
+                                                {!trans.valor_despacho}
+                                            </td>
+                                            <td>
+                                                {!trans.duracao}
+                                            </td>
+                                            <td>
+                                                {!trans.moeda}
+                                            </td>
+                                            <td>
+                                                {!trans.peso}
+                                            </td>
+                                        </tr>
+                                    </apex:repeat>
+                                    <tr>
+                                        <td>
+                                            <div class="slds-form-element__control">
+                                                <span class="slds-checkbox">
+                                                    <apex:inputCheckbox value="{!outraTransp}" id="checkboxOutTransp" styleClass="checkDisableT"
+                                                                        onchange="changeCheckboxesT(this.checked, this.id);showOutraTransp(this.checked);"/>
+                                                    <apex:outputLabel styleClass="slds-checkbox__label" for="checkboxOutTransp">
+                                                        <span class="slds-checkbox--faux"></span>
+                                                    </apex:outputLabel>
+                                                </span>
+                                            </div>
+                                        </td>
+                                        <td colspan="3">
+                                            <div class="slds-hide showOutraInputs">
+                                                <div class="slds-form-element__row">
+                                                    <abbr class="slds-required">*</abbr>
+                                                    <apex:outputLabel for="transpNome">
+                                                        {!$ObjectType.Expedicao__c.Fields.Transportadora__c.Label}
+                                                    </apex:outputLabel>
+                                                </div>
+                                                <div class="slds-form-element__row">
+                                                    <apex:inputText maxlength="20" id="transpNome" value="{!outraTranspNome}" styleClass="slds-input outraTranspInputs mandatoryInputs"/>
+                                                </div>
+                                            </div>
+                                            <div class="hiddenOutraInputs">
+                                                Outra transportadora
+                                            </div>
+                                        </td>
+                                        <td colspan="3">
+                                            <div class="slds-hide showOutraInputs">
+                                                <div class="slds-form-element__row">
+                                                    <abbr class="slds-required">*</abbr> 
+                                                    <apex:outputLabel for="transpValor">
+                                                        {!$ObjectType.Expedicao__c.Fields.Valor_transporte__c.Label}
+                                                    </apex:outputLabel>
+                                                </div>
+                                                <div class="slds-form-element__row">
+                                                    <apex:inputText id="transpValor" value="{!outraTranspValor}" styleClass="slds-input outraTranspInputs mandatoryInputs"/>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <script>
+                            var outraTransp = disableOutraTransp();
+                            function disableOutraTransp(){
+                                var inputs = document.getElementsByClassName("outraTranspInputs");
+                                for(var i = 0 ; i < inputs.length ; i++){
+                                    inputs[i].setAttribute("disabled", "true");
+                                }
+                            }
+                            function showOutraTransp(mostra){
+                                var inputs = document.getElementsByClassName("outraTranspInputs");
+                                
+                                for(var i = 0 ; i < inputs.length ; i++){
+                                    if(mostra){
+                                        inputs[i].removeAttribute("disabled");
+                                    }else{
+                                        inputs[i].setAttribute("disabled", "true");
+                                    }
+                                }
+                                
+                                if(mostra){
+                                    var divsToShow = document.getElementsByClassName("showOutraInputs");
+                                    for(var i = 0 ; i < divsToShow.length ; i++){
+                                        divsToShow[i].classList.remove("slds-hide");
+                                    }
+                                    
+                                    var hideDiv = document.getElementsByClassName("hiddenOutraInputs")[0];
+                                    hideDiv.classList.add("slds-hide");
+                                }else{
+                                    var divsToShow = document.getElementsByClassName("showOutraInputs");
+                                    for(var i = 0 ; i < divsToShow.length ; i++){
+                                        divsToShow[i].classList.add("slds-hide");
+                                    }
+                                    
+                                    var hideDiv = document.getElementsByClassName("hiddenOutraInputs")[0];
+                                    hideDiv.classList.remove("slds-hide");
+                                }
+                            }
+                            </script>
+                        </apex:outputPanel>
+                        <script>
+                        function changeCheckboxesT(checked, id){
+                            var eles = document.getElementsByClassName("checkDisableT");
+                            
+                            if(checked){
+                                for(var i = 0 ; i < eles.length ; i++){
+                                    if(eles[i].id != id){
+                                        eles[i].setAttribute("disabled", "true");
+                                        eles[i].checked = false;
+                                    }
+                                }
+                            }else{
+                                for(var i = 0 ; i < eles.length ; i++){
+                                    eles[i].removeAttribute("disabled");
+                                }
+                            }
+                        }
+                        </script>
+                    </div>
+                    <div class="slds-modal__footer">
+                        <apex:outputPanel id="transpRec">
+                            <div style="text-align: -webkit-auto;position: absolute;">
+                                {!$Label.Transportadora_recomendada}: {!recTransp.transp}
+                            </div>
+                        </apex:outputPanel>
+                        <div class="slds-notify slds-notify_alert slds-theme_alert-texture slds-theme_error slds-hide" id="alertasErros" role="alert">
+                            <h2 id="alertasErrosMensagem">
+                            </h2>
+                        </div>
+                        <apex:outputPanel id="transpButtons">
+                            <apex:outputPanel id="errorpan" rendered="{!!sucess}">{!$Label.Selecione_uma_morada}</apex:outputPanel>
+                            <apex:commandButton value="{!$Label.Cancelar}" styleClass="slds-button slds-button--destructive"
+                                                onclick="hideAlert();showSpinner();hideModal('modalTransportadoras');" action="{!dummyMethod}" reRender="messages3"
+                                                oncomplete="hideSpinner();showModal('modalMoradas');"/>
+                            <a class="slds-button slds-button--neutral slds-button--brand" onclick="checkConfirmarExp();">
+                                {!$Label.Confirmar}
+                            </a>
+                            <apex:actionFunction name="confirmarExpedicao" rerender="transpButtons,messages3" action="{!checkTransportadoras}" oncomplete="hideSpinner();{!If(sucess, 'closeTab();', transpHelpString)}"/>
+                            <script>
+                            function checkConfirmarExp(){
+                                var isValid = true;
+                                var checkbox = document.getElementById('{!$Component.checkboxOutTransp}');
+                                var alert = true;
+                                if(checkbox.checked){
+                                    var inputValor = document.getElementById('{!$Component.transpValor}');
+                                    var inputNome = document.getElementById('{!$Component.transpNome}');
+                                    
+                                    if(inputValor.value == '' || inputValor.value == null){
+                                        isValid = false;
+                                        inputValor.parentElement.classList.add("slds-has-error");
+                                        
+                                    }else{
+                                        if(isNaN(parseInt(inputValor.value))){
+                                            isValid = false;
+                                            showAlert("{!$Label.Valor_moeda}");
+                                            alert = false;
+                                            inputValor.parentElement.classList.add("slds-has-error");
+                                        }
+                                    }
+                                    
+                                    if(inputNome.value  == '' || inputNome.value == null){
+                                        isValid = false;
+                                        inputNome.parentElement.classList.add("slds-has-error");
+                                    }
+                                    
+                                    /*for(var i = 0 ; i < mandatoryInputs.length; i++){
+                                        if(mandatoryInputs[i].value == '' || mandatoryInputs[i].value == null){
+                                            isValid = false;
+                                            mandatoryInputs[i].parentElement.classList.add("slds-has-error");
+                                        }   
+                                    }*/
+                                }
+                                if(isValid){
+                                    showSpinner();
+                                    hideAlert();
+                                    hideModal('modalTransportadoras');
+                                    confirmarExpedicao();
+                                }else{
+                                    if(alert) showAlert("{!$Label.Campos_obrigatorios}");   
+                                }
+                            }
+                            </script>
+                        </apex:outputPanel>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+    </apex:form>
+    <script>
+    j$ = jQuery.noConflict();
+    
+    //Modal Open
+    j$(document).ready(function() {
+        j$('#backdrop').addClass('slds-backdrop--open');
+        checkStart();
+    });
+    //Modal Methods
+    function showModal(modal){
+        j$('#' + modal).addClass('slds-fade-in-open');
+    }
+    function hideModal(modal){
+        j$('#' + modal).removeClass('slds-fade-in-open');
+    }
+    function showSpinner(){
+        j$("#spinner").css("display", "block");
+    }
+    function hideSpinner(){
+        j$("#spinner").css("display", "none");  
+    }
+    
+    var callRefreshTab = function callRefreshTab(result) {
+        for(i=0;i<result.ids.length;i++){
+            if(i < result.ids.length-1){
+                sforce.console.refreshSubtabById(result.ids[i], true);
+            }
+        }
+    }
+
+    var callRefreshPrimaryTab = function callRefreshPrimaryTab(result) {
+        sforce.console.refreshPrimaryTabById(result.id, true);
+        sforce.console.getSubtabIds(result.id, callRefreshTab);
+    }
+    
+    function closeTab() {
+        sforce.console.getEnclosingPrimaryTabId(callRefreshPrimaryTab);
+        
+        var closeSubTab = function closeSubTab(result){
+            sforce.console.closeTab(result.id);
+        };
+        sforce.console.getFocusedSubtabId(closeSubTab);
+    }
+
+    function doRedirect(focus){
+        var url = "{!opp.Id}";
+        if(sforce.console.isInConsole()){
+            var checkTabObj = function checkTabObj(result){
+                if("{!opp.AccountId}".includes(result.id)){//se a conta já estiver aberta
+                    var redirectSubTab = function redirectSubTab(result3){
+                        //abre propria tab
+                        var closeSubTab = function closeSubTab(result2){
+                            sforce.console.openSubtab(result3.id, url, focus, "{!opp.Name}", result2.id);
+                        };
+                        sforce.console.getFocusedSubtabId(closeSubTab);
+                    };
+                    sforce.console.getFocusedPrimaryTabId(redirectSubTab);
+                }else{
+                    var currentTab;
+                    var openSubtab = function openSubtab(result2){
+                        sforce.console.openSubtab(result2.id,url, focus, "{!opp.Name}", null);
+                        //abre nova opp
+                        if(currentTab != null) sforce.console.closeTab(currentTab);
+                    };
+                    var openPrimTab = function openPrimTab(result) {
+                        currentTab = result.id;
+                        sforce.console.openPrimaryTab(null, "{!opp.AccountId}", true, "",openSubtab);
+                        
+                    };
+                    sforce.console.getFocusedPrimaryTabId(openPrimTab);
+                }
+            };
+            
+            sforce.console.getFocusedPrimaryTabObjectId(checkTabObj);
+        }else{
+            window.open("/" + url, "_self");
+        }
+    }
+    
+    function showAlert(message){
+        var divAlert = document.getElementById("alertasErros");
+        var mensagem = document.getElementById("alertasErrosMensagem");
+        divAlert.classList.remove("slds-hide");
+        
+        mensagem.innerHTML = message;
+    }
+    
+    function hideAlert(){
+        var mandatoryInputs = document.getElementsByClassName('mandatoryInputs');
+        for(var i = 0 ; i < mandatoryInputs.length; i++){
+            mandatoryInputs[i].parentElement.classList.remove("slds-has-error");
+        }
+        var divAlert = document.getElementById("alertasErros");
+        if(divAlert != null) divAlert.classList.add("slds-hide");
+    }
+    </script>
+</apex:page>

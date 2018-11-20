@@ -1,0 +1,39 @@
+43.0 APEX_CODE,DEBUG;APEX_PROFILING,INFO;CALLOUT,INFO;DB,INFO;NBA,INFO;SYSTEM,DEBUG;VALIDATION,INFO;VISUALFORCE,INFO;WAVE,INFO;WORKFLOW,INFO
+14:42:58.0 (84787)|USER_INFO|[EXTERNAL]|0050Y000000P4Th|stepadmin@pstricker.proj|Fuso horário da Europa Ocidental|GMTZ
+14:42:58.0 (120850)|EXECUTION_STARTED
+14:42:58.0 (125054)|CODE_UNIT_STARTED|[EXTERNAL]|0661n000005z0Z7|VF: /apex/p_WidgetFailures
+14:42:58.0 (285806)|VF_DESERIALIZE_VIEWSTATE_BEGIN|0661n000005z0Z7
+14:42:58.0 (6824569)|VF_DESERIALIZE_VIEWSTATE_END
+14:42:58.0 (7273369)|SYSTEM_MODE_ENTER|true
+14:42:58.0 (7320572)|SYSTEM_MODE_ENTER|false
+14:42:58.0 (7341277)|SYSTEM_MODE_EXIT|false
+14:42:58.0 (7774544)|SYSTEM_MODE_ENTER|true
+14:42:58.0 (8222550)|SYSTEM_MODE_ENTER|false
+14:42:58.0 (10548764)|SOQL_EXECUTE_BEGIN|[79]|Aggregations:0|Select Id, Name, Description, AccountId, Account.Name, LastModifiedDate From Opportunity Where Erro_comunicacao__c = true and Id Not In :myOppIds And CreatedDate > 2018-11-05T00:00:00Z And (N_de_expedicao__c = null Or N_de_expedicao__c = '0') Order By LastModifiedDate Desc
+14:42:58.0 (62096077)|SOQL_EXECUTE_END|[79]|Rows:1
+14:42:58.0 (63437389)|SOQL_EXECUTE_BEGIN|[79]|Aggregations:0|Select Id, Name, Description, AccountId, Account.Name, LastModifiedDate From Opportunity Where Id In :myOppIds and Erro_comunicacao__c = false And CreatedDate > 2018-11-05T00:00:00Z And (N_de_expedicao__c = null Or N_de_expedicao__c = '0') Order By LastModifiedDate Desc
+14:42:58.0 (69929018)|SOQL_EXECUTE_END|[79]|Rows:0
+14:42:58.0 (72574200)|SYSTEM_MODE_EXIT|false
+14:42:58.0 (76457422)|SYSTEM_MODE_ENTER|true
+14:42:58.0 (77116939)|SYSTEM_MODE_ENTER|true
+14:42:58.0 (94412358)|VF_SERIALIZE_VIEWSTATE_BEGIN|0661n000005z0Z7
+14:42:58.0 (98287124)|VF_SERIALIZE_VIEWSTATE_END
+14:42:58.117 (117057453)|CUMULATIVE_LIMIT_USAGE
+14:42:58.117 (117057453)|LIMIT_USAGE_FOR_NS|(default)|
+  Number of SOQL queries: 2 out of 100
+  Number of query rows: 1 out of 50000
+  Number of SOSL queries: 0 out of 20
+  Number of DML statements: 0 out of 150
+  Number of DML rows: 0 out of 10000
+  Maximum CPU time: 0 out of 10000
+  Maximum heap size: 0 out of 6000000
+  Number of callouts: 0 out of 100
+  Number of Email Invocations: 0 out of 10
+  Number of future calls: 0 out of 50
+  Number of queueable jobs added to the queue: 0 out of 50
+  Number of Mobile Apex push calls: 0 out of 10
+
+14:42:58.117 (117057453)|CUMULATIVE_LIMIT_USAGE_END
+
+14:42:58.0 (117107204)|CODE_UNIT_FINISHED|VF: /apex/p_WidgetFailures
+14:42:58.0 (117770157)|EXECUTION_FINISHED

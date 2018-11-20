@@ -1,0 +1,218 @@
+<apex:page standardController="Opportunity" extensions="c_UploadGuia">
+    <apex:slds />
+    <apex:includeScript value="{!URLFOR($Resource.bs, '/jQuery_2_0_3.js')}"/>
+    <apex:includeScript value="/support/console/39.0/integration.js"/>
+    <apex:includeScript value="{!URLFOR($Resource.swal2, '/sweetalert2.min.js')}"/>
+    <style>
+        .swal-icon{
+        box-sizing: content-box !important;
+        }
+        .swal-styled{
+        background-image: inherit;
+        }
+        .swal-container {
+        z-index: 9001;
+        }
+        .swal-button {
+        background-image: inherit;
+        font-size: 14px !important;
+        }
+    </style>
+    <apex:form >
+        <div class="slds-scope">
+            
+            <div class="slds-page-header">
+                <div class="slds-media">
+                    <div class="slds-media__figure">
+                        <span class="slds-icon_container slds-icon-standard-file">
+                            <svg class="slds-icon" aria-hidden="true">
+                                <use xmlns:xlink="http://www.w3.org/1999/xlink" 
+                                     xlink:href="{!URLFOR($Asset.SLDS , '/assets/icons/standard-sprite/svg/symbols.svg#file')}"></use>
+                            </svg>
+                        </span>
+                    </div>
+                    <div class="slds-media__body">
+                        <h1 class="slds-page-header__title slds-truncate slds-align-middle">{!$Label.Carregar_Guia}</h1>
+                        <p class="slds-text-body_small slds-line-height_reset">{!Opportunity.Name}</p>
+                    </div>
+                    
+                    
+                    <apex:outputPanel id="messages">
+                        <apex:pageMessages escape="true"/>
+                    </apex:outputPanel>
+                    <div class="slds-form-element slds-m-right_medium">
+                        <apex:commandButton styleClass="slds-file-selector__button slds-button slds-button_brand" onclick="midFile();" id="uploadbtn" reRender="scripts" value="{!$Label.Confirmar}"/>
+                        
+                    </div>
+                    <div class="slds-form-element">
+                        <button class="slds-button slds-button--destructive slds-float--right" type="button"
+                                onclick="doRedirect('{!Opportunity.Id}');">{!$Label.Cancelar}</button>
+                    </div>
+                </div>
+            </div>
+            <fieldset class="slds-form--compound slds-m-around_large" >
+                <div class="slds-form-element__group ">
+                    <div class="slds-form-element__row">
+                        <div class="slds-form-element" style="width: 20%;">
+                            <apex:actionFunction name="createFile" rerender="fileScripts, scripts" action="{!showBlob}" oncomplete="showSucess();">
+                                <apex:param assignTo="{!blobFile}" name="p1" value=""/>
+                                <apex:param assignTo="{!fileName}" name="p2" value=""/>
+                            </apex:actionFunction>
+                            <apex:actionFunction name="rerenderFilepanel" rerender="filePanel">
+                                <apex:param assignTo="{!fileName}" name="p1" value=""/>
+                            </apex:actionFunction>
+                            <apex:outputPanel id="fileScripts">
+                                <script>
+                                function midFile(){
+                                    var file = document.querySelector('input[type=file]').files[0];
+                                    if(file != null){
+                                        var reader = new FileReader();
+                                        reader.readAsDataURL(file);
+                                        reader.addEventListener("load", function () {
+                                            createFile(reader.result, file.name);
+                                        }, false);
+                                    }else{
+                                        swal('{!$Label.Erro}','{!$Label.Sem_ficheiro}','error');
+                                    }
+                                }
+                                function readFileName(fileValue){
+                                    if(check_extension(fileValue)){
+                                        var file = document.querySelector('input[type=file]').files[0];
+                                        if(file != null){
+                                            var reader = new FileReader();
+                                            reader.readAsDataURL(file);
+                                            reader.addEventListener("load", function () {
+                                                rerenderFilepanel(file.name);
+                                                document.getElementById("midleEle").style.display = "block";
+                                            }, false);
+                                        }
+                                    }
+                                }
+                                
+                                function showSucess(){
+                                    if({!fileSucess}){
+                                        
+                                        swal('{!$Label.Sucesso}!','','success').then(result => {doRedirect("{!Opportunity.Id}");});
+                                    }else{
+                                        swal('{!$Label.Erro}','','error');
+                                    }
+                                }
+                                var hash = {
+                                    '.pdf' : 1,
+                                };
+                                
+                                function check_extension(filename) {
+                                    var re = /\..+$/;
+                                    var ext = filename.match(re);
+                                    var submitEl = document.getElementById('{!$Component.uploadbtn}');
+                                    
+                                    if (hash[ext[0].toLowerCase()]) {
+                                        submitEl.disabled = false;
+                                        return true;
+                                    } else {
+                                        swal('{!$Label.Erro}','{!$Label.Ficheiro_invalido}','error');  
+                                        submitEl.disabled = true;
+                                        document.getElementById("midleEle").style.display = "none";
+                                        return false;
+                                    }
+                                }
+                                </script>
+                            </apex:outputPanel>
+                            <span class="slds-form-element__label" id="file-selector-primary-label">{!$ObjectType.Attachment.label}</span>
+                            <div class="slds-form-element__control">
+                                <div class="slds-file-selector slds-file-selector_files">
+                                    <div class="slds-file-selector__dropzone">
+                                        <input type="file" class="slds-file-selector__input slds-assistive-text" accept=".pdf" id="file-upload-input-01" aria-labelledby="file-selector-primary-label file-selector-secondary-label" onchange="readFileName(this.value);"/>
+                                        <label class="slds-file-selector__body" for="file-upload-input-01" id="file-selector-secondary-label">
+                                            <span class="slds-file-selector__button slds-button slds-button_neutral">{!$Label.Carregar}</span>
+                                            <span class="slds-file-selector__text slds-medium-show">{!$Label.Clique_para_carregar}</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="slds-form-element" style="display:none;" id="midleEle">
+                            
+                            <div style="width: 20rem;" class="slds-m-top_medium">
+                                <div class="slds-file slds-file_card">
+                                    <figure>
+                                        <a class="slds-file__crop" style="cursor: default;">
+                                            <span class="slds-file__icon slds-icon_container" title="image">
+                                                <svg class="slds-icon" aria-hidden="true">
+                                                    <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{!URLFOR($Asset.SLDS , '/assets/icons/doctype-sprite/svg/symbols.svg#pdf')}" />
+                                                </svg>
+                                                <span class="slds-assistive-text"></span>
+                                            </span>
+                                            <!--img src="https://www.lightningdesignsystem.com/assets/images/placeholder-img@16x9.jpg"/-->
+                                        </a>
+                                        <figcaption class="slds-file__title slds-file__title_card">
+                                            <div class="slds-media slds-media_small slds-media_center">
+                                                <div class="slds-media__figure slds-line-height_reset">
+                                                    <span class="slds-icon_container" title="pdf">
+                                                        <svg class="slds-icon slds-icon_x-small" aria-hidden="true">
+                                                            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{!URLFOR($Asset.SLDS , '/assets/icons/doctype-sprite/svg/symbols.svg#pdf')}" />
+                                                        </svg>
+                                                        <span class="slds-assistive-text">pdf</span>
+                                                    </span>
+                                                </div>
+                                                <div class="slds-media__body">
+                                                    <apex:outputPanel id="filePanel">
+                                                        <span class="slds-file__text slds-truncate" title="{!fileName}">{!fileName}</span>
+                                                    </apex:outputPanel>
+                                                </div>
+                                            </div>
+                                        </figcaption>
+                                    </figure>
+                                </div>
+                            </div>
+                            
+                        </div>
+                    </div>
+                </div>
+            </fieldset>
+            
+        </div>
+    </apex:form>
+    <apex:outputPanel id="scripts">
+        <script>
+        function doRedirect(url){
+            if(sforce.console.isInConsole()){
+                var checkTabObj = function checkTabObj(result){
+                    if("{!Opportunity.AccountId}".includes(result.id)){//se a conta já estiver aberta
+                        var redirectSubTab = function redirectSubTab(result3){
+                            //abre propria tab
+                            var closeSubTab = function closeSubTab(result2){
+                                sforce.console.openSubtab(result3.id, url, true, "{!Opportunity.Name}", result2.id);
+                            };
+                            sforce.console.getFocusedSubtabId(closeSubTab);
+                            
+                            
+                        };
+                        sforce.console.getFocusedPrimaryTabId(redirectSubTab);
+                        
+                    }else{
+                        var currentTab;
+                        var openSubtab = function openSubtab(result2) {
+                            sforce.console.openSubtab(result2.id,url, true, "{!Opportunity.Name}", null);
+                            //abre nova opp
+                            
+                            if(currentTab != null) sforce.console.closeTab(currentTab);
+                        };
+                        var openPrimTab = function openPrimTab(result) {
+                            currentTab = result.id;
+                            sforce.console.openPrimaryTab(null, "{!Opportunity.AccountId}", true, "",openSubtab);
+                            
+                        };
+                        sforce.console.getFocusedPrimaryTabId(openPrimTab);
+                    }
+                };
+                
+                sforce.console.getFocusedPrimaryTabObjectId(checkTabObj);
+            }else{
+                window.open("/" + url, "_self");
+            }
+        }
+        j$ = jQuery.noConflict();
+        </script>
+    </apex:outputPanel>
+</apex:page>

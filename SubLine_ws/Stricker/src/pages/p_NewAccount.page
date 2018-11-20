@@ -1,0 +1,3 @@
+<apex:page standardController="Account">
+    {!$Label.As_contas_sao_criadas}. {!$Label.Verifique_leads_novo_registo}
+</apex:page>

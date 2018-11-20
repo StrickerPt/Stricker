@@ -1,0 +1,82 @@
+<apex:page standardController="Lead" extensions="c_checkLeadVat" showHeader="false" sidebar="false" action="{!checkIsento}">
+    <html xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+        <apex:includeScript value="{!URLFOR($Resource.bs, '/jQuery_2_0_3.js')}"/>
+        <apex:includeScript value="/support/console/39.0/integration.js"/>
+        <style>
+            .apexp {margin-left: -10px !important;}
+            .btn {
+            border: 1px solid #e0e5ee !important;
+            border-radius: 3px !important;
+            box-shadow: none !important;
+            cursor: default !important;
+            font-size: 12px !important;
+            height: auto !important;
+            outline: 0 !important;
+            font-weight: normal !important;
+            font-family: 'SalesforceSans-Regular',Helvetica,Arial,sans-serif !important;
+            color: #0070d2 !important;
+            text-align: center !important;
+            white-space: nowrap !important;
+            line-height: 24px !important;
+            padding: 0 9px !important;
+            background-color: #f4f5f7 !important;
+            background-image: none !important;
+            }
+            .btn:hover{
+            background-color: #e7edf4 !important;
+            text-decoration: none !important;
+            }
+        </style>
+        <script>
+        var callRefreshTab = function callRefreshTab(result) {
+            for(i=0;i<result.ids.length;i++){
+                if(i < result.ids.length-1){
+                    sforce.console.refreshSubtabById(result.ids[i], true);
+                }
+            }
+        }
+        
+        var callRefreshPrimaryTab = function callRefreshPrimaryTab(result) {
+            sforce.console.refreshPrimaryTabById(result.id, true);
+            sforce.console.getSubtabIds(result.id, callRefreshTab);
+        }
+        
+        function refresh(){ 
+            sforce.console.getEnclosingPrimaryTabId(callRefreshPrimaryTab);
+        }
+        </script>
+        <apex:form >
+            <apex:pageBlock mode="maindetail">
+                <apex:pageBlockSection collapsible="false" columns="2">
+                    <apex:pageBlockSectionItem labelStyle="color: #54698d;font-weight: normal;" dataStyle="font-family: SalesforceSans-Regular,Arial,sans-serif;color: #16325c;">
+                        <apex:outputLabel value="Name" for="lead_name"/>
+                        <apex:outputText value="{!v_displayInfo.name}" id="lead_name"/>
+                    </apex:pageBlockSectionItem>
+                    <apex:pageBlockSectionItem labelStyle="color: #54698d;font-weight: normal;" dataStyle="font-family: SalesforceSans-Regular,Arial,sans-serif;color: #16325c;">
+                        <apex:outputLabel value="VAT Number" for="lead_vatNumber"/>
+                        <apex:outputText value="{!v_displayInfo.vatNumber}" id="lead_vatNumber"/>
+                    </apex:pageBlockSectionItem>
+                    <apex:pageBlockSectionItem labelStyle="color: #54698d;font-weight: normal;" dataStyle="font-family: SalesforceSans-Regular,Arial,sans-serif;color: #16325c;">
+                        <apex:outputLabel value="Address" for="lead_address"/>
+                        <apex:outputText value="{!v_displayInfo.address}" id="lead_address"/>
+                    </apex:pageBlockSectionItem>
+                    <apex:pageBlockSectionItem labelStyle="color: #54698d;font-weight: normal;" dataStyle="font-family: SalesforceSans-Regular,Arial,sans-serif;color: #16325c;">
+                        <apex:outputLabel value="Valid" for="lead_valid"/>
+                        <apex:outputPanel >
+                            <apex:image value="{!$Resource.check}" rendered="{!v_displayInfo.valid}" style="height: 16px;"/>
+                            <apex:image value="{!$Resource.wrong}" rendered="{!!v_displayInfo.valid}" style="height: 16px;"/>
+                        </apex:outputPanel>
+                    </apex:pageBlockSectionItem>
+                </apex:pageBlockSection>
+                
+                <apex:pageBlockSection collapsible="false" columns="1" rendered="{!v_displayInfo.valid}">
+                    <apex:pageBlockSectionItem labelStyle="color: #54698d;font-weight: normal;" dataStyle="font-family: SalesforceSans-Regular,Arial,sans-serif;color: #16325c;">
+                        <apex:outputPanel style="text-align: center;display: block;">
+                            <apex:commandButton value="{!$Label.Copiar_empresa}" action="{!copyName}" style="padding: 2px 3px;" oncomplete="refresh();"/>
+                        </apex:outputPanel>
+                    </apex:pageBlockSectionItem>
+                </apex:pageBlockSection>
+            </apex:pageBlock>
+        </apex:form>
+    </html>
+</apex:page>

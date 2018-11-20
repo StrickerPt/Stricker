@@ -1,0 +1,165 @@
+<apex:page standardController="Opportunity" extensions="c_ValidarMoradaOnline">
+    <apex:includeScript value="{!URLFOR($Resource.bs, '/jQuery_2_0_3.js')}"/>
+    <apex:includeScript value="/support/console/39.0/integration.js"/>
+    <style>
+    </style>
+    <apex:form id="theForm">
+        <apex:slds />
+        <div class="slds-scope">
+            <apex:actionFunction name="createRecord" action="{!criarNovaMorada}" oncomplete="checkReturn(true);"/>
+            <script>
+            j$ = jQuery.noConflict();
+            
+            //Modal Open
+            j$(document).ready(function() {
+                openModal();
+            });
+            
+            function openModal(){
+                j$('#backdrop').addClass('slds-backdrop--open');
+                if(!{!doPage}){
+                    closeModal();
+                    createRecord();
+                }else{
+                    j$('#modal').addClass('slds-fade-in-open');
+                }
+            }
+            
+            function closeModal(){
+                j$('#modal').removeClass('slds-fade-in-open');
+                j$("#spinner").css("display", "block");
+            }
+            function buttonsEnabled(enabled) {
+                // retrieve all of the buttons or links on the page
+                // with the css class of btn
+                var $buttons = jQuery('.btn');
+                if (enabled === false) {
+                    // add the btnDisabled class to give it the look of being disabled
+                    // add the disabled attribute to actually disable interactability
+                    $buttons.toggleClass('btnDisabled', true).attr('disabled', 'disabled');
+                } else {
+                    // remove the css class and the disabled attribute
+                    $buttons.toggleClass('btnDisabled', false).attr('disabled', null);
+                } 
+            }
+            </script>
+            <div class="slds-modal" aria-hidden="false" role="dialog" id="modal">
+                <div class="slds-modal__container slds-p-around--medium">
+                    <div class="slds-modal__header">
+                        <h2 class="slds-text-heading--medium">Moradas existentes</h2>
+                        <div class="slds-form-element">
+                            <apex:actionFunction name="clearMessages" action="{!clearMessages}" reRender="theForm"/>
+                            <div onclick="clearMessages()" class="slds-text-title slds-float--right slds-text-body--regular slds-m-right--small"
+                                 style="text-transform: none;">
+                                <apex:pageMessages escape="false" id="messages"></apex:pageMessages>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="slds-modal__content slds-p-around--medium" id="content" >
+                        <fieldset class="slds-form--compound">
+                            <div class="slds-form-element__group ">
+                                <div class="slds-form-element__row">
+                                    <div class="slds-form-element">
+                                        
+                                        <apex:dataTable value="{!moradas}" var="morada" rendered="{!moradas.size > 0}"
+                                                        styleClass="slds-table slds-table--bordered" headerClass="slds-text-title--caps">
+                                            <apex:column headerValue="Selecionar" width="5%">
+                                                <div class="slds-form-element">
+                                                    <div class="slds-form-element__control">
+                                                        <span class="slds-checkbox">
+                                                            <apex:inputCheckbox styleClass="checkBox" value="{!morada.selected}" id="checkbox" onchange="checkSelected(this);"/>
+                                                            <apex:outputLabel styleClass="slds-checkbox__label"  for="checkbox" >
+                                                                <span class="slds-checkbox--faux"></span>
+                                                            </apex:outputLabel>
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                                <script>
+                                                function checkSelected(ele){
+                                                    var elements = document.getElementsByClassName("checkBox");
+                                                    for(var i = 0; i < elements.length; i++){
+                                                        if(elements[i].id != ele.id){
+                                                            elements[i].checked = false;
+                                                        }
+                                                    }
+                                                }
+                                                </script>
+                                            </apex:column>
+                                            
+                                            <apex:column headerValue="Localidade">
+                                                <apex:outputText value="{!morada.address.Localidade__c}"/>
+                                            </apex:column>
+                                            
+                                            <apex:column headerValue="Morada">
+                                                <apex:outputText value="{!morada.address.Morada_de_entrega__c}"/>
+                                            </apex:column>
+                                            
+                                            <apex:column headerValue="Código Postal">
+                                                <apex:outputText value="{!morada.address.Codigo_postal__c}"/>
+                                            </apex:column>
+                                        </apex:dataTable>
+                                    </div>
+                                </div>
+                                <div class="slds-form-element__row" style="float: left;">
+                                    
+                                </div>
+                            </div>
+                        </fieldset>
+                    </div>
+                    <div class="slds-modal__footer">
+                        <fieldset class="slds-form--compound">
+                            <div class="slds-form-element__group ">
+                                <div class="slds-form-element__row" style="float: right;">
+                                    <div class="slds-form-element">
+                                        <apex:commandButton onclick="closeModal();buttonsEnabled(false);checkReturn(true);buttonsEnabled(true);"
+                                                            value="{!$Label.Botao_Voltar}" styleClass="slds-button slds-button--destructive"/>
+                                        <apex:commandButton action="{!criarNovaMorada}" onclick="closeModal();buttonsEnabled(false);"
+                                                            reRender="returnMethod, messages" value="Criar nova morada" 
+                                                            oncomplete="checkReturn({!addressCreated});buttonsEnabled(true);"
+                                                            styleClass="slds-button slds-button_brand"/>
+                                        <apex:outputPanel id="returnMethod">
+                                            <script>
+                                            function checkReturn(sucess){
+                                                if(sucess){
+                                                    if(sforce.console.isInConsole()){
+                                                        var closeSubTab = function closeSubTab(result) {
+                                                            var tabId = result.id;
+                                                            sforce.console.closeTab(tabId);
+                                                        };
+                                                        sforce.console.getFocusedSubtabId(closeSubTab);
+                                                        
+                                                        
+                                                        var refreshTab = function refreshTab(result) {
+                                                            //Now that we have the primary tab ID, we can close it
+                                                            var primaryTabId = result.id;
+                                                            sforce.console.refreshPrimaryTabById(primaryTabId, true);
+                                                        };
+                                                        sforce.console.getEnclosingPrimaryTabId(refreshTab);
+                                                    }else{
+                                                        window.open("/{!opp.Id}", "_self");   
+                                                    }
+                                                }else{
+                                                    j$("#spinner").css("display", "none");
+                                                    openModal();   
+                                                }
+                                            }
+                                            </script>
+                                        </apex:outputPanel>
+                                    </div>
+                                </div>
+                            </div>
+                        </fieldset>
+                    </div>
+                </div>
+            </div>
+            <div class="slds-backdrop" id="backdrop"></div>
+            <div class="slds-spinner_container" style="display:none;" id="spinner">
+                <div role="status" class="slds-spinner slds-spinner--medium">
+                    <span class="slds-assistive-text">Loading</span>
+                    <div class="slds-spinner__dot-a"></div>
+                    <div class="slds-spinner__dot-b"></div>
+                </div>
+            </div>
+        </div>
+    </apex:form>
+</apex:page>

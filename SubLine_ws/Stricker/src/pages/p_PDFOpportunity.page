@@ -1,0 +1,223 @@
+<apex:page standardController="Opportunity" extensions="c_PDFOpportunity" language="{!lang}" cache="false" readOnly="true" applyBodyTag="false" applyHtmlTag="false" renderAs="PDF" showHeader="false">
+    <head>
+        <style type="text/css" media="print">
+            @page {
+            size: A4 portrait;
+            margin-left: 1.0cm;
+            margin-right: 1.0cm;
+            margin-top: 4.0cm;
+            margin-bottom: 3.5cm;
+            @top-center {
+            content: element(header);
+            }
+            @bottom-center {
+            content: element(footer);
+            }
+            }
+            div.header {
+            padding: 10px;
+            position: running(header);
+            }
+            div.footer {
+            display: block;
+            padding: 5px;
+            position: running(footer);
+            }
+            .pagenumber:before {
+            content: counter(page);
+            }
+            .pagecount:before {
+            content: counter(pages);
+            }
+            table {
+            -fs-table-paginate: paginate;
+            }
+            body {
+            font-family: Arial Unicode MS;
+            }
+        </style>
+    </head>
+    <div class="header" style="margin-left: -25px;margin-right: -25px;">
+        <table style="width: 100%">
+            <tr>
+                <td style="width: 48%;"><apex:image height="64px" value="{!LogoUrl}"/></td>
+                <td style="width: 27%;text-align: left;"><h1>O</h1></td>
+                <td style="width: 25%;text-align: left;">
+                    <p>{!$Label.Orcamento_n} <span style="padding-left: 30px;">{!opp.Auto_Number__c}</span></p>
+                    <p>{!$Label.Data}: <span ><apex:outputText value="{0,date,dd/MM/yyyy}">&nbsp;<apex:param value="{!TODAY()}"/></apex:outputText>&nbsp;</span></p>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <div class="footer" style="margin-left: -10px;margin-right: -10px">
+        <table style="width: 100%;">
+            <tr>
+                <td colspan="2" style="text-align: right;">
+                    <div style="font-size: 10pt;float: right;font-weight: bold;"><span class="pagenumber"/> / <span class="pagecount"/></div>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2" style="font-size: 9pt;text-align: center;border-top:1px solid black;border-bottom:1px solid black;">Fica convencionado o domicílio da sociedade Paul Stricker, SA para a resolução de qualquer litígio emergente do presente contrato.</td>
+            </tr>
+            <tr>
+                <td style="width: 20%;text-align: right;"><apex:image height="48px" value="{!LogoISOUrl}"/></td>
+                <td style="width: 80%;text-align: left;">
+                    <p style="font-size: 9pt;margin:2px;">Núcleo Industrial de Murtede, Lote 5 - 3060-372 MURTEDE - PORTUGAL</p>
+                    <p style="font-size: 9pt;margin:2px;">Tel: +351 231209980 - Fax: +351 231209989 - E-mail: info@stricker.pt</p>
+                    <p style="font-size: 9pt;margin:2px;">NIPC PT501888640 - Sociedade Anónima - Capital Social €1.000.000,00 - C.R.C. Cantanhede no 501888640</p>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <div class="content" style="margin-left: -10px;margin-right: -10px;padding: 2px;font-size: 10pt;">
+        <table style="width: 100%;">
+            <tbody>
+                <tr>
+                    <td style="width: 12%;font-weight: bold;">{!$Label.Numero_de_cliente}</td>
+                    <td style="width: 38%;">{!opp.Account.Numero_de_cliente__c} - {!opp.Account.Name} </td>
+                    <td style="font-weight: bold;">{!$Label.Telefone}</td>
+                    <td style="width: 38%;">{!opp.Account.Phone}</td>
+                </tr>
+                <tr>
+                    <td style="font-weight: bold;">{!$Label.Morada}</td>
+                    <td colspan="3">{!opp.Account.BillingStreet}&nbsp;{!opp.Account.BillingPostalCode}&nbsp;{!opp.Account.BillingCity}&nbsp;{!opp.Account.BillingCountry}</td>
+                </tr>
+                <tr>
+                    <td style="font-weight: bold;">{!$Label.Local_de_entrega}:</td>
+                    <td colspan="3" style="border-bottom: 1px solid black;"></td>
+                </tr>
+            </tbody>
+        </table>
+        <p/>
+        <table style="width: 100%;border: 1px solid black;">
+            <thead>
+                <tr>
+                    <th>{!$Label.Referencia}</th>
+                    <th  width="50%">{!$Label.Designacao}</th>
+                    <th>{!$Label.Quantidade}</th>
+                    <th>{!$Label.Preco}</th>
+                    <th>{!$Label.Desconto}</th>
+                    <th>{!$Label.Total}</th>
+               
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td colspan="7" style="border-top: 1px solid black;"></td>
+                </tr>
+                <apex:repeat value="{!prodMap}" var="exp">
+                    <apex:repeat value="{!prodMap[exp].oliIds}" var="oliId">
+                        <tr>
+                            <td><apex:outputField value="{!produtos[oliId].item.Referencia_SKU__c}" /></td>
+                            <td  width="50%"><apex:outputField value="{!produtos[oliId].item.Lingua_do_cliente__c}" /></td>
+                            <td><apex:outputField value="{!produtos[oliId].item.Quantity}" /></td>
+                            <td><apex:outputText value="{0, Number, #,###,###,##0.000}">    
+                 <apex:param value="{!produtos[oliId].item.Preco_Unitario__c}"/>
+            </apex:outputText> <b style="font-size: 8pt;"> <apex:outputField value="{!produtos[oliId].item.CurrencyISOCode}" />                             </b> 
+                                <!-- td><apex:outputField value="{!produtos[oliId].item.Preco_Unitario__c}" /></td -->
+                        </td>
+                            <td><apex:outputField value="{!produtos[oliId].item.Desconto_unitario__c}" /></td>
+                            <!-- td><apex:outputField value="{!produtos[oliId].item.Total_de_customizacao__c}" /></td-->
+                             <td><apex:outputText value="{0, Number, #,###,###,##0.00}">    
+                                <apex:param value="{!produtos[oliId].item.Total_de_customizacao__c}"/>
+                            </apex:outputText> <b style="font-size: 8pt;"><apex:outputField value="{!produtos[oliId].item.CurrencyISOCode}" /></b> 
+                            </td>
+                        </tr>
+                        <apex:repeat value="{!produtos[oliId].customList}" var="key">
+                            <tr>
+                                <td><apex:outputField value="{!produtos[oliId].customList[key].item.Referencia_SKU__c}" /></td>
+                                <td width="50%"><apex:outputField value="{!produtos[oliId].customList[key].item.Product2.Referencia_relacionada__c}" />&nbsp;-&nbsp; 
+                                    <apex:outputField value="{!produtos[oliId].customList[key].item.Product2.Componente_da_impressao__c}" />&nbsp;-&nbsp; 
+                                    <apex:outputField value="{!produtos[oliId].customList[key].item.Product2.Tecnica__c}" />&nbsp;-&nbsp; 
+                                    <apex:outputField value="{!produtos[oliId].customList[key].item.Dimensoes_maximas_de_impressao__c}" />&nbsp;-&nbsp;
+                                    <apex:outputField value="{!produtos[oliId].customList[key].item.Product2.Cores_de_customizacao__c}" /> {!IF(produtos[oliId].customList[key].item.Product2.Cores_de_customizacao__c != null ,
+                                    if(produtos[oliId].customList[key].item.Product2.Cores_de_customizacao__c == '1', $Label.Cor,$Label.Cores), '')}
+                                </td>
+                                <td><apex:outputField value="{!produtos[oliId].customList[key].item.Quantity}" /></td>                                
+                                <td><apex:outputText value="{0, Number, #,###,###,##0.00}">    
+                 <apex:param value="{!produtos[oliId].customList[key].item.Preco_Unitario__c}"/>
+            </apex:outputText> <b style="font-size: 8pt;"> <apex:outputField value="{!produtos[oliId].customList[key].item.CurrencyISOCode}" /> </b> 
+                        </td>
+                                <!-- td><apex:outputField value="{!produtos[oliId].customList[key].item.Preco_Unitario__c}" /></td -->
+                                <td><apex:outputField value="{!produtos[oliId].customList[key].item.Desconto_unitario__c}" /></td>
+                                <!-- td><apex:outputField value="{!produtos[oliId].customList[key].item.Total_de_customizacao__c}" /></td -->
+                                <td><apex:outputText value="{0, Number, #,###,###,##0.00}">    
+                                <apex:param value="{!produtos[oliId].customList[key].item.Total_de_customizacao__c}"/>
+                            </apex:outputText> <b style="font-size: 8pt;"> <apex:outputField value="{!produtos[oliId].customList[key].item.CurrencyISOCode}" /> </b> 
+                            </td>
+                            </tr>
+                        </apex:repeat>
+                    </apex:repeat>
+                    
+                    <apex:repeat rendered="{!prodMap[exp].linhaPortes != null}" value="{!transportadoras[prodMap[exp].linhaPortes]}" var="portes">
+                        
+                        <tr>
+                            <td><apex:outputField value="{!portes.item.Referencia_SKU__c}" /></td>
+                                  <td  width="50%"><apex:outputField value="{!portes.item.Lingua_do_cliente__c}" /></td>
+                            <td><apex:outputField value="{!portes.item.Quantity}" /></td>
+                             <td><apex:outputText value="{0, Number, #,###,###,##0.000}">    
+                 <apex:param value="{!portes.item.Preco_Unitario__c}"/>
+            </apex:outputText> <b style="font-size: 8pt;"> <apex:outputField value="{!portes.item.CurrencyISOCode}" /> </b> 
+                        </td>
+                            <!-- td><apex:outputField value="{!portes.item.Preco_Unitario__c}" /></td -->
+                            <td><apex:outputField value="{!portes.item.Desconto_unitario__c}" /></td>
+                            <!-- td><apex:outputField value="{!portes.item.Total_de_customizacao__c}" /></td  -->
+                            <td><apex:outputText value="{0, Number, #,###,###,##0.00}">    
+                                <apex:param value="{!portes.item.Total_de_customizacao__c}"/>
+                            </apex:outputText>  <b style="font-size: 8pt;"> <apex:outputField value="{!portes.item.CurrencyISOCode}" /> </b> 
+                            </td>                      
+                        </tr>
+                    </apex:repeat>
+                    
+                    <tr>
+                        
+                        <td colspan="7" style="border-top: 1px solid black;"></td>
+                    </tr>
+                </apex:repeat>
+                <apex:repeat value="{!taxas}" var="tax">
+                    <tr>
+                        <td><apex:outputField value="{!taxas[tax].item.Referencia_SKU__c}" /></td>
+                        <td  width="50%"><apex:outputField value="{!taxas[tax].item.Lingua_do_cliente__c}" /></td>
+                        <td><apex:outputField value="{!taxas[tax].item.Quantity}" /></td>
+                        <td><apex:outputText value="{0, Number, #,###,###,##0.000}">    
+                 <apex:param value="{!taxas[tax].item.Preco_Unitario__c}"/>
+            </apex:outputText>
+                        </td>
+                        <!-- td><apex:outputField value="{!taxas[tax].item.Preco_Unitario__c}" /></td -->
+                        <td><apex:outputField value="{!taxas[tax].item.Desconto_unitario__c}" /></td>
+                        <!-- td><apex:outputField value="{!taxas[tax].item.Total_de_customizacao__c}" /></td  -->
+                        <td><apex:outputText value="{0, Number, #,###,###,##0.00}">    
+                                <apex:param value="{!taxas[tax].item.Total_de_customizacao__c}"/>
+                            </apex:outputText>
+                            </td>  
+                    </tr>
+                </apex:repeat>
+            </tbody>
+        </table>
+        <p style="font-size: 10pt;">
+            <!--Software PHC - Processado por programa certificado no 0006/AT (20161210)-Documento de uso interno -->
+        </p>
+        <table style="width: 100%;border: 1px solid black;margin: 0;">
+            <tr>
+                <td style="width: 7%;font-weight: bold;font-size: 10pt;">{!$Label.Validade}:</td>
+                <td><apex:outputText value="{0,date,dd/MM/yyyy}">&nbsp;<apex:param value="{!opp.Validade__c}"/></apex:outputText></td>
+            </tr>
+            <tr>
+                <td colspan="2" style="text-align: center;font-weight: bold;font-size: 10pt;">
+                    {!$Label.Caso_a_encomenda} {!$Label.A_Stricker_reserva_se}
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2" style="text-align: center;font-weight: bold;font-size: 10pt;">
+                    {!$Label.As_respectivas_condicoes}
+                </td>
+            </tr>
+            
+            <tr>
+                <td colspan="2" style="text-align: center;font-weight: bold;font-size: 10pt;">
+                    {!$Label.Oferta_de_taxas_de_impressao}
+                </td>
+            </tr>
+        </table>
+    </div>
+</apex:page>

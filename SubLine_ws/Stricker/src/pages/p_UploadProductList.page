@@ -1,0 +1,69 @@
+<apex:page standardController="Opportunity" extensions="c_UploadProductList">
+    <apex:slds />
+    <div class="slds-scope">
+        <apex:form >
+            <div class="slds-page-header">
+                <div class="slds-media">
+                    <div class="slds-media__figure">
+                        <span class="slds-icon_container slds-icon-standard-opportunity" title="Description of icon when needed">
+                            <svg class="slds-icon" aria-hidden="true">
+                                <use xmlns:xlink="http://www.w3.org/1999/xlink" 
+                                     xlink:href="{!URLFOR($Asset.SLDS , '/assets/icons/standard-sprite/svg/symbols.svg#opportunity')}"></use>
+                            </svg>
+                        </span>
+                    </div>
+                    <div class="slds-media__body">
+                        <h1 class="slds-page-header__title slds-truncate slds-align-middle">{!Opportunity.Name}</h1>
+                        <p class="slds-text-body_small slds-line-height_reset">{!$Label.Importar_produtos}</p>
+                        
+                    </div>
+                    
+                    <apex:outputPanel id="messages">
+                        <apex:pageMessages escape="true"/>
+                    </apex:outputPanel>
+                    <!--div class="slds-form-element">
+                        <button class="slds-button slds-button--destructive slds-float--right" type="button" onclick="doRedirect(true);">{!$Label.Cancelar}</button>
+                    </div-->
+                </div>
+            </div>
+            <apex:pagemessages />
+            <apex:pageBlock >
+                <apex:actionRegion >
+                    <center>                
+                        <apex:inputFile value="{!FileContent}" filename="{!FileName}" />
+                        &nbsp;&nbsp;&nbsp;&nbsp;
+                        <apex:commandButton action="{!ReadFile}" value="Enviar Ficheiro" id="btnUploadFile" style="width:120px;" status="UploadStatus"/>
+                        &nbsp;&nbsp;
+                        <apex:commandButton action="{!ReadFile2Collumns}" value="2 Colunas" id="btnUploadFile2" style="width:120px;" status="UploadStatus"/>
+                        &nbsp;&nbsp;
+                        <apex:commandButton action="{!BackOpportunity}" value="{!$Label.Botao_Voltar}" id="btnBackOpportunity" style="width:60px;" status="Voltar"/>
+                        <table class="slds-size--1-of-2">
+                            <tr>
+                                <td style="text-align: -webkit-center;">
+                                    <br/> <br/> <font color="red"> <b>O ficheiro .csv com o seguinte formato:
+                                    <br/><br/>Referencia | Tamanho | Quantidade | Preco | Cor
+                                    <br /><br/>Deve estar separado por ";"  </b> </font>
+                                    <br/> <br/> <font color="gray"> <b>Obtenha o ficheiro 
+                                    <a href="{!URLFOR($Page.p_UploadProductTemplate)}" style="cursor:pointer;" target="_blank">aqui</a>
+                                    </b> </font>
+                                </td>
+                                <td style="text-align: -webkit-center;">
+                                    <br/> <br/> <font color="red"> <b>O ficheiro .csv com o seguinte formato:
+                                    <br/><br/>Referencia.Cor.Tamanho | Quantidade
+                                    <br /><br/>Deve estar separado por ";"  </b> </font>
+                                    <br/> <br/> <font color="gray"> <b>Obtenha o ficheiro 
+                                    <a href="{!URLFOR($Page.p_UploadItemsTemplate)}" style="cursor:pointer;" target="_blank">aqui</a>
+                                    </b> </font>
+                                </td>
+                            </tr>
+                        </table>
+                    </center>
+                </apex:actionRegion>         
+            </apex:pageBlock>
+            <apex:actionStatus id="UploadStatus">
+                <apex:facet name="start">
+                </apex:facet>
+            </apex:actionStatus>      
+        </apex:form>
+    </div>
+</apex:page>

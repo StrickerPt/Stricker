@@ -1,0 +1,59 @@
+<apex:component >
+    <div class="slds-section">
+        <h3 class="slds-section__title">
+            <a aria-controls="expando-unique-id" aria-expanded="true" class="slds-button slds-section__title-action" onclick="changeSection(this, this.parentElement.parentElement);">
+                <span class="slds-truncate" style="width: 100%; text-align: left;">
+                    <div class="slds-icon_container slds-m-right--medium">
+                        <svg class="slds-section__title-action-icon slds-button__icon" aria-hidden="false">
+                            <use xmlns:xlink="http://www.w3.org/1999/xlink"
+                                 xlink:href="{!URLFOR($Asset.SLDS , '/assets/icons/utility-sprite/svg/symbols.svg#switch')}"></use>
+                        </svg>
+                    </div>
+                    {!$Label.Templates}
+                </span>
+            </a>
+        </h3>
+        <div aria-hidden="true" class="slds-section__content" id="expando-unique-id">
+            <table class="slds-table slds-table_bordered slds-table_cell-buffer">
+                <thead>
+                    <tr>
+                        <th>
+                            _Nome do template
+                        </th>
+                        <th>
+                            &nbsp;
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            Template insert precos c/ cliente
+                        </td>
+                        <td>
+                            <a class="slds-icon_container slds-float_right" href="{!URLFOR($Page.p_ImportPrecosCliente)}">
+                                <svg class="slds-icon--small slds-icon-text-default" aria-hidden="false">
+                                    <use xmlns:xlink="http://www.w3.org/1999/xlink"
+                                         xlink:href="{!URLFOR($Asset.SLDS , '/assets/icons/utility-sprite/svg/symbols.svg#download')}"></use>
+                                </svg>
+                            </a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Template insert precos s/ cliente
+                        </td>
+                        <td>
+                            <a class="slds-icon_container slds-float_right" href="{!URLFOR($Page.p_ImportPrecosSCliente)}">
+                                <svg class="slds-icon--small slds-icon-text-default" aria-hidden="false">
+                                    <use xmlns:xlink="http://www.w3.org/1999/xlink"
+                                         xlink:href="{!URLFOR($Asset.SLDS , '/assets/icons/utility-sprite/svg/symbols.svg#download')}"></use>
+                                </svg>
+                            </a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</apex:component>

@@ -1,0 +1,86 @@
+<apex:page showHeader="false" sidebar="false" controller="c_maquete" cache="false" standardStylesheets="false" title="Maquete" language="{!opp.Account.Lingua_do_cliente__c}">
+    <html>
+        <head>
+            <apex:includeScript value="{!URLFOR($Resource.bs, '/jQuery_2_0_3.js')}"/>
+            <apex:includeScript value="{!URLFOR($Resource.bs, '/js/bootstrap.js')}"/>
+            <apex:includeScript value="{!URLFOR($Resource.bs, '/js/bootstrap-typeahead.js')}"/>
+            <apex:stylesheet value="{!URLFOR($Resource.bs, '/css/bootstrap.css')}"/>
+            <apex:stylesheet value="{!URLFOR($Resource.bs, '/css/bootstrap-theme.css')}"/>
+            <style>
+            </style>
+            <script>
+            </script>
+        </head>
+        <body>
+            <apex:form id="frm">
+                <div class="bs" >
+                    <font face="calibri">
+                        <div class="page-header">
+                            <div class="container">
+                                <div class="row no-gutters">
+                                    <div class="col-12 col-sm-6 col-md-8">
+                                        <h1 style="font-size: 14pt;color: blue;font-weight: bold;"><font face="calibri">{!$Label.Aprovacao_de_maquete}</font></h1>
+                                    </div>
+                                    <div class="col-6 col-md-4">
+                                        <apex:image style="height: 50px;float: right;" value="https://c.cs88.content.force.com/servlet/servlet.ImageServer?id=0159E0000009A4L&oid=00D9E000000Cw4d&lastMod=1488465733000"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="container">
+                            <apex:outputPanel rendered="{!!isBlocked && !isSucess}" id="mainPanel">
+                                <div class="row no-gutters">
+                                    <label for="inputEmail3" class="col-sm-2 col-form-label" style="color: blue;font-weight: bold;">{!$Label.Cliente}</label>
+                                    <div class="col-sm-10" style="font-weight: bold;color: #4c4c4c;">
+                                        {!opp.Account.Name}
+                                    </div>
+                                </div>
+                                <div class="row no-gutters">
+                                    <label for="inputEmail3" class="col-sm-2 col-form-label" style="color: blue;font-weight: bold;">{!$Label.Versao_da_maquete}</label>
+                                    <div class="col-sm-10" style="font-weight: bold;color: #4c4c4c;">
+                                        {!opp.Versao_de_maquete_enviada__c}
+                                    </div>
+                                </div>
+                                <div class="row no-gutters">
+                                    <div class="col-sm-12" style="margin-top: 60px;text-align: center;font-weight: bold;color: #4c4c4c;">
+                                        {!$Label.Deseja_aprovar}&nbsp;
+                                        <!--------------------criar dropdown para mostrar varios anexos--------------------->
+                                        <apex:outputLink value="" onclick="window.open('/sfc/servlet.shepherd/version/download/{!docId}')" title="Download do documento">{!$Label.Anexo}</apex:outputLink>:
+                                    </div>
+                                </div>
+                                <div class="row justify-content-md-center">
+                                    <div class="col-12 col-md-12" style="text-align: center;margin-top: 10px;">
+                                        <apex:commandButton value="{!$Label.Aprovar}" action="{!aprovar}" styleClass="btn btn-primary" style="margin: 20px;" disabled="{!isRetificar}"/>
+                                        <apex:commandButton value="{!$Label.Retificar}" onclick="window.open('/apex/retificar?doc={!docId}&id={!opp.id}&v={!versao}','_self');" reRender="retPanel" styleClass="btn btn-primary" style="margin: 20px;"/>
+                                        
+                                    </div>
+                                </div>
+                                <div class="row justify-content-md-center">
+                                    <div class="col-sm-12" style="margin-top: 60px;text-align: center;font-weight: bold;color: #4c4c4c;">
+                                        {!$Label.Ao_aprovar_esta_maquete} {!$Label.Referencia}, {!$Label.Dimensoes}, {!$Label.Cores}, {!$Label.Posicionamento}, {!$Label.Versao_da_maquete}, {!$Label.Tecnica_de_impressao} {!$Label.e_outras_informacoes}.
+                                    </div>
+                                </div>
+                            </apex:outputPanel>
+                            
+                            <apex:outputPanel rendered="{!isBlocked}">
+                                <div class="row no-gutters">
+                                    <div class="col-sm-12" style="margin-top: 60px;text-align: center;font-weight: bold;color: #4c4c4c;">
+                                    {!$Label.Pedido_de_aprovacao_ja_foi_respondido}
+                                    </div>
+                                </div>
+                            </apex:outputPanel>
+                            
+                            <apex:outputPanel rendered="{!!isBlocked && isSucess}">
+                                <div class="row no-gutters">
+                                    <div class="col-sm-12" style="margin-top: 60px;text-align: center;font-weight: bold;color: #4c4c4c;">
+                                        {!$Label.Resposta_foi_submetida_com_sucesso}
+                                    </div>
+                                </div>
+                            </apex:outputPanel>
+                        </div>
+                    </font>
+                </div>
+            </apex:form>
+        </body>
+    </html>
+</apex:page>

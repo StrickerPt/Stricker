@@ -1,0 +1,600 @@
+44.0 APEX_CODE,DEBUG;APEX_PROFILING,INFO;CALLOUT,INFO;DB,INFO;NBA,INFO;SYSTEM,DEBUG;VALIDATION,INFO;VISUALFORCE,INFO;WAVE,INFO;WORKFLOW,INFO
+14:23:23.0 (163357)|USER_INFO|[EXTERNAL]|0050Y000000P4Th|stepadmin@pstricker.proj|Fuso horário da Europa Ocidental|GMTZ
+14:23:23.0 (216957)|EXECUTION_STARTED
+14:23:23.0 (223069)|CODE_UNIT_STARTED|[EXTERNAL]|common.apex.soap.impl.ApexObjectDeserializer
+14:23:23.0 (772568)|CODE_UNIT_FINISHED|common.apex.soap.impl.ApexObjectDeserializer
+14:23:23.0 (1043214)|EXECUTION_FINISHED
+14:23:23.2 (2183174)|USER_INFO|[EXTERNAL]|0050Y000000P4Th|stepadmin@pstricker.proj|Fuso horário da Europa Ocidental|GMTZ
+14:23:23.2 (2200011)|EXECUTION_STARTED
+14:23:23.2 (2203960)|CODE_UNIT_STARTED|[EXTERNAL]|common.apex.soap.impl.ApexObjectDeserializer
+14:23:23.2 (2355102)|CODE_UNIT_FINISHED|common.apex.soap.impl.ApexObjectDeserializer
+14:23:23.2 (2483928)|EXECUTION_FINISHED
+14:23:23.2 (2708699)|USER_INFO|[EXTERNAL]|0050Y000000P4Th|stepadmin@pstricker.proj|Fuso horário da Europa Ocidental|GMTZ
+14:23:23.2 (2726096)|EXECUTION_STARTED
+14:23:23.2 (2730903)|CODE_UNIT_STARTED|[EXTERNAL]|common.apex.soap.impl.ApexObjectDeserializer
+14:23:23.2 (2908212)|CODE_UNIT_FINISHED|common.apex.soap.impl.ApexObjectDeserializer
+14:23:23.2 (3041646)|EXECUTION_FINISHED
+14:23:23.3 (3201884)|USER_INFO|[EXTERNAL]|0050Y000000P4Th|stepadmin@pstricker.proj|Fuso horário da Europa Ocidental|GMTZ
+14:23:23.3 (3218756)|EXECUTION_STARTED
+14:23:23.3 (3222787)|CODE_UNIT_STARTED|[EXTERNAL]|common.apex.soap.impl.ApexObjectDeserializer
+14:23:23.3 (3408202)|CODE_UNIT_FINISHED|common.apex.soap.impl.ApexObjectDeserializer
+14:23:23.3 (3538393)|EXECUTION_FINISHED
+14:23:23.4 (4539344)|USER_INFO|[EXTERNAL]|0050Y000000P4Th|stepadmin@pstricker.proj|Fuso horário da Europa Ocidental|GMTZ
+14:23:23.4 (4557099)|EXECUTION_STARTED
+14:23:23.4 (4565638)|CODE_UNIT_STARTED|[EXTERNAL]|01p1n00000PPVK6|w_ReturnDossier.updateDossier(w_ReturnDossier.DossierRetorno)
+14:23:23.4 (5136554)|USER_DEBUG|[5]|DEBUG|DossierRetorno:[cust_transp_stricker=13, dat_conc_prod=null, dat_fat=null, dat_fecho=null, erros=null, linhas_doss=(DossierLinha:[alinhamento=0, altura=0, arma=1, cativo=true, cod_pais_morada=GB, cod_post_morada=DN20 8JZ NORTH LINCOLNSHIRE, comp_impressao= , comprimento=0, cores_cust=0, cuidado_de=KEVIN RADLEY, des_prod=Shipping cost, fonte= , local_impressao=null, local_morada=NORTH LINCOLNSHIRE, lotes=, morada_entrega=11 CHAPEL COURT BRIGG, n_impressoes=1, n_repeticoes=1, n_seq_morada=2, nome_contact=24744M2 - RADLEY COACH TRAVEL, nome_pais_morada=United Kingdom, p_esc_original=0, pantone=null, peso=0, preco_esc_a=0, preco_total=12, preco_unit=12, quant=1, ref_rel=null, ref_sku=NSPCE, sf_id=00k1n00000ZSCM5AAP, stamp=STK8A-911A-2E3ED3244E419 , tab_imp=null, tecnica= , tef_log= , transp=TNT ECONOMY, txt_cust= , valor_tabela=null, volume=0], DossierLinha:[alinhamento=0, altura=0, arma=1, cativo=true, cod_pais_morada=GB, cod_post_morada=DN20 8JZ NORTH LINCOLNSHIRE, comp_impressao= , comprimento=0, cores_cust=0, cuidado_de=KEVIN RADLEY, des_prod=Pack of 54 cards.Red, fonte= , local_impressao=null, local_morada=NORTH LINCOLNSHIRE, lotes=20181105, morada_entrega=11 CHAPEL COURT BRIGG, n_impressoes=0, n_repeticoes=0, n_seq_morada=2, nome_contact=24744M2 - RADLEY COACH TRAVEL, nome_pais_morada=United Kingdom, p_esc_original=0, pantone=null, peso=23.75, preco_esc_a=0, preco_total=78, preco_unit=0.312, quant=250, ref_rel=null, ref_sku=98080.05, sf_id=00k1n00000ZSCLBAA5, stamp=STK47-BEB2-41609C66F7308 , tab_imp=null, tecnica= , tef_log= , transp=TNT ECONOMY, txt_cust= , valor_tabela=null, volume=0.039], DossierLinha:[alinhamento=5, altura=70, arma=1, cativo=true, cod_pais_morada=GB, cod_post_morada=DN20 8JZ NORTH LINCOLNSHIRE, comp_impressao=Caixa, comprimento=45, cores_cust=1, cuidado_de=KEVIN RADLEY, des_prod= , fonte= , local_impressao=null, local_morada=NORTH LINCOLNSHIRE, lotes=, morada_entrega=11 CHAPEL COURT BRIGG, n_impressoes=250, n_repeticoes=1, n_seq_morada=2, nome_contact=24744M2 - RADLEY COACH TRAVEL, nome_pais_morada=United Kingdom, p_esc_original=0, pantone=null, peso=0, preco_esc_a=0, preco_total=129.75, preco_unit=0.519, quant=250, ref_rel=null, ref_sku=NSUV, sf_id=00k1n00000ZSCLCAA5, stamp=STK8F-B06A-E2AF570B02DD8 , tab_imp=null, tecnica=UV Digital, tef_log= , transp=TNT ECONOMY, txt_cust= , valor_tabela=null, volume=0]), logi4=false, msg_erro=null, n_exp=0, n_maq_aceite=, n_vol=0, nweb=0, ref_phc=null, sf_id=0061n00000USw2gAAD, stamp=STKAE-80CE-A55E306184B51 , tab1=Clt Aprovou Maquete, vol=0]
+14:23:24.841 (1841366436)|USER_DEBUG|[1082]|DEBUG|Select id,isdeleted,accountid,recordtypeid,name,description,stagename,amount,probability,closedate,type,nextstep,leadsource,isclosed,iswon,forecastcategory,forecastcategoryname,currencyisocode,campaignid,hasopportunitylineitem,pricebook2id,ownerid,createddate,createdbyid,lastmodifieddate,lastmodifiedbyid,systemmodstamp,lastactivitydate,fiscalquarter,fiscalyear,fiscal,lastvieweddate,lastreferenceddate,syncedquoteid,contractid,hasopenactivity,hasoverduetask,budget_confirmed__c,discovery_completed__c,roi_analysis_completed__c,email_de_assistente_comercial__c,loss_reason__c,retificacoes_pedidas_pelo_cliente__c,data_limite_de_producao__c,adiantamento__c,amostra__c,antes_da_expedicao__c,aprovado__c,auto_number__c,autorizada__c,auxiliar_aprovacao_de_maquete__c,codigo_de_dossier__c,codigo_postal_online__c,comentarios_de_aprovacao__c,contabilizador_de_oportunidades__c,credito_dias__c,credito_percentagem__c,custo_de_transporte_stricker__c,data_de_aprovacao_de_maquete__c,data_de_conclusao_de_producao__c,limite_de_credito_comercial__c,data_de_faturacao__c,data_do_lembrete__c,data_do_pedido_de_maquete__c,data_limite_de_maquete__c,designer__c,destino_de_impressao__c,documento_de_destino__c,dossier__c,em_falta__c,email_para_envio_de_maquete__c,enviar_para_aprovacao__c,estado_da_maquete__c,estado_do_orcamento__c,estado_icon_maquete__c,fecho_automatico_da_reserva__c,fonte__c,idioma_para_documentos__c,impresso__c,incoterm__c,morada_de_entrega_online__c,motivo_de_insucesso__c,motivo_de_isencao_de_impostos__c,motivo_de_pendente__c,n_de_expedicao__c,n_de_versao_de_maquete_aceite__c,n_de_versoes_de_maquete__c,numero_de_dossier__c,numero_de_volumes__c,nweb__c,origem__c,outro_email_para_envio_de_maquete__c,pais_online__c,para_aprovacao__c,pedido_por__c,referencia_interna__c,regiao_online__c,retificacoes_pedidas_pelo_comercial__c,stamp__c,telefone_logistico__c,tempo_de_despacho__c,tipo_de_amostra__c,validade__c,validar_morada_online__c,versao_de_maquete_enviada__c,volume_total__c,volumes__c,id_morada_de_entrega__c,auxiliar_expedicao__c,auxiliar_total_de_produtos__c,auxiliar_total_de_produtos_cativos__c,preco_total__c,total_de_produtos__c,valor_total_de_customizacao__c,data_de_envio_de_maquete__c,limite_credito_comercial__c,limite_operacional_de_divida__c,nao_aprovado__c,notas_de_expedicao__c,referencia_phc__c,url_documento_web__c,data_de_pedido_de_retificacao__c,armazem__c,data_de_envio__c,localidade_online__c,limite_operacional_da_divida__c,divida_nao_titulada_maturidade__c,divida_nao_titulada_saldo__c,divida_titulada_maturidade__c,divida_titulada_saldo__c,divida_vencida__c,vendas_totais_ano_anterior__c,vendas_totais_periodo_homologo__c,vendas_totais_ano_presente__c,em_curso__c,auxiliar_de_novo_comentario__c,auxiliar_retificacao__c,comentarios_para_maquete__c,dossier_de_repeticao__c,inicio_de_pausa_de_maquete__c,maquete_em_atraso__c,maquete_em_pausa__c,novo_comentario__c,snapshot_de_maquete__c,snapshot_em_atraso__c,espera_de_integracao__c,erro_comunicacao__c,peso_kg__c,retificacao__c,transportadora_online__c,sla__c,ao_cuidado_de_online__c,mudanca_de_cor__c,alerta_mudanca_de_cor__c,enviada_para_cliente__c,catalogos__c,link_para_web__c,processo_aprov_ativo__c,situacao_atual_phc__c,em_producao__c,nao_calcula_portes_automaticos__c,versao_enviada__c,textil_em_falta__c,sem_extra_de_impressao__c,(Select id,opportunityid,sortorder,pricebookentryid,product2id,productcode,name,currencyisocode,quantity,discount,totalprice,unitprice,listprice,servicedate,description,createddate,createdbyid,lastmodifieddate,lastmodifiedbyid,systemmodstamp,isdeleted,lingua_do_cliente_idioma__c,agrupador_oli__c,alinhamento__c,altura__c,auxiliar_total_de_produtos__c,auxiliar_total_de_produtos_cativos__c,alocacao_de_stock__c,componente_da_impressao__c,comprimento__c,cores_de_customizacao__c,customizado__c,desconto_unitario__c,dimensoes_maximas_de_impressao__c,expedicao__c,fonte__c,lingua_do_cliente__c,numero_de_impressoes__c,numero_de_repeticoes__c,numero_do_armazem__c,peso__c,preco_aplicado__c,preco_unitario__c,proxima_chegada_de_stock__c,quantidade_original__c,referencia_sku__c,referencia_relacionada__c,referencia_semelhante__c,stock_atual__c,stock_cativo__c,stock_previsto__c,tamanho__c,tecnica__c,texto_a_customizar__c,total_de_customizacao__c,transportadora__c,valor_de_tabela_de_precos__c,valor_unitario_original__c,verifica_expedicao__c,volume__c,armazem__c,lotes__c,stamp__c,auxiliar_expedicao__c,codigo_de_cor__c,pantone_cor__c,uploaddossier__c,escalao_a__c,id_original__c,n_de_caixas__c,localizacao_de_impressao__c,stock_cativo_form__c,catalogo__c,referencia_relacionada_original__c,textil_em_falta__c,Product2.Name,Product2.Referencia_relacionada__c,Product2.Nome_do_produto_DE__c,Product2.Nome_do_produto_en_US__c,Product2.Nome_do_produto_ES__c,Product2.Nome_do_produto_FR__c,Product2.Nome_do_produto_it__c,Product2.Nome_do_produto_NL__c,Product2.Nome_do_produto_PL__c,Product2.Nome_do_produto_pt_BR__c,Product2.Nome_do_produto_RU__c,Product2.Nome_do_produto_DE_PHC__c,Product2.Nome_do_produto_en_US_PHC__c,Product2.Nome_do_produto_ES_PHC__c,Product2.Nome_do_produto_FR_PHC__c,Product2.Nome_do_produto_it_PHC__c,Product2.Nome_do_produto_NL_PHC__c,Product2.Nome_do_produto_PL_PHC__c,Product2.Nome_do_produto_pt_BR_PHC__c,Product2.Nome_do_produto_RU_PHC__c,Product2.RecordType.DeveloperName,Product2.Tabela_de_customizacoes__c,Product2.Peso_caixa__c,Product2.Caixa_interior_unidades__c,Expedicao__r.Morada_aux__c,Expedicao__r.Ao_Cuidado_De__c,Expedicao__r.Morada_de_Entrega__r.Ao_Cuidado_De__c,Expedicao__r.Transportadora__c,Expedicao__r.Morada_de_Entrega__r.MSEQ__c,Expedicao__r.Morada_de_Entrega__r.Codigo_postal__c,Expedicao__r.Morada_de_Entrega__r.Localidade__c,Expedicao__r.Morada_de_entrega__r.Morada_de_entrega__c,Expedicao__r.Morada_de_Entrega__r.Pais__c,Expedicao__r.Recolha_do_cliente__c,Expedicao__r.Morada_de_Entrega__r.Nome_da_empresa__c From OpportunityLineItems),Account.Numero_de_cliente__c,Account.Tipologia_de_facturacao__c,Account.Name,Pedido_por__r.Name From Opportunity where Id  = '0061n00000USw2gAAD'
+14:23:24.841 (1846373681)|SOQL_EXECUTE_BEGIN|[1083]|Aggregations:1|Select id,isdeleted,accountid,recordtypeid,name,description,stagename,amount,probability,closedate,type,nextstep,leadsource,isclosed,iswon,forecastcategory,forecastcategoryname,currencyisocode,campaignid,hasopportunitylineitem,pricebook2id,ownerid,createddate,createdbyid,lastmodifieddate,lastmodifiedbyid,systemmodstamp,lastactivitydate,fiscalquarter,fiscalyear,fiscal,lastvieweddate,lastreferenceddate,syncedquoteid,contractid,hasopenactivity,hasoverduetask,budget_confirmed__c,discovery_completed__c,roi_analysis_completed__c,email_de_assistente_comercial__c,loss_reason__c,retificacoes_pedidas_pelo_cliente__c,data_limite_de_producao__c,adiantamento__c,amostra__c,antes_da_expedicao__c,aprovado__c,auto_number__c,autorizada__c,auxiliar_aprovacao_de_maquete__c,codigo_de_dossier__c,codigo_postal_online__c,comentarios_de_aprovacao__c,contabilizador_de_oportunidades__c,credito_dias__c,credito_percentagem__c,custo_de_transporte_stricker__c,data_de_aprovacao_de_maquete__c,data_de_conclusao_de_producao__c,limite_de_credito_comercial__c,data_de_faturacao__c,data_do_lembrete__c,data_do_pedido_de_maquete__c,data_limite_de_maquete__c,designer__c,destino_de_impressao__c,documento_de_destino__c,dossier__c,em_falta__c,email_para_envio_de_maquete__c,enviar_para_aprovacao__c,estado_da_maquete__c,estado_do_orcamento__c,estado_icon_maquete__c,fecho_automatico_da_reserva__c,fonte__c,idioma_para_documentos__c,impresso__c,incoterm__c,morada_de_entrega_online__c,motivo_de_insucesso__c,motivo_de_isencao_de_impostos__c,motivo_de_pendente__c,n_de_expedicao__c,n_de_versao_de_maquete_aceite__c,n_de_versoes_de_maquete__c,numero_de_dossier__c,numero_de_volumes__c,nweb__c,origem__c,outro_email_para_envio_de_maquete__c,pais_online__c,para_aprovacao__c,pedido_por__c,referencia_interna__c,regiao_online__c,retificacoes_pedidas_pelo_comercial__c,stamp__c,telefone_logistico__c,tempo_de_despacho__c,tipo_de_amostra__c,validade__c,validar_morada_online__c,versao_de_maquete_enviada__c,volume_total__c,volumes__c,id_morada_de_entrega__c,auxiliar_expedicao__c,auxiliar_total_de_produtos__c,auxiliar_total_de_produtos_cativos__c,preco_total__c,total_de_produtos__c,valor_total_de_customizacao__c,data_de_envio_de_maquete__c,limite_credito_comercial__c,limite_operacional_de_divida__c,nao_aprovado__c,notas_de_expedicao__c,referencia_phc__c,url_documento_web__c,data_de_pedido_de_retificacao__c,armazem__c,data_de_envio__c,localidade_online__c,limite_operacional_da_divida__c,divida_nao_titulada_maturidade__c,divida_nao_titulada_saldo__c,divida_titulada_maturidade__c,divida_titulada_saldo__c,divida_vencida__c,vendas_totais_ano_anterior__c,vendas_totais_periodo_homologo__c,vendas_totais_ano_presente__c,em_curso__c,auxiliar_de_novo_comentario__c,auxiliar_retificacao__c,comentarios_para_maquete__c,dossier_de_repeticao__c,inicio_de_pausa_de_maquete__c,maquete_em_atraso__c,maquete_em_pausa__c,novo_comentario__c,snapshot_de_maquete__c,snapshot_em_atraso__c,espera_de_integracao__c,erro_comunicacao__c,peso_kg__c,retificacao__c,transportadora_online__c,sla__c,ao_cuidado_de_online__c,mudanca_de_cor__c,alerta_mudanca_de_cor__c,enviada_para_cliente__c,catalogos__c,link_para_web__c,processo_aprov_ativo__c,situacao_atual_phc__c,em_producao__c,nao_calcula_portes_automaticos__c,versao_enviada__c,textil_em_falta__c,sem_extra_de_impressao__c,(Select id,opportunityid,sortorder,pricebookentryid,product2id,productcode,name,currencyisocode,quantity,discount,totalprice,unitprice,listprice,servicedate,description,createddate,createdbyid,lastmodifieddate,lastmodifiedbyid,systemmodstamp,isdeleted,lingua_do_cliente_idioma__c,agrupador_oli__c,alinhamento__c,altura__c,auxiliar_total_de_produtos__c,auxiliar_total_de_produtos_cativos__c,alocacao_de_stock__c,componente_da_impressao__c,comprimento__c,cores_de_customizacao__c,customizado__c,desconto_unitario__c,dimensoes_maximas_de_impressao__c,expedicao__c,fonte__c,lingua_do_cliente__c,numero_de_impressoes__c,numero_de_repeticoes__c,numero_do_armazem__c,peso__c,preco_aplicado__c,preco_unitario__c,proxima_chegada_de_stock__c,quantidade_original__c,referencia_sku__c,referencia_relacionada__c,referencia_semelhante__c,stock_atual__c,stock_cativo__c,stock_previsto__c,tamanho__c,tecnica__c,texto_a_customizar__c,total_de_customizacao__c,transportadora__c,valor_de_tabela_de_precos__c,valor_unitario_original__c,verifica_expedicao__c,volume__c,armazem__c,lotes__c,stamp__c,auxiliar_expedicao__c,codigo_de_cor__c,pantone_cor__c,uploaddossier__c,escalao_a__c,id_original__c,n_de_caixas__c,localizacao_de_impressao__c,stock_cativo_form__c,catalogo__c,referencia_relacionada_original__c,textil_em_falta__c,Product2.Name,Product2.Referencia_relacionada__c,Product2.Nome_do_produto_DE__c,Product2.Nome_do_produto_en_US__c,Product2.Nome_do_produto_ES__c,Product2.Nome_do_produto_FR__c,Product2.Nome_do_produto_it__c,Product2.Nome_do_produto_NL__c,Product2.Nome_do_produto_PL__c,Product2.Nome_do_produto_pt_BR__c,Product2.Nome_do_produto_RU__c,Product2.Nome_do_produto_DE_PHC__c,Product2.Nome_do_produto_en_US_PHC__c,Product2.Nome_do_produto_ES_PHC__c,Product2.Nome_do_produto_FR_PHC__c,Product2.Nome_do_produto_it_PHC__c,Product2.Nome_do_produto_NL_PHC__c,Product2.Nome_do_produto_PL_PHC__c,Product2.Nome_do_produto_pt_BR_PHC__c,Product2.Nome_do_produto_RU_PHC__c,Product2.RecordType.DeveloperName,Product2.Tabela_de_customizacoes__c,Product2.Peso_caixa__c,Product2.Caixa_interior_unidades__c,Expedicao__r.Morada_aux__c,Expedicao__r.Ao_Cuidado_De__c,Expedicao__r.Morada_de_Entrega__r.Ao_Cuidado_De__c,Expedicao__r.Transportadora__c,Expedicao__r.Morada_de_Entrega__r.MSEQ__c,Expedicao__r.Morada_de_Entrega__r.Codigo_postal__c,Expedicao__r.Morada_de_Entrega__r.Localidade__c,Expedicao__r.Morada_de_entrega__r.Morada_de_entrega__c,Expedicao__r.Morada_de_Entrega__r.Pais__c,Expedicao__r.Recolha_do_cliente__c,Expedicao__r.Morada_de_Entrega__r.Nome_da_empresa__c From OpportunityLineItems),Account.Numero_de_cliente__c,Account.Tipologia_de_facturacao__c,Account.Name,Pedido_por__r.Name From Opportunity where Id  = '0061n00000USw2gAAD'
+14:23:24.841 (1910711889)|SOQL_EXECUTE_END|[1083]|Rows:1
+14:23:24.841 (1911791354)|USER_DEBUG|[26]|INFO|Validar se trata resposta
+14:23:24.841 (1911848332)|USER_DEBUG|[29]|INFO|A tratar resposta
+14:23:24.841 (1912260192)|USER_DEBUG|[42]|DEBUG|DossierLinha:[alinhamento=0, altura=0, arma=1, cativo=true, cod_pais_morada=GB, cod_post_morada=DN20 8JZ NORTH LINCOLNSHIRE, comp_impressao= , comprimento=0, cores_cust=0, cuidado_de=KEVIN RADLEY, des_prod=Shipping cost, fonte= , local_impressao=null, local_morada=NORTH LINCOLNSHIRE, lotes=, morada_entrega=11 CHAPEL COURT BRIGG, n_impressoes=1, n_repeticoes=1, n_seq_morada=2, nome_contact=24744M2 - RADLEY COACH TRAVEL, nome_pais_morada=United Kingdom, p_esc_original=0, pantone=null, peso=0, preco_esc_a=0, preco_total=12, preco_unit=12, quant=1, ref_rel=null, ref_sku=NSPCE, sf_id=00k1n00000ZSCM5AAP, stamp=STK8A-911A-2E3ED3244E419 , tab_imp=null, tecnica= , tef_log= , transp=TNT ECONOMY, txt_cust= , valor_tabela=null, volume=0]
+14:23:24.841 (1912926976)|USER_DEBUG|[42]|DEBUG|DossierLinha:[alinhamento=0, altura=0, arma=1, cativo=true, cod_pais_morada=GB, cod_post_morada=DN20 8JZ NORTH LINCOLNSHIRE, comp_impressao= , comprimento=0, cores_cust=0, cuidado_de=KEVIN RADLEY, des_prod=Pack of 54 cards.Red, fonte= , local_impressao=null, local_morada=NORTH LINCOLNSHIRE, lotes=20181105, morada_entrega=11 CHAPEL COURT BRIGG, n_impressoes=0, n_repeticoes=0, n_seq_morada=2, nome_contact=24744M2 - RADLEY COACH TRAVEL, nome_pais_morada=United Kingdom, p_esc_original=0, pantone=null, peso=23.75, preco_esc_a=0, preco_total=78, preco_unit=0.312, quant=250, ref_rel=null, ref_sku=98080.05, sf_id=00k1n00000ZSCLBAA5, stamp=STK47-BEB2-41609C66F7308 , tab_imp=null, tecnica= , tef_log= , transp=TNT ECONOMY, txt_cust= , valor_tabela=null, volume=0.039]
+14:23:24.841 (1913305997)|USER_DEBUG|[83]|DEBUG|mesma linha somar stock;
+14:23:24.841 (1914079305)|USER_DEBUG|[42]|DEBUG|DossierLinha:[alinhamento=5, altura=70, arma=1, cativo=true, cod_pais_morada=GB, cod_post_morada=DN20 8JZ NORTH LINCOLNSHIRE, comp_impressao=Caixa, comprimento=45, cores_cust=1, cuidado_de=KEVIN RADLEY, des_prod= , fonte= , local_impressao=null, local_morada=NORTH LINCOLNSHIRE, lotes=, morada_entrega=11 CHAPEL COURT BRIGG, n_impressoes=250, n_repeticoes=1, n_seq_morada=2, nome_contact=24744M2 - RADLEY COACH TRAVEL, nome_pais_morada=United Kingdom, p_esc_original=0, pantone=null, peso=0, preco_esc_a=0, preco_total=129.75, preco_unit=0.519, quant=250, ref_rel=null, ref_sku=NSUV, sf_id=00k1n00000ZSCLCAA5, stamp=STK8F-B06A-E2AF570B02DD8 , tab_imp=null, tecnica=UV Digital, tef_log= , transp=TNT ECONOMY, txt_cust= , valor_tabela=null, volume=0]
+14:23:24.841 (1914591393)|USER_DEBUG|[191]|DEBUG|listOli {00k1n00000ZSCLBAA5=OpportunityLineItem:{OpportunityId=0061n00000USw2gAAD, PricebookEntryId=01u0Y00000DOWdwQAH, Product2Id=01t0Y000008Kf1WQAS, ProductCode=98080, Name=FO - O-025713 Baralho de 54 cartas, CurrencyIsoCode=GBP, Quantity=250, Discount=0.00, TotalPrice=78.00, UnitPrice=0.312, ListPrice=0.00, Description=Pack of 54 cards.Red, SystemModstamp=2018-11-20 11:25:33, IsDeleted=false, Lingua_do_cliente_idioma__c=Pack of 54 cards, Alinhamento__c=0, Altura__c=0, Auxiliar_total_de_produtos__c=1, Auxiliar_total_de_produtos_cativos__c=1, Alocacao_de_Stock__c=1 - 20181105 - 250;, Comprimento__c=0, Cores_de_customizacao__c=0, Customizado__c=true, Desconto_unitario__c=0.00, Expedicao__c=a0O1n00000MvXLeEAN, Lingua_do_cliente__c=Pack of 54 cards, Numero_de_impressoes__c=0, Numero_de_repeticoes__c=0, Peso__c=23.75, Preco_aplicado__c=Quantidade, Preco_unitario__c=0.312, Referencia_SKU__c=98080.05, Stock_cativo__c=true, Total_de_customizacao__c=78, Transportadora__c=TNT ECONOMY, Valor_de_tabela_de_precos__c=true, Valor_unitario_original__c=0.3120, Verifica_expedicao__c=1, Volume__c=0.039, Armazem__c=1, Lotes__c=20181105, Stamp__c=STK47-BEB2-41609C66F7308 , Auxiliar_expedicao__c=1, Codigo_de_cor__c=05, Escalao_A__c=0.281, N_de_caixas__c=2.500, Stock_Cativo_Form__c=true, Catalogo__c=false, Textil_em_falta__c=false, Id=00k1n00000ZSCLBAA5, Componente_da_impressao__c= , Tecnica__c= }}
+14:23:24.841 (1914749574)|DML_BEGIN|[194]|Op:Upsert|Type:OpportunityLineItem|Rows:1
+14:23:24.841 (1922566425)|CODE_UNIT_STARTED|[EXTERNAL]|01q0Y000001JlYc|t_Oli on OpportunityLineItem trigger event BeforeUpdate|__sfdc_trigger/t_Oli
+14:23:24.841 (1938654423)|SOQL_EXECUTE_BEGIN|[31]|Aggregations:0|SELECT Id, Peso__c, Volume__c FROM Product2 WHERE Id IN (SELECT Product2Id FROM OpportunityLineItem WHERE Id IN :tmpVar1)
+14:23:24.841 (1942947568)|SOQL_EXECUTE_END|[31]|Rows:1
+14:23:24.943 (1943330579)|CUMULATIVE_LIMIT_USAGE
+14:23:24.943 (1943330579)|LIMIT_USAGE_FOR_NS|(default)|
+  Number of SOQL queries: 2 out of 100
+  Number of query rows: 5 out of 50000
+  Number of SOSL queries: 0 out of 20
+  Number of DML statements: 1 out of 150
+  Number of DML rows: 1 out of 10000
+  Maximum CPU time: 1512 out of 10000
+  Maximum heap size: 0 out of 6000000
+  Number of callouts: 0 out of 100
+  Number of Email Invocations: 0 out of 10
+  Number of future calls: 0 out of 50
+  Number of queueable jobs added to the queue: 0 out of 50
+  Number of Mobile Apex push calls: 0 out of 10
+
+14:23:24.943 (1943330579)|CUMULATIVE_LIMIT_USAGE_END
+
+14:23:24.841 (1944113279)|CODE_UNIT_FINISHED|t_Oli on OpportunityLineItem trigger event BeforeUpdate|__sfdc_trigger/t_Oli
+14:23:24.841 (1947641079)|CODE_UNIT_STARTED|[EXTERNAL]|Validation:OpportunityLineItem:00k1n00000ZSCLB
+14:23:24.841 (1947662442)|VALIDATION_RULE|03d0Y0000002J94|Reserva_aberta_cativa
+14:23:24.841 (1947838493)|VALIDATION_FORMULA|AND (  Opportunity.RecordType.Name  = 'Reserva', TEXT( Opportunity.StageName ) = 'Aberto',  Stock_cativo__c = true)|Opportunity.RecordType.Name=Folha de Obra , Stock_cativo__c=1 , Opportunity.StageName=Maquete
+14:23:24.841 (1947846013)|VALIDATION_PASS
+14:23:24.841 (1948099248)|CODE_UNIT_FINISHED|Validation:OpportunityLineItem:00k1n00000ZSCLB
+14:23:24.841 (1977914478)|CODE_UNIT_STARTED|[EXTERNAL]|01q0Y000001JlYc|t_Oli on OpportunityLineItem trigger event AfterUpdate|__sfdc_trigger/t_Oli
+14:23:24.841 (1980499494)|SOQL_EXECUTE_BEGIN|[6]|Aggregations:0|SELECT Id, Nao_calcula_portes_automaticos__c FROM Opportunity WHERE Id IN (SELECT OpportunityId FROM OpportunityLineItem WHERE Id IN :tmpVar1)
+14:23:24.841 (1984648391)|SOQL_EXECUTE_END|[6]|Rows:1
+14:23:24.985 (1985057718)|CUMULATIVE_LIMIT_USAGE
+14:23:24.985 (1985057718)|LIMIT_USAGE_FOR_NS|(default)|
+  Number of SOQL queries: 3 out of 100
+  Number of query rows: 6 out of 50000
+  Number of SOSL queries: 0 out of 20
+  Number of DML statements: 1 out of 150
+  Number of DML rows: 1 out of 10000
+  Maximum CPU time: 1512 out of 10000
+  Maximum heap size: 0 out of 6000000
+  Number of callouts: 0 out of 100
+  Number of Email Invocations: 0 out of 10
+  Number of future calls: 0 out of 50
+  Number of queueable jobs added to the queue: 0 out of 50
+  Number of Mobile Apex push calls: 0 out of 10
+
+14:23:24.985 (1985057718)|CUMULATIVE_LIMIT_USAGE_END
+
+14:23:24.841 (1985853083)|CODE_UNIT_FINISHED|t_Oli on OpportunityLineItem trigger event AfterUpdate|__sfdc_trigger/t_Oli
+14:23:24.841 (1985944916)|CODE_UNIT_STARTED|[EXTERNAL]|Workflow:OpportunityLineItem
+14:23:24.841 (1998986170)|WF_RULE_EVAL_BEGIN|Fluxo de trabalho
+14:23:24.841 (1999040404)|WF_CRITERIA_BEGIN|[Produto de oportunidade:  00k1n00000ZSCLB]|Verificação de produto da oportunidade|01Q0Y0000009mnT|ON_ALL_CHANGES|0
+14:23:24.841 (1999116633)|WF_RULE_FILTER|[Produto de oportunidade : Referência SKU não igual a ]
+14:23:24.841 (1999131375)|WF_RULE_EVAL_VALUE|98080.05
+14:23:24.841 (1999136202)|WF_CRITERIA_END|true
+14:23:24.841 (1999451574)|WF_CRITERIA_BEGIN|[Produto de oportunidade:  00k1n00000ZSCLB]|Verificação de têxtil cativo|01Q1n000000Ujgc|ON_CREATE_OR_TRIGGERING_UPDATE|0
+14:23:24.841 (1999521731)|WF_RULE_FILTER|[Produto de oportunidade : Stock cativo igual a false] 
+E [Produto de oportunidade : Tamanho igual a XS, S, M, L, XL, XXL]
+14:23:24.841 (1999529175)|WF_RULE_EVAL_VALUE|true
+14:23:24.841 (1999532925)|WF_CRITERIA_END|false
+14:23:24.841 (1999549020)|WF_SPOOL_ACTION_BEGIN|Fluxo de trabalho
+14:23:24.841 (2007044930)|WF_ACTION| Atualização de campo: 2;
+14:23:24.841 (2007057371)|WF_RULE_EVAL_END
+14:23:24.841 (2007168607)|WF_ACTIONS_END| Atualização de campo: 2;
+14:23:24.841 (2007177889)|CODE_UNIT_FINISHED|Workflow:OpportunityLineItem
+14:23:24.841 (2017796316)|DML_END|[194]
+14:23:24.841 (2018028809)|DML_BEGIN|[196]|Op:Update|Type:Expedicao__c|Rows:1
+14:23:24.841 (2025640386)|CODE_UNIT_STARTED|[EXTERNAL]|Validation:Expedicao:a0O1n00000MvXLe
+14:23:24.841 (2025661376)|VALIDATION_RULE|03d0Y0000002J8n|Bloquear_registo
+14:23:24.841 (2025801877)|VALIDATION_FORMULA|AND(  Dossier__r.Impresso__c <> Null,  ISCHANGED( Morada_de_entrega__c ) )|Morada_de_entrega__c=a051n00000Ue17Y , Dossier__r.Impresso__c=0
+14:23:24.841 (2025809147)|VALIDATION_PASS
+14:23:24.841 (2026030607)|CODE_UNIT_FINISHED|Validation:Expedicao:a0O1n00000MvXLe
+14:23:24.841 (2075205849)|DML_END|[196]
+14:23:24.841 (2076272044)|SOQL_EXECUTE_BEGIN|[200]|Aggregations:0|SELECT id FROM OpportunityLineItem WHERE (OpportunityId = :tmpVar1 AND Id != :tmpVar2 AND Id NOT IN :tmpVar3 AND Product2.RecordType.DeveloperName = 'Produto')
+14:23:24.841 (2082365411)|SOQL_EXECUTE_END|[200]|Rows:0
+14:23:24.841 (2082512429)|USER_DEBUG|[205]|DEBUG|()
+14:23:24.841 (2083165817)|SOQL_EXECUTE_BEGIN|[287]|Aggregations:1|SELECT Id, Description, Autorizada__c, Erro_comunicacao__c, Versao_enviada__c, Espera_de_integracao__c, (SELECT Id FROM Expedicoes__r) FROM Opportunity WHERE Id = :tmpVar1
+14:23:24.841 (2088973414)|SOQL_EXECUTE_END|[287]|Rows:1
+14:23:24.841 (2089278565)|USER_DEBUG|[314]|DEBUG|TERCEIRA
+14:23:24.841 (2089633014)|USER_DEBUG|[344]|DEBUG|false
+14:23:24.841 (2089669166)|DML_BEGIN|[345]|Op:Update|Type:Opportunity|Rows:1
+14:23:24.841 (2100282357)|CODE_UNIT_STARTED|[EXTERNAL]|01q0Y000001J0ji|t_Opportunity on Opportunity trigger event BeforeUpdate|__sfdc_trigger/t_Opportunity
+14:23:24.841 (2101181082)|SOQL_EXECUTE_BEGIN|[3]|Aggregations:0|SELECT Id, Name, IsActive, IsDefault, SundayStartTime, SundayEndTime, MondayStartTime, MondayEndTime, TuesdayStartTime, TuesdayEndTime, WednesdayStartTime, WednesdayEndTime, ThursdayStartTime, ThursdayEndTime, FridayStartTime, FridayEndTime, SaturdayStartTime, SaturdayEndTime, TimeZoneSidKey, SystemModstamp, CreatedDate, CreatedById, LastModifiedDate, LastModifiedById, LastViewedDate FROM BusinessHours WHERE Name = 'PT'
+14:23:24.841 (2112261477)|SOQL_EXECUTE_END|[3]|Rows:1
+14:23:24.841 (2112952773)|SOQL_EXECUTE_BEGIN|[11]|Aggregations:0|SELECT id, Referencias__c FROM Referencias_limite_prod__c
+14:23:24.841 (2115934190)|SOQL_EXECUTE_END|[11]|Rows:1
+14:23:24.841 (2116842579)|SOQL_EXECUTE_BEGIN|[18]|Aggregations:0|SELECT Id, Horas__c, Minutos__c FROM SLA__mdt WHERE DeveloperName = 'Maquetes'
+14:23:24.841 (2119773617)|SOQL_EXECUTE_END|[18]|Rows:1
+14:23:24.841 (2123961369)|SOQL_EXECUTE_BEGIN|[20]|Aggregations:1|SELECT Id, (SELECT id FROM Pedidos_de_maquete__r WHERE Ativo__c = TRUE) FROM Opportunity WHERE Id IN :tmpVar1
+14:23:24.841 (2130077076)|SOQL_EXECUTE_END|[20]|Rows:1
+14:23:25.132 (2132708311)|CUMULATIVE_LIMIT_USAGE
+14:23:25.132 (2132708311)|LIMIT_USAGE_FOR_NS|(default)|
+  Number of SOQL queries: 8 out of 100
+  Number of query rows: 12 out of 50000
+  Number of SOSL queries: 0 out of 20
+  Number of DML statements: 3 out of 150
+  Number of DML rows: 3 out of 10000
+  Maximum CPU time: 1756 out of 10000
+  Maximum heap size: 0 out of 6000000
+  Number of callouts: 0 out of 100
+  Number of Email Invocations: 0 out of 10
+  Number of future calls: 0 out of 50
+  Number of queueable jobs added to the queue: 0 out of 50
+  Number of Mobile Apex push calls: 0 out of 10
+
+14:23:25.132 (2132708311)|CUMULATIVE_LIMIT_USAGE_END
+
+14:23:24.841 (2133508765)|CODE_UNIT_FINISHED|t_Opportunity on Opportunity trigger event BeforeUpdate|__sfdc_trigger/t_Opportunity
+14:23:24.841 (2145002821)|CODE_UNIT_STARTED|[EXTERNAL]|Validation:Opportunity:0061n00000USw2g
+14:23:24.841 (2145024465)|VALIDATION_RULE|03d0Y0000002f7P|Aprovada
+14:23:24.841 (2148293529)|VALIDATION_FORMULA|AND(TEXT( Estado_da_maquete__c ) = 'Aprovada',  ISNULL(N_de_versao_de_maquete_aceite__c), $Profile.Name = 'Comercial Backoffice')|N_de_versao_de_maquete_aceite__c=2 , $Profile.Name=Administrador do sistema , Estado_da_maquete__c=Aprovada
+14:23:24.841 (2148312087)|VALIDATION_PASS
+14:23:24.841 (2148315640)|VALIDATION_RULE|03d0Y0000002J8r|Condicoes_de_pagamento
+14:23:24.841 (2148434175)|VALIDATION_FORMULA|Adiantamento__c +  Antes_da_expedicao__c + Credito_percentagem__c <> 100|Antes_da_expedicao__c=null , Credito_percentagem__c=null , Adiantamento__c=null
+14:23:24.841 (2148439954)|VALIDATION_PASS
+14:23:24.841 (2148442365)|VALIDATION_RULE|03d0Y0000002gGS|Data_envio_Data_producao
+14:23:24.841 (2148611634)|VALIDATION_FORMULA|AND(Data_de_envio__c <> null ,Data_de_envio__c <  Data_limite_de_producao__c, $Profile.Name <> 'Administrador do sistema')|Data_limite_de_producao__c=null , $Profile.Name=Administrador do sistema , Data_de_envio__c=2018-11-26 14:12:00
+14:23:24.841 (2148621360)|VALIDATION_PASS
+14:23:24.841 (2148624322)|VALIDATION_RULE|03d0Y0000002J8s|Destino_impressao
+14:23:24.841 (2148799111)|VALIDATION_FORMULA|AND( ISCHANGED( Autorizada__c ),  text(Destino_de_impressao__c) = NULL, $Profile.Name <> 'Administrador do sistema')|Autorizada__c=null , Destino_de_impressao__c=Guia Cliente , $Profile.Name=Administrador do sistema
+14:23:24.841 (2148809833)|VALIDATION_PASS
+14:23:24.841 (2148812537)|VALIDATION_RULE|03d0Y0000002J8t|Doc_destino_obrigatorio
+14:23:24.841 (2148951527)|VALIDATION_FORMULA|AND( ISCHANGED( Autorizada__c ),  text(Documento_de_destino__c) = NULL, $Profile.Name <> 'Administrador do sistema')|Autorizada__c=null , $Profile.Name=Administrador do sistema , Documento_de_destino__c=Guia de Remessa
+14:23:24.841 (2148958169)|VALIDATION_PASS
+14:23:24.841 (2148960764)|VALIDATION_RULE|03d0Y0000002J8u|Email_de_maquete
+14:23:24.841 (2149032808)|VALIDATION_FORMULA|AND(TEXT(StageName) = 'Pedido de criação de maquete',  Email_para_envio_de_maquete__c = NULL )|StageName=Maquete , Email_para_envio_de_maquete__c=sales@ehadvertisingltd.co.uk
+14:23:24.841 (2149039384)|VALIDATION_PASS
+14:23:24.841 (2149041822)|VALIDATION_RULE|03d0Y0000002J8v|Encomendas_canceladas
+14:23:24.841 (2149132122)|VALIDATION_FORMULA|AND(  Name <> null,  Account.Encomendas_canceladas__c = true)|Account.Encomendas_canceladas__c=0 , Name=FO - O-025713
+14:23:24.841 (2149137267)|VALIDATION_PASS
+14:23:24.841 (2149139690)|VALIDATION_RULE|03d0Y0000002J8w|Limite_excedido
+14:23:24.841 (2149267916)|VALIDATION_FORMULA|AND(
+				Autorizada__c <> null, 
+				Account.Divida_nao_titulada_maturidade__c > Account.Limite_operacional_de_divida__c, 
+				$Profile.Name <> 'Administrador do sistema',
+				$Profile.Name <> 'Director comercial'
+)|Autorizada__c=null , Account.Limite_operacional_de_divida__c=30.0 , $Profile.Name=Administrador do sistema , Account.Divida_nao_titulada_maturidade__c=0.0
+14:23:24.841 (2149275664)|VALIDATION_PASS
+14:23:24.841 (2149278068)|VALIDATION_RULE|03d0Y0000002J8x|Maquete_nao_aprovada
+14:23:24.841 (2149383988)|VALIDATION_FORMULA|AND( Autorizada__c <> Null, 
+				TEXT(Estado_da_maquete__c) <>  'Aprovada', 
+				RecordType.Name = 'Folha de Obra',
+		 $Profile.Name <> 'Administrador do sistema'	)|Autorizada__c=null , $Profile.Name=Administrador do sistema , Estado_da_maquete__c=Aprovada , RecordType.Name=Folha de Obra
+14:23:24.841 (2149391521)|VALIDATION_PASS
+14:23:24.841 (2149394033)|VALIDATION_RULE|03d1n000000N8YW|Nao_Autorizada
+14:23:24.841 (2149446212)|VALIDATION_FORMULA|AND( Autorizada__c = NULL, TEXT( StageName ) = "Armazém")|Autorizada__c=null , StageName=Maquete
+14:23:24.841 (2149451267)|VALIDATION_PASS
+14:23:24.841 (2149453543)|VALIDATION_RULE|03d0Y0000002J8y|Numero_de_versoes
+14:23:24.841 (2149509385)|VALIDATION_FORMULA|N_de_versao_de_maquete_aceite__c > N_de_versoes_de_maquete__c|N_de_versoes_de_maquete__c=2 , N_de_versao_de_maquete_aceite__c=2
+14:23:24.841 (2149514295)|VALIDATION_PASS
+14:23:24.841 (2149516748)|VALIDATION_RULE|03d0Y0000002J90|Produtos_por_cativar_stock
+14:23:24.841 (2149715826)|VALIDATION_FORMULA|OR( 
+AND( 
+Auxiliar_total_de_produtos__c > Auxiliar_total_de_produtos_cativos__c , 
+Autorizada__c <> Null, 
+Textil_em_falta__c = 0, 
+RecordType.DeveloperName = 'Folha_de_Obra' 
+), 
+AND( 
+Auxiliar_total_de_produtos__c > Auxiliar_total_de_produtos_cativos__c , 
+Autorizada__c <> Null, 
+RecordType.DeveloperName = 'Nota_de_encomenda' 
+) 
+)|Autorizada__c=null , Textil_em_falta__c=0 , RecordType.DeveloperName=Folha_de_Obra , Auxiliar_total_de_produtos_cativos__c=3 , Auxiliar_total_de_produtos__c=3
+14:23:24.841 (2149747380)|VALIDATION_PASS
+14:23:24.841 (2149751581)|VALIDATION_RULE|03d0Y0000002J91|Produtos_sem_expedicao
+14:23:24.841 (2149927516)|VALIDATION_FORMULA|AND(Auxiliar_expedicao__c < Auxiliar_total_de_produtos__c,  
+				ISCHANGED( Autorizada__c ), 
+				$Profile.Name <> 'Administrador do sistema')|Autorizada__c=null , $Profile.Name=Administrador do sistema , Auxiliar_expedicao__c=3 , Auxiliar_total_de_produtos__c=3
+14:23:24.841 (2149937469)|VALIDATION_PASS
+14:23:24.841 (2149940415)|VALIDATION_RULE|03d1n000000N9Di|Subfase_autorizada_fo
+14:23:24.841 (2150202259)|VALIDATION_FORMULA|AND( 
+				Autorizada__c <> null, 
+				TEXT(Motivo_de_pendente__c) <> 'Aviado', 
+				TEXT(Motivo_de_pendente__c) <> 'Catálogos', 
+				TEXT(Motivo_de_pendente__c) <> null,
+				TEXT(Motivo_de_pendente__c) <> 'Em falta - Pendente de stock',
+				 RecordType.DeveloperName = 'Folha_de_Obra',
+				$Profile.Name <> 'Administrador do sistema'
+)|Autorizada__c=null , $Profile.Name=Administrador do sistema , RecordType.DeveloperName=Folha_de_Obra , Motivo_de_pendente__c=null
+14:23:24.841 (2150215385)|VALIDATION_PASS
+14:23:24.841 (2150218177)|VALIDATION_RULE|03d1n000000N9Dj|Subfase_autorizada_ne
+14:23:24.841 (2150410806)|VALIDATION_FORMULA|AND( 
+				Autorizada__c <> null, 
+				TEXT(Motivo_de_pendente__c) <> 'Aviado', 
+				TEXT(Motivo_de_pendente__c) <> 'Catálogos', 
+				TEXT(Motivo_de_pendente__c) <> null,
+				TEXT(Motivo_de_pendente__c) <> 'Em falta - Pendente de stock',
+				 RecordType.DeveloperName = 'Nota_de_encomenda',
+				$Profile.Name <> 'Administrador do sistema'
+)|Autorizada__c=null , $Profile.Name=Administrador do sistema , RecordType.DeveloperName=Folha_de_Obra , Motivo_de_pendente__c=null
+14:23:24.841 (2150422620)|VALIDATION_PASS
+14:23:24.841 (2150425251)|VALIDATION_RULE|03d1n000000N9Dk|Texteis_nao_cativar
+14:23:24.841 (2150687085)|VALIDATION_FORMULA|AND( 
+Auxiliar_total_de_produtos__c = Auxiliar_total_de_produtos_cativos__c , 
+Autorizada__c <> Null, 
+Textil_em_falta__c = 0, 
+TEXT(Motivo_de_pendente__c)='Em falta - Pendente de stock' 
+)|Autorizada__c=null , Textil_em_falta__c=0 , Auxiliar_total_de_produtos_cativos__c=3 , Motivo_de_pendente__c=null , Auxiliar_total_de_produtos__c=3
+14:23:24.841 (2150705481)|VALIDATION_PASS
+14:23:24.841 (2150709540)|VALIDATION_RULE|03d1n000000N9Dl|Texteis_por_cativar_stock
+14:23:24.841 (2151052586)|VALIDATION_FORMULA|AND( 
+Autorizada__c <> Null, 
+Textil_em_falta__c > 0, 
+TEXT(Motivo_de_pendente__c)<>'Em falta - Pendente de stock', 
+RecordType.DeveloperName = 'Folha_de_Obra',
+$Profile.Name <> 'Administrador do sistema'
+)|Autorizada__c=null , $Profile.Name=Administrador do sistema , Textil_em_falta__c=0 , RecordType.DeveloperName=Folha_de_Obra , Motivo_de_pendente__c=null
+14:23:24.841 (2151068532)|VALIDATION_PASS
+14:23:24.841 (2151071661)|VALIDATION_RULE|03d0Y0000002J8o|Bloquear_registo_autorizado
+14:23:24.841 (2151654255)|VALIDATION_FORMULA|AND( Autorizada__c <> Null, 
+PRIORVALUE( Autorizada__c ) <> Null, 
+$Profile.Name <> 'Administrador do sistema', 
+OR( 
+ISCHANGED(Referencia_interna__c), 
+ISCHANGED(Documento_de_destino__c), 
+ISCHANGED(Destino_de_impressao__c), 
+ISCHANGED(Armazem__c), 
+ISCHANGED(Origem__c), 
+ISCHANGED(Motivo_de_pendente__c), 
+ISCHANGED(Nao_calcula_portes_automaticos__c), 
+ISCHANGED(Amostra__c), 
+ISCHANGED(Tipo_de_amostra__c), 
+ISCHANGED(Notas_de_expedicao__c), 
+ISCHANGED(Incoterm__c), 
+ISCHANGED(Motivo_de_isencao_de_impostos__c), 
+ISCHANGED(Dossier_de_repeticao__c), 
+ISCHANGED(Designer__c), 
+ISCHANGED(Email_para_envio_de_maquete__c), 
+ISCHANGED(Outro_email_para_envio_de_maquete__c), 
+ISCHANGED(N_de_versao_de_maquete_aceite__c), 
+ISCHANGED(StageName), 
+ISCHANGED(Sem_extra_de_impressao__c), 
+ISCHANGED(Preco_total__c)) 
+)|Autorizada__c=null , N_de_versao_de_maquete_aceite__c=2 , StageName=Maquete , Referencia_interna__c=22850 , Nao_calcula_portes_automaticos__c=0 , Origem__c=Email , Outro_email_para_envio_de_maquete__c=null , Designer__c=CJ , Destino_de_impressao__c=Guia Cliente , $Profile.Name=Administrador do sistema , Tipo_de_amostra__c=null , Dossier_de_repeticao__c=null , Motivo_de_pendente__c=null , Amostra__c=0 , Armazem__c=1 , Preco_total__c=219.750000000000000000000000000000000000332558 , Motivo_de_isencao_de_impostos__c=null , Email_para_envio_de_maquete__c=sales@ehadvertisingltd.co.uk , Documento_de_destino__c=Guia de Remessa , Notas_de_expedicao__c=null , Incoterm__c=DDP , Sem_extra_de_impressao__c=0
+14:23:24.841 (2151680686)|VALIDATION_PASS
+14:23:24.841 (2151683631)|VALIDATION_RULE|03d0Y0000002J8p|Bloquear_registo_impresso
+14:23:24.841 (2151841356)|VALIDATION_FORMULA|AND( Impresso__c <> Null, 
+PRIORVALUE( Impresso__c ) <> Null, 
+$Profile.Name <> 'Administrador do sistema', 
+NOT(ISCHANGED(Description)), NOT(ISCHANGED(Erro_comunicacao__c)))|Impresso__c=0 , $Profile.Name=Administrador do sistema , Description=null , Erro_comunicacao__c=0
+14:23:24.841 (2151848797)|VALIDATION_PASS
+14:23:24.841 (2151851638)|VALIDATION_RULE|03d1n000000N8hN|Bloqueio_aprovacao_cliente
+14:23:24.841 (2152009078)|VALIDATION_FORMULA|AND( Enviada_para_cliente__c, 
+PRIORVALUE( Enviada_para_cliente__c ), 
+$Profile.Name = 'Designer', 
+NOT(ISCHANGED(Description)), NOT(ISCHANGED(Erro_comunicacao__c)),
+NOT(ISCHANGED(Espera_de_integracao__c)))|Espera_de_integracao__c=0 , $Profile.Name=Administrador do sistema , Description=null , Enviada_para_cliente__c=1 , Erro_comunicacao__c=0
+14:23:24.841 (2152017633)|VALIDATION_PASS
+14:23:24.841 (2152020322)|VALIDATION_RULE|03d0Y0000002J8q|Cliente_bloqueado
+14:23:24.841 (2152101565)|VALIDATION_FORMULA|AND(  Name <> null,  Account.Bloqueado__c= true)|Account.Bloqueado__c=0 , Name=FO - O-025713
+14:23:24.841 (2152106898)|VALIDATION_PASS
+14:23:24.841 (2152109270)|VALIDATION_RULE|03d0Y0000002eiy|Fase_Construcao
+14:23:24.841 (2152244639)|VALIDATION_FORMULA|AND(TEXT(Estado_da_maquete__c) = 'Em construção',
+				TEXT(StageName) <> 'Fechado anulado',
+				AND($Profile.Name <> 'Designer',
+								$Profile.Name <> 'Administrador do sistema'),
+				NOT(ISCHANGED(Description)), NOT(ISCHANGED(Erro_comunicacao__c)) 
+, NOT(ISCHANGED(Espera_de_integracao__c))
+			)|Espera_de_integracao__c=0 , $Profile.Name=Administrador do sistema , Description=null , StageName=Maquete , Estado_da_maquete__c=Aprovada , Erro_comunicacao__c=0
+14:23:24.841 (2152254356)|VALIDATION_PASS
+14:23:24.841 (2152256934)|VALIDATION_RULE|03d1n000000N97J|Nao_Faturada
+14:23:24.841 (2152370560)|VALIDATION_FORMULA|AND( RecordType.DeveloperName = 'Folha_de_Obra', TEXT(StageName) = 'Fechado faturado',  Data_de_faturacao__c = null , $Profile.Name <> 'Administrador do sistema')|$Profile.Name=Administrador do sistema , RecordType.DeveloperName=Folha_de_Obra , Data_de_faturacao__c=null , StageName=Maquete
+14:23:24.841 (2152377369)|VALIDATION_PASS
+14:23:24.841 (2152379878)|VALIDATION_RULE|03d1n000000N97E|Nao_processo_de_faturacao
+14:23:24.841 (2152484541)|VALIDATION_FORMULA|AND( RecordType.DeveloperName = 'Folha_de_Obra', TEXT(StageName) = 'Em processo de faturação',  OR(N_de_expedicao__c  = null, N_de_expedicao__c  = '0'), $Profile.Name <> 'Administrador do sistema')|$Profile.Name=Administrador do sistema , RecordType.DeveloperName=Folha_de_Obra , StageName=Maquete , N_de_expedicao__c=0
+14:23:24.841 (2152491812)|VALIDATION_PASS
+14:23:24.841 (2152494345)|VALIDATION_RULE|03d1n000000N979|Nao_Producao
+14:23:24.841 (2152584832)|VALIDATION_FORMULA|AND( RecordType.DeveloperName = 'Folha_de_Obra', TEXT(StageName) = 'Em produção', Autorizada__c = null, $Profile.Name <> 'Administrador do sistema')|Autorizada__c=null , $Profile.Name=Administrador do sistema , RecordType.DeveloperName=Folha_de_Obra , StageName=Maquete
+14:23:24.841 (2152591826)|VALIDATION_PASS
+14:23:24.841 (2152594316)|VALIDATION_RULE|03d1n000000N9Dg|Pedir_maquete
+14:23:24.841 (2152657896)|VALIDATION_FORMULA|AND( TEXT(Estado_da_maquete__c) = 'Por aceitar',  Auxiliar_retificacao__c = false,  N_de_versoes_de_maquete__c >= 1)|N_de_versoes_de_maquete__c=2 , Auxiliar_retificacao__c=1 , Estado_da_maquete__c=Aprovada
+14:23:24.841 (2152663551)|VALIDATION_PASS
+14:23:24.841 (2152665976)|VALIDATION_RULE|03d1n000000N9Dh|Pedir_retificacao
+14:23:24.841 (2152723553)|VALIDATION_FORMULA|AND( TEXT(Estado_da_maquete__c) = 'Por aceitar',  Auxiliar_retificacao__c = true,  N_de_versoes_de_maquete__c = null)|N_de_versoes_de_maquete__c=2 , Auxiliar_retificacao__c=1 , Estado_da_maquete__c=Aprovada
+14:23:24.841 (2152728729)|VALIDATION_PASS
+14:23:24.841 (2152731127)|VALIDATION_RULE|03d0Y0000002J92|Reserva_aberta_cativa
+14:23:24.841 (2152816056)|VALIDATION_FORMULA|AND (  RecordType.Name = 'Reserva', TEXT( StageName ) = 'Aberto',  Auxiliar_total_de_produtos_cativos__c  >= 1)|StageName=Maquete , Auxiliar_total_de_produtos_cativos__c=3 , RecordType.Name=Folha de Obra
+14:23:24.841 (2152821562)|VALIDATION_PASS
+14:23:24.841 (2152823939)|VALIDATION_RULE|03d0Y0000002J93|Reserva_concluida_autorizada
+14:23:24.841 (2152884154)|VALIDATION_FORMULA|AND(RecordType.Name = 'RESERVA',  IsClosed =true, ISNULL(Autorizada__c))|Autorizada__c=null , RecordType.Name=Folha de Obra , IsClosed=0
+14:23:24.841 (2152889414)|VALIDATION_PASS
+14:23:24.841 (2153118550)|CODE_UNIT_FINISHED|Validation:Opportunity:0061n00000USw2g
+14:23:24.841 (2174061335)|CODE_UNIT_STARTED|[EXTERNAL]|01q0Y000001J0jf|t_ExportFile on Opportunity trigger event AfterUpdate|__sfdc_trigger/t_ExportFile
+14:23:24.841 (2174543028)|SOQL_EXECUTE_BEGIN|[8]|Aggregations:0|SELECT Id FROM RecordType WHERE (SobjectType = 'Opportunity' AND (DeveloperName = 'Folha_de_Obra' OR DeveloperName = 'Nota_de_encomenda'))
+14:23:24.841 (2180661359)|SOQL_EXECUTE_END|[8]|Rows:2
+14:23:25.181 (2181103856)|CUMULATIVE_LIMIT_USAGE
+14:23:25.181 (2181103856)|LIMIT_USAGE_FOR_NS|(default)|
+  Number of SOQL queries: 9 out of 100
+  Number of query rows: 14 out of 50000
+  Number of SOSL queries: 0 out of 20
+  Number of DML statements: 3 out of 150
+  Number of DML rows: 3 out of 10000
+  Maximum CPU time: 1756 out of 10000
+  Maximum heap size: 0 out of 6000000
+  Number of callouts: 0 out of 100
+  Number of Email Invocations: 0 out of 10
+  Number of future calls: 0 out of 50
+  Number of queueable jobs added to the queue: 0 out of 50
+  Number of Mobile Apex push calls: 0 out of 10
+
+14:23:25.181 (2181103856)|CUMULATIVE_LIMIT_USAGE_END
+
+14:23:24.841 (2181933602)|CODE_UNIT_FINISHED|t_ExportFile on Opportunity trigger event AfterUpdate|__sfdc_trigger/t_ExportFile
+14:23:24.841 (2182509113)|CODE_UNIT_STARTED|[EXTERNAL]|01q0Y000001J0ji|t_Opportunity on Opportunity trigger event AfterUpdate|__sfdc_trigger/t_Opportunity
+14:23:24.841 (2183010241)|SOQL_EXECUTE_BEGIN|[3]|Aggregations:0|SELECT Id, Name, IsActive, IsDefault, SundayStartTime, SundayEndTime, MondayStartTime, MondayEndTime, TuesdayStartTime, TuesdayEndTime, WednesdayStartTime, WednesdayEndTime, ThursdayStartTime, ThursdayEndTime, FridayStartTime, FridayEndTime, SaturdayStartTime, SaturdayEndTime, TimeZoneSidKey, SystemModstamp, CreatedDate, CreatedById, LastModifiedDate, LastModifiedById, LastViewedDate FROM BusinessHours WHERE Name = 'PT'
+14:23:24.841 (2191581498)|SOQL_EXECUTE_END|[3]|Rows:1
+14:23:25.191 (2191724939)|CUMULATIVE_LIMIT_USAGE
+14:23:25.191 (2191724939)|LIMIT_USAGE_FOR_NS|(default)|
+  Number of SOQL queries: 10 out of 100
+  Number of query rows: 15 out of 50000
+  Number of SOSL queries: 0 out of 20
+  Number of DML statements: 3 out of 150
+  Number of DML rows: 3 out of 10000
+  Maximum CPU time: 1756 out of 10000
+  Maximum heap size: 0 out of 6000000
+  Number of callouts: 0 out of 100
+  Number of Email Invocations: 0 out of 10
+  Number of future calls: 0 out of 50
+  Number of queueable jobs added to the queue: 0 out of 50
+  Number of Mobile Apex push calls: 0 out of 10
+
+14:23:25.191 (2191724939)|CUMULATIVE_LIMIT_USAGE_END
+
+14:23:24.841 (2192542069)|CODE_UNIT_FINISHED|t_Opportunity on Opportunity trigger event AfterUpdate|__sfdc_trigger/t_Opportunity
+14:23:24.841 (2192735478)|CODE_UNIT_STARTED|[EXTERNAL]|Workflow:Opportunity
+14:23:24.841 (2202089017)|WF_RULE_EVAL_BEGIN|Fluxo de trabalho
+14:23:24.841 (2202133943)|WF_CRITERIA_BEGIN|[Dossier: FO - O-025713 0061n00000USw2g]|Dossier_Criacao_de_dossier3010Y000000ZoYG|01Q0Y000000A6jJ|ON_CREATE_ONLY|0
+14:23:24.841 (2202145423)|WF_RULE_NOT_EVALUATED
+14:23:24.841 (2202154028)|WF_CRITERIA_BEGIN|[Dossier: FO - O-025713 0061n00000USw2g]|Dossier_Follow_up_de_maquete3011n000000J7MA|01Q1n000000UiLX|ON_ALL_CHANGES|0
+14:23:24.841 (2202244135)|WF_FORMULA|Formula:ENCODED:[treatNullAsNull]true|Values:
+14:23:24.841 (2202253183)|WF_CRITERIA_END|true
+14:23:24.841 (2202901911)|WF_CRITERIA_BEGIN|[Dossier: FO - O-025713 0061n00000USw2g]|Envio de orçamento|01Q0Y0000009mnP|ON_CREATE_OR_TRIGGERING_UPDATE|0
+14:23:24.841 (2203019543)|WF_RULE_FILTER|[Dossier : Fase igual a Enviado]
+14:23:24.841 (2203037827)|WF_RULE_EVAL_VALUE|Maquete
+14:23:24.841 (2203044579)|WF_CRITERIA_END|false
+14:23:24.841 (2203058731)|WF_CRITERIA_BEGIN|[Dossier: FO - O-025713 0061n00000USw2g]|Email do Backoffice|01Q0Y0000009mnO|ON_CREATE_OR_TRIGGERING_UPDATE|0
+14:23:24.841 (2203106201)|WF_RULE_NOT_EVALUATED
+14:23:24.841 (2203117184)|WF_CRITERIA_BEGIN|[Dossier: FO - O-025713 0061n00000USw2g]|Data de envio de maquete|01Q0Y0000009mnN|ON_CREATE_OR_TRIGGERING_UPDATE|0
+14:23:24.841 (2203180299)|WF_RULE_FILTER|[Dossier : Data de envio de maquete igual a ] 
+E [Dossier : Estado da maquete igual a Em aprovação do cliente]
+14:23:24.841 (2203200204)|WF_RULE_EVAL_VALUE|2018-11-20 10:48:46
+14:23:24.841 (2203205434)|WF_CRITERIA_END|false
+14:23:24.841 (2203219357)|WF_CRITERIA_BEGIN|[Dossier: FO - O-025713 0061n00000USw2g]|Dossier - Faturado|01Q0Y0000009zRc|ON_CREATE_OR_TRIGGERING_UPDATE|0
+14:23:24.841 (2203281603)|WF_RULE_FILTER|[Dossier : Data de faturação maior ou igual start = Sat Jan 01 00:00:00 GMT 2000 end = Sat Jan 01 00:01:00 GMT 2000]
+14:23:24.841 (2203290231)|WF_RULE_EVAL_VALUE|
+14:23:24.841 (2203293797)|WF_CRITERIA_END|false
+14:23:24.841 (2203306951)|WF_CRITERIA_BEGIN|[Dossier: FO - O-025713 0061n00000USw2g]|Pedido de maquete|01Q0Y0000009mnS|ON_CREATE_OR_TRIGGERING_UPDATE|0
+14:23:24.841 (2203359939)|WF_RULE_FILTER|[Dossier : Fase igual a Pedido de maquete]
+14:23:24.841 (2203371674)|WF_RULE_EVAL_VALUE|Maquete
+14:23:24.841 (2203376594)|WF_CRITERIA_END|false
+14:23:24.841 (2203394271)|WF_CRITERIA_BEGIN|[Dossier: FO - O-025713 0061n00000USw2g]|Oportunidade aceite designer|01Q0Y0000009mnR|ON_CREATE_OR_TRIGGERING_UPDATE|0
+14:23:24.841 (2203470923)|WF_RULE_FILTER|[Dossier : Designer não igual a ] 
+E [Dossier : Estado da maquete igual a Por aceitar] 
+E [Dossier : Retificação não igual a true]
+14:23:24.841 (2203482845)|WF_RULE_EVAL_VALUE|11
+14:23:24.841 (2203491278)|WF_RULE_EVAL_VALUE|5
+14:23:24.841 (2203496115)|WF_CRITERIA_END|false
+14:23:24.841 (2203508720)|WF_CRITERIA_BEGIN|[Dossier: FO - O-025713 0061n00000USw2g]|Pedido_de_retificacao_de_maquete3010Y000000Yymw|01Q0Y0000009nJl|ON_ALL_CHANGES|0
+14:23:24.841 (2203581564)|WF_FORMULA|Formula:ENCODED:[treatNullAsNull]true|Values:
+14:23:24.841 (2203589411)|WF_CRITERIA_END|true
+14:23:24.841 (2203613247)|WF_CRITERIA_BEGIN|[Dossier: FO - O-025713 0061n00000USw2g]|Dossier_Pendente_de_maquete3011n000000J9Uf|01Q1n000000UjJY|ON_ALL_CHANGES|0
+14:23:24.841 (2203644901)|WF_FORMULA|Formula:ENCODED:[treatNullAsNull]true|Values:
+14:23:24.841 (2203651470)|WF_CRITERIA_END|true
+14:23:24.841 (2203665025)|WF_CRITERIA_BEGIN|[Dossier: FO - O-025713 0061n00000USw2g]|Dossier_Notifica_o_saiu_de_producao3011n000000JAEm|01Q1n000000Ujbr|ON_ALL_CHANGES|0
+14:23:24.841 (2203690852)|WF_FORMULA|Formula:ENCODED:[treatNullAsNull]true|Values:
+14:23:24.841 (2203697782)|WF_CRITERIA_END|true
+14:23:24.841 (2203715383)|WF_CRITERIA_BEGIN|[Dossier: FO - O-025713 0061n00000USw2g]|Dossier_Enviar_para_aprovacao3011n000000J9hn|01Q1n000000UjPg|ON_ALL_CHANGES|0
+14:23:24.841 (2203750931)|WF_FORMULA|Formula:ENCODED:[treatNullAsNull]true|Values:
+14:23:24.841 (2203757805)|WF_CRITERIA_END|true
+14:23:24.841 (2203773540)|WF_CRITERIA_BEGIN|[Dossier: FO - O-025713 0061n00000USw2g]|Dossier_Incoterm3010Y000000Znff|01Q0Y000000A6L7|ON_RECURSIVE_UPDATE|0
+14:23:24.841 (2203804461)|WF_FORMULA|Formula:ENCODED:[treatNullAsNull]true|Values:
+14:23:24.841 (2203810256)|WF_CRITERIA_END|true
+14:23:24.841 (2203824802)|WF_CRITERIA_BEGIN|[Dossier: FO - O-025713 0061n00000USw2g]|Dossier_Notificacao_de_novo_comentario3011n000000J7NM|01Q1n000000UiLr|ON_ALL_CHANGES|0
+14:23:24.841 (2203849239)|WF_FORMULA|Formula:ENCODED:[treatNullAsNull]true|Values:
+14:23:24.841 (2203855361)|WF_CRITERIA_END|true
+14:23:24.841 (2203879212)|WF_CRITERIA_BEGIN|[Dossier: FO - O-025713 0061n00000USw2g]|Dossier_Fechar_dossier3010Y000000ZoAs|01Q0Y000000A6Y6|ON_RECURSIVE_UPDATE|0
+14:23:24.841 (2203905963)|WF_FORMULA|Formula:ENCODED:[treatNullAsNull]true|Values:
+14:23:24.841 (2203912435)|WF_CRITERIA_END|true
+14:23:24.841 (2203926544)|WF_CRITERIA_BEGIN|[Dossier: FO - O-025713 0061n00000USw2g]|Dossier_Novo_comentario_de_maquete3011n000000J8Ks|01Q1n000000UilT|ON_RECURSIVE_UPDATE|0
+14:23:24.841 (2203950669)|WF_FORMULA|Formula:ENCODED:[treatNullAsNull]true|Values:
+14:23:24.841 (2203957602)|WF_CRITERIA_END|true
+14:23:24.841 (2203974995)|WF_CRITERIA_BEGIN|[Dossier: FO - O-025713 0061n00000USw2g]|Follow_up_de_orcamentos3010Y000000ZYYU|01Q0Y0000009zix|ON_RECURSIVE_UPDATE|0
+14:23:24.841 (2203995767)|WF_FORMULA|Formula:ENCODED:[treatNullAsNull]true|Values:
+14:23:24.841 (2203999887)|WF_CRITERIA_END|true
+14:23:24.841 (2204010013)|WF_CRITERIA_BEGIN|[Dossier: FO - O-025713 0061n00000USw2g]|Dossier - Maquete retificação|01Q1n000000UiDn|ON_CREATE_OR_TRIGGERING_UPDATE|0
+14:23:24.841 (2204046296)|WF_RULE_NOT_EVALUATED
+14:23:24.841 (2204054656)|WF_CRITERIA_BEGIN|[Dossier: FO - O-025713 0061n00000USw2g]|Dossier_Aprovado3011n000000J9rE|01Q1n000000UjSf|ON_ALL_CHANGES|0
+14:23:24.841 (2204072390)|WF_FORMULA|Formula:ENCODED:[treatNullAsNull]true|Values:
+14:23:24.841 (2204076750)|WF_CRITERIA_END|true
+14:23:24.841 (2204086654)|WF_CRITERIA_BEGIN|[Dossier: FO - O-025713 0061n00000USw2g]|Dossier - Estado de Armazém|01Q0Y0000009zRN|ON_CREATE_OR_TRIGGERING_UPDATE|0
+14:23:24.841 (2204143144)|WF_RULE_FILTER|[Dossier : Impresso em Armazém igual a true] 
+E [Dossier : Tipo de registro do dossier igual a Folha de Obra]
+14:23:24.841 (2204150525)|WF_RULE_EVAL_VALUE|false
+14:23:24.841 (2204154485)|WF_CRITERIA_END|false
+14:23:24.841 (2204162002)|WF_CRITERIA_BEGIN|[Dossier: FO - O-025713 0061n00000USw2g]|Dossier - Data de retificação|01Q0Y0000009zU2|ON_CREATE_OR_TRIGGERING_UPDATE|0
+14:23:24.841 (2204187993)|WF_RULE_FILTER|[Dossier : Estado da maquete igual a Em retificação]
+14:23:24.841 (2204195305)|WF_RULE_EVAL_VALUE|5
+14:23:24.841 (2204198987)|WF_CRITERIA_END|false
+14:23:24.841 (2204208223)|WF_CRITERIA_BEGIN|[Dossier: FO - O-025713 0061n00000USw2g]|Dossier_Aprovacao_de_maquete3010Y000000a3Dd|01Q0Y000000AD1J|ON_ALL_CHANGES|0
+14:23:24.841 (2204229601)|WF_FORMULA|Formula:ENCODED:[treatNullAsNull]true|Values:
+14:23:24.841 (2204234098)|WF_CRITERIA_END|true
+14:23:24.841 (2204247455)|WF_CRITERIA_BEGIN|[Dossier: FO - O-025713 0061n00000USw2g]|Incoterm DDP|01Q1n000000UjYn|ON_ALL_CHANGES|0
+14:23:24.841 (2204319206)|WF_RULE_FILTER|[Cliente : Código do país de cobrança igual a AL, DE, AD, AT, BE, BA, BG, CY, HR, DK, SK, SI, ES, EE, RU, FI, FR, GR, VA, HU, IE, IT, XK, LI, LT, LU, MK, MT, MD, MC, ME, NL, PL, GB, CZ, RO, SM, RS, SE]
+14:23:24.841 (2207943787)|WF_RULE_EVAL_VALUE|77
+14:23:24.841 (2207962758)|WF_CRITERIA_END|true
+14:23:24.841 (2208024895)|WF_CRITERIA_BEGIN|[Dossier: FO - O-025713 0061n00000USw2g]|Dossier_Retificacao_de_maquete3010Y000000Zz2r|01Q1n000000UiDs|ON_ALL_CHANGES|0
+14:23:24.841 (2208108092)|WF_FORMULA|Formula:ENCODED:[treatNullAsNull]true|Values:
+14:23:24.841 (2208114910)|WF_CRITERIA_END|true
+14:23:24.841 (2208131114)|WF_CRITERIA_BEGIN|[Dossier: FO - O-025713 0061n00000USw2g]|Dossier_Reprovado3010Y000000Z7no|01Q0Y0000009nIt|ON_ALL_CHANGES|0
+14:23:24.841 (2208151417)|WF_FORMULA|Formula:ENCODED:[treatNullAsNull]true|Values:
+14:23:24.841 (2208155556)|WF_CRITERIA_END|true
+14:23:24.841 (2208167687)|WF_CRITERIA_BEGIN|[Dossier: FO - O-025713 0061n00000USw2g]|Dossier - Em falta|01Q0Y0000009zp5|ON_CREATE_OR_TRIGGERING_UPDATE|0
+14:23:24.841 (2208489945)|WF_FORMULA|Formula:ENCODED:[treatNullAsNull]{!ID:00N0Y00000NcWvX} <>  {!ID:00N0Y00000NcWvY}|Values:Auxiliar_total_de_produtos_cativos__c=3, Auxiliar_total_de_produtos__c=3
+14:23:24.841 (2208499421)|WF_CRITERIA_END|false
+14:23:24.841 (2208517053)|WF_CRITERIA_BEGIN|[Dossier: FO - O-025713 0061n00000USw2g]|Dossier - Estado de faturação|01Q0Y0000009zRS|ON_CREATE_OR_TRIGGERING_UPDATE|0
+14:23:24.841 (2208643166)|WF_FORMULA|Formula:ENCODED:[treatNullAsNull]LEN({!ID:00N0Y00000NcWu9}) > 3|Values:N_de_expedicao__c=0
+14:23:24.841 (2208650227)|WF_CRITERIA_END|false
+14:23:24.841 (2208686384)|WF_SPOOL_ACTION_BEGIN|Fluxo de trabalho
+14:23:24.841 (2218903384)|WF_ACTION| Atualização de campo: 1; Acionador do fluxo: 14;
+14:23:24.841 (2218920712)|WF_RULE_EVAL_END
+14:23:24.841 (2219020609)|WF_FLOW_ACTION_BEGIN|09L0Y000000V5Ef
+14:23:25.220 (2220953894)|FLOW_CREATE_INTERVIEW_BEGIN|00D0Y000001If1v|3000Y000000cQxt|3010Y000000Znff
+14:23:25.220 (2222295130)|FLOW_CREATE_INTERVIEW_END|285434559e3a086a699c66decfb81673174f258-3829|Dossier - Incoterm
+14:23:25.222 (2222875856)|FLOW_START_INTERVIEWS_BEGIN|1
+14:23:25.222 (2222925610)|FLOW_START_INTERVIEW_BEGIN|285434559e3a086a699c66decfb81673174f258-3829|Dossier - Incoterm
+14:23:25.222 (2227940525)|FLOW_START_INTERVIEW_END|285434559e3a086a699c66decfb81673174f258-3829|Dossier - Incoterm
+14:23:25.222 (2227970840)|FLOW_START_INTERVIEWS_END|1
+14:23:24.841 (2229035407)|WF_FLOW_ACTION_END|09L0Y000000V5Ef
+14:23:24.841 (2229072733)|WF_FLOW_ACTION_BEGIN|09L0Y000000V1qm
+14:23:25.230 (2230997882)|FLOW_CREATE_INTERVIEW_BEGIN|00D0Y000001If1v|3000Y000000cIyz|3010Y000000ZYYU
+14:23:25.230 (2231991969)|FLOW_CREATE_INTERVIEW_END|285534559e3a086a699c66decfb81673174f258-382a|Follow up de orçamentos
+14:23:25.232 (2232512208)|FLOW_START_INTERVIEWS_BEGIN|1
+14:23:25.232 (2232555195)|FLOW_START_INTERVIEW_BEGIN|285534559e3a086a699c66decfb81673174f258-382a|Follow up de orçamentos
+14:23:25.232 (2237945607)|FLOW_START_INTERVIEW_END|285534559e3a086a699c66decfb81673174f258-382a|Follow up de orçamentos
+14:23:25.232 (2237967888)|FLOW_START_INTERVIEWS_END|1
+14:23:24.841 (2238537190)|WF_FLOW_ACTION_END|09L0Y000000V1qm
+14:23:24.841 (2238578805)|WF_FLOW_ACTION_BEGIN|09L1n0000001bXh
+14:23:25.240 (2240922651)|FLOW_CREATE_INTERVIEW_BEGIN|00D0Y000001If1v|3000Y000000cSYm|3011n000000J9Uf
+14:23:25.240 (2241754225)|FLOW_CREATE_INTERVIEW_END|285634559e3a086a699c66decfb81673174f258-382b|Dossier - Pendente de maquete
+14:23:25.242 (2242161937)|FLOW_START_INTERVIEWS_BEGIN|1
+14:23:25.242 (2242203320)|FLOW_START_INTERVIEW_BEGIN|285634559e3a086a699c66decfb81673174f258-382b|Dossier - Pendente de maquete
+14:23:25.242 (2299007556)|FLOW_START_INTERVIEW_END|285634559e3a086a699c66decfb81673174f258-382b|Dossier - Pendente de maquete
+14:23:25.242 (2299035793)|FLOW_START_INTERVIEWS_END|1
+14:23:24.841 (2299680007)|WF_FLOW_ACTION_END|09L1n0000001bXh
+14:23:24.841 (2299718446)|WF_FLOW_ACTION_BEGIN|09L1n0000001auQ
+14:23:25.301 (2301503268)|FLOW_CREATE_INTERVIEW_BEGIN|00D0Y000001If1v|3000Y000000cIyw|3010Y000000Zz2r
+14:23:25.301 (2302251509)|FLOW_CREATE_INTERVIEW_END|285734559e3a086a699c66decfb81673174f258-382c|Dossier - Retificação de maquete
+14:23:25.302 (2302671469)|FLOW_START_INTERVIEWS_BEGIN|1
+14:23:25.302 (2302714834)|FLOW_START_INTERVIEW_BEGIN|285734559e3a086a699c66decfb81673174f258-382c|Dossier - Retificação de maquete
+14:23:25.302 (2311483386)|FLOW_START_INTERVIEW_END|285734559e3a086a699c66decfb81673174f258-382c|Dossier - Retificação de maquete
+14:23:25.302 (2311516916)|FLOW_START_INTERVIEWS_END|1
+14:23:24.841 (2311973832)|WF_FLOW_ACTION_END|09L1n0000001auQ
+14:23:24.841 (2312003602)|WF_FLOW_ACTION_BEGIN|09L1n0000001azV
+14:23:25.313 (2313809779)|FLOW_CREATE_INTERVIEW_BEGIN|00D0Y000001If1v|3001n00000092Lu|3011n000000J7MA
+14:23:25.313 (2314632974)|FLOW_CREATE_INTERVIEW_END|285834559e3a086a699c66decfb81673174f258-382d|Dossier - Follow up de maquete
+14:23:25.315 (2315013428)|FLOW_START_INTERVIEWS_BEGIN|1
+14:23:25.315 (2315046499)|FLOW_START_INTERVIEW_BEGIN|285834559e3a086a699c66decfb81673174f258-382d|Dossier - Follow up de maquete
+14:23:25.315 (2328784082)|FLOW_START_INTERVIEW_END|285834559e3a086a699c66decfb81673174f258-382d|Dossier - Follow up de maquete
+14:23:25.315 (2328817279)|FLOW_START_INTERVIEWS_END|1
+14:23:24.841 (2329418842)|WF_FLOW_ACTION_END|09L1n0000001azV
+14:23:24.841 (2329455668)|WF_FLOW_ACTION_BEGIN|09L0Y000000UsbC
+14:23:25.331 (2331053105)|FLOW_CREATE_INTERVIEW_BEGIN|00D0Y000001If1v|3000Y000000cH1n|3010Y000000Yymw
+14:23:25.331 (2331815978)|FLOW_CREATE_INTERVIEW_END|285934559e3a086a699c66decfb81673174f258-382e|Pedido de retificação de maquete
+14:23:25.332 (2332227101)|FLOW_START_INTERVIEWS_BEGIN|1
+14:23:25.332 (2332266055)|FLOW_START_INTERVIEW_BEGIN|285934559e3a086a699c66decfb81673174f258-382e|Pedido de retificação de maquete
+14:23:25.332 (2336342607)|FLOW_START_INTERVIEW_END|285934559e3a086a699c66decfb81673174f258-382e|Pedido de retificação de maquete
+14:23:25.332 (2336366800)|FLOW_START_INTERVIEWS_END|1
+14:23:24.841 (2336915780)|WF_FLOW_ACTION_END|09L0Y000000UsbC
+14:23:24.841 (2336957253)|WF_FLOW_ACTION_BEGIN|09L1n0000001azk
+14:23:25.338 (2338664686)|FLOW_CREATE_INTERVIEW_BEGIN|00D0Y000001If1v|3000Y000000cThz|3011n000000J7NM
+14:23:25.338 (2339387823)|FLOW_CREATE_INTERVIEW_END|286034559e3a086a699c66decfb81673174f258-382f|Dossier - Notificação de novo comentário
+14:23:25.339 (2339717463)|FLOW_START_INTERVIEWS_BEGIN|1
+14:23:25.339 (2339756689)|FLOW_START_INTERVIEW_BEGIN|286034559e3a086a699c66decfb81673174f258-382f|Dossier - Notificação de novo comentário
+14:23:25.339 (2353005014)|FLOW_START_INTERVIEW_END|286034559e3a086a699c66decfb81673174f258-382f|Dossier - Notificação de novo comentário
+14:23:25.339 (2353037100)|FLOW_START_INTERVIEWS_END|1
+14:23:24.841 (2353731864)|WF_FLOW_ACTION_END|09L1n0000001azk
+14:23:24.841 (2353786363)|WF_FLOW_ACTION_BEGIN|09L1n0000001bFJ
+14:23:25.355 (2355994024)|FLOW_CREATE_INTERVIEW_BEGIN|00D0Y000001If1v|3000Y000000cSYl|3011n000000J8Ks
+14:23:25.355 (2356964108)|FLOW_CREATE_INTERVIEW_END|286234559e3a086a699c66decfb81673174f258-3831|Dossier - Novo comentário de maquete
+14:23:25.357 (2357349615)|FLOW_START_INTERVIEWS_BEGIN|1
+14:23:25.357 (2357392796)|FLOW_START_INTERVIEW_BEGIN|286234559e3a086a699c66decfb81673174f258-3831|Dossier - Novo comentário de maquete
+14:23:25.357 (2363399524)|FLOW_START_INTERVIEW_END|286234559e3a086a699c66decfb81673174f258-3831|Dossier - Novo comentário de maquete
+14:23:25.357 (2363428592)|FLOW_START_INTERVIEWS_END|1
+14:23:24.841 (2364018010)|WF_FLOW_ACTION_END|09L1n0000001bFJ
+14:23:24.841 (2364054625)|WF_FLOW_ACTION_BEGIN|09L0Y000000UsWC
+14:23:25.366 (2366354482)|FLOW_CREATE_INTERVIEW_BEGIN|00D0Y000001If1v|3000Y000000cIyv|3010Y000000Z7no
+14:23:25.366 (2367339379)|FLOW_CREATE_INTERVIEW_END|286334559e3a086a699c66decfb81673174f258-3832|Dossier - Reprovado
+14:23:25.367 (2367726887)|FLOW_START_INTERVIEWS_BEGIN|1
+14:23:25.367 (2367773266)|FLOW_START_INTERVIEW_BEGIN|286334559e3a086a699c66decfb81673174f258-3832|Dossier - Reprovado
+14:23:25.367 (2374176522)|FLOW_START_INTERVIEW_END|286334559e3a086a699c66decfb81673174f258-3832|Dossier - Reprovado
+14:23:25.367 (2374202072)|FLOW_START_INTERVIEWS_END|1
+14:23:24.841 (2374768105)|WF_FLOW_ACTION_END|09L0Y000000UsWC
+14:23:24.841 (2374796321)|WF_FLOW_ACTION_BEGIN|09L0Y000000V5KE
+14:23:25.376 (2376847144)|FLOW_CREATE_INTERVIEW_BEGIN|00D0Y000001If1v|3000Y000000cIyu|3010Y000000ZoAs
+14:23:25.376 (2377783659)|FLOW_CREATE_INTERVIEW_END|286434559e3a086a699c66decfb81673174f258-3833|Dossier - Fechar dossier
+14:23:25.378 (2378106043)|FLOW_START_INTERVIEWS_BEGIN|1
+14:23:25.378 (2378136145)|FLOW_START_INTERVIEW_BEGIN|286434559e3a086a699c66decfb81673174f258-3833|Dossier - Fechar dossier
+14:23:25.378 (2383112231)|FLOW_START_INTERVIEW_END|286434559e3a086a699c66decfb81673174f258-3833|Dossier - Fechar dossier
+14:23:25.378 (2383138406)|FLOW_START_INTERVIEWS_END|1
+14:23:24.841 (2383669378)|WF_FLOW_ACTION_END|09L0Y000000V5KE
+14:23:24.841 (2383703836)|WF_FLOW_ACTION_BEGIN|09L1n0000001bb5
+14:23:25.385 (2385763463)|FLOW_CREATE_INTERVIEW_BEGIN|00D0Y000001If1v|3000Y000000cIyt|3011n000000J9hn
+14:23:25.385 (2386797463)|FLOW_CREATE_INTERVIEW_END|286534559e3a086a699c66decfb81673174f258-3834|Dossier - Enviar para aprovação
+14:23:25.387 (2387113435)|FLOW_START_INTERVIEWS_BEGIN|1
+14:23:25.387 (2387145322)|FLOW_START_INTERVIEW_BEGIN|286534559e3a086a699c66decfb81673174f258-3834|Dossier - Enviar para aprovação
+14:23:25.387 (2412079112)|FLOW_START_INTERVIEW_END|286534559e3a086a699c66decfb81673174f258-3834|Dossier - Enviar para aprovação
+14:23:25.387 (2412104483)|FLOW_START_INTERVIEWS_END|1
+14:23:24.841 (2412671978)|WF_FLOW_ACTION_END|09L1n0000001bb5
+14:23:24.841 (2412701530)|WF_FLOW_ACTION_BEGIN|09L1n0000001bcr
+14:23:25.414 (2414666714)|FLOW_CREATE_INTERVIEW_BEGIN|00D0Y000001If1v|3000Y000000cIyr|3011n000000J9rE
+14:23:25.414 (2415690670)|FLOW_CREATE_INTERVIEW_END|286634559e3a086a699c66decfb81673174f258-3835|Dossier - Aprovado
+14:23:25.416 (2416042617)|FLOW_START_INTERVIEWS_BEGIN|1
+14:23:25.416 (2416084358)|FLOW_START_INTERVIEW_BEGIN|286634559e3a086a699c66decfb81673174f258-3835|Dossier - Aprovado
+14:23:25.416 (2423338667)|FLOW_START_INTERVIEW_END|286634559e3a086a699c66decfb81673174f258-3835|Dossier - Aprovado
+14:23:25.416 (2423371092)|FLOW_START_INTERVIEWS_END|1
+14:23:24.841 (2423959953)|WF_FLOW_ACTION_END|09L1n0000001bcr
+14:23:24.841 (2423996126)|WF_FLOW_ACTION_BEGIN|09L1n0000001bif
+14:23:25.426 (2426299868)|FLOW_CREATE_INTERVIEW_BEGIN|00D0Y000001If1v|3001n00000092sd|3011n000000JAEm
+14:23:25.426 (2427170429)|FLOW_CREATE_INTERVIEW_END|286734559e3a086a699c66decfb81673174f258-3836|Dossier - Notificação saiu de produção
+14:23:25.427 (2427533049)|FLOW_START_INTERVIEWS_BEGIN|1
+14:23:25.427 (2427574935)|FLOW_START_INTERVIEW_BEGIN|286734559e3a086a699c66decfb81673174f258-3836|Dossier - Notificação saiu de produção
+14:23:25.427 (2463673641)|FLOW_START_INTERVIEW_END|286734559e3a086a699c66decfb81673174f258-3836|Dossier - Notificação saiu de produção
+14:23:25.427 (2463709468)|FLOW_START_INTERVIEWS_END|1
+14:23:24.841 (2464323102)|WF_FLOW_ACTION_END|09L1n0000001bif
+14:23:24.841 (2464356145)|WF_FLOW_ACTION_BEGIN|09L0Y000000V8eR
+14:23:25.466 (2466554518)|FLOW_CREATE_INTERVIEW_BEGIN|00D0Y000001If1v|3000Y000000cIyq|3010Y000000a3Dd
+14:23:25.466 (2467487078)|FLOW_CREATE_INTERVIEW_END|287134559e3a086a699c66decfb81673174f258-383a|Dossier - Aprovação de maquete
+14:23:25.467 (2467927177)|FLOW_START_INTERVIEWS_BEGIN|1
+14:23:25.467 (2467966725)|FLOW_START_INTERVIEW_BEGIN|287134559e3a086a699c66decfb81673174f258-383a|Dossier - Aprovação de maquete
+14:23:25.467 (2476544065)|FLOW_START_INTERVIEW_END|287134559e3a086a699c66decfb81673174f258-383a|Dossier - Aprovação de maquete
+14:23:25.467 (2476571511)|FLOW_START_INTERVIEWS_END|1
+14:23:24.841 (2477077195)|WF_FLOW_ACTION_END|09L0Y000000V8eR
+14:23:24.841 (2477153830)|WF_TIME_TRIGGERS_BEGIN
+14:23:24.841 (2492567555)|WF_ACTIONS_END| Atualização de campo: 1; Acionador do fluxo: 14;
+14:23:24.841 (2492586893)|CODE_UNIT_FINISHED|Workflow:Opportunity
+14:23:24.841 (2499136929)|DML_END|[345]
+14:23:25.512 (2512871149)|CUMULATIVE_LIMIT_USAGE
+14:23:25.512 (2512871149)|LIMIT_USAGE_FOR_NS|(default)|
+  Number of SOQL queries: 10 out of 100
+  Number of query rows: 15 out of 50000
+  Number of SOSL queries: 0 out of 20
+  Number of DML statements: 3 out of 150
+  Number of DML rows: 3 out of 10000
+  Maximum CPU time: 1756 out of 10000
+  Maximum heap size: 0 out of 6000000
+  Number of callouts: 0 out of 100
+  Number of Email Invocations: 0 out of 10
+  Number of future calls: 0 out of 50
+  Number of queueable jobs added to the queue: 0 out of 50
+  Number of Mobile Apex push calls: 0 out of 10
+
+14:23:25.512 (2512871149)|CUMULATIVE_LIMIT_USAGE_END
+
+14:23:24.841 (2512913617)|CODE_UNIT_FINISHED|w_ReturnDossier.updateDossier(w_ReturnDossier.DossierRetorno)
+14:23:24.841 (2513778515)|EXECUTION_FINISHED
+14:23:25.513 (2513904086)|USER_INFO|[EXTERNAL]|0050Y000000P4Th|stepadmin@pstricker.proj|Fuso horário da Europa Ocidental|GMTZ
+14:23:25.513 (2513926376)|EXECUTION_STARTED
+14:23:25.513 (2513931286)|CODE_UNIT_STARTED|[EXTERNAL]|common.apex.soap.impl.ApexObjectSerializer
+14:23:25.513 (2513977665)|CODE_UNIT_FINISHED|common.apex.soap.impl.ApexObjectSerializer
+14:23:25.513 (2514725998)|EXECUTION_FINISHED
+14:23:25.515 (2515005891)|USER_INFO|[EXTERNAL]|0050Y000000P4Th|stepadmin@pstricker.proj|Fuso horário da Europa Ocidental|GMTZ
+14:23:25.515 (2515029811)|EXECUTION_STARTED
+14:23:25.515 (2515035487)|CODE_UNIT_STARTED|[EXTERNAL]|common.apex.soap.impl.ApexObjectSerializer
+14:23:25.515 (2515072815)|CODE_UNIT_FINISHED|common.apex.soap.impl.ApexObjectSerializer
+14:23:25.515 (2515889441)|EXECUTION_FINISHED

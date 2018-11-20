@@ -1,0 +1,67 @@
+<apex:page standardController="Product2" extensions="c_ConsultaStockCores">
+    <apex:slds />
+    <div class="slds-scope">
+        <div style="height:300px;" class="slds-scrollable-y">
+            <table class="slds-table slds-table_bordered slds-table_cell-buffer slds-m-top--medium">
+                <thead>
+                    <tr>
+                        <th>
+                            {!$ObjectType.Product2.Fields.Cor__c.Label}
+                        </th>
+                        <th>
+                            {!$Label.Total_Armazem}
+                        </th>
+                        <th>
+                            {!$Label.Total_Cativo}
+                        </th>
+                        <th>
+                            {!$Label.Total_Disponivel}
+                        </th>
+                        <th>
+                            {!$Label.Data_proxima_chegada}
+                        </th>
+                        <th>
+                            {!$Label.Quantidade_proxima_chegada}
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <apex:repeat value="{!elements}" var="ele">
+                        <tr>
+                            <td>
+                                <apex:outputField value="{!ele.cor.Codigo_de_cor__c}"/>
+                            </td>
+                            <td>
+                                {!ele.stockAtual}
+                            </td>
+                            <td>
+                                {!ele.stockCativo}
+                            </td>
+                            <td>
+                                {!ele.stockDisponivel}
+                            </td>
+                            <td>
+                                <apex:outputPanel rendered="{!ele.dataPrevista != null}">
+                                    <apex:outputText value="{0, date, dd/MM/yyyy}">
+                                        <apex:param value="{!ele.dataPrevista}" /> 
+                                    </apex:outputText>
+                                </apex:outputPanel>
+                                <apex:outputPanel rendered="{!ele.dataPrevista = null}">
+                                    -
+                                </apex:outputPanel>
+                            </td>
+                            <td>
+                                <apex:outputPanel rendered="{!ele.stockPrevisto != null}">
+                                    {!ele.stockPrevisto}
+                                </apex:outputPanel>
+                                <apex:outputPanel rendered="{!ele.stockPrevisto = null}">
+                                    -
+                                </apex:outputPanel>
+                            </td>
+                        </tr>
+                    </apex:repeat>
+                </tbody>
+            </table>            
+        </div>
+    </div>
+</apex:page>

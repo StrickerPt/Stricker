@@ -1,0 +1,165 @@
+<apex:page standardController="Opportunity" renderAs="pdf" extensions="c_PDFPackingList" language="{!lang}" cache="false" readOnly="true" standardStylesheets="false" applyBodyTag="false" applyHtmlTag="false" showHeader="false" >
+    <html>
+        <head>
+            <style type="text/css" media="print">
+                @page {
+                size: A4 portrait;
+                margin-left: 1.0cm;
+                margin-right: 0.8cm;
+                margin-top: 3.8cm;
+                margin-bottom: 2.5cm;
+                @top-center {
+                content: element(header);
+                }
+                }
+                div.header {
+                padding: 10px;
+                position: running(header);
+                }
+                th.spacing{
+                padding-top: 4px;
+                font-size: small;
+                text-align: center;
+                }
+                tbody{
+                margin-top: 10px;
+                background-color: white;
+                border-color: white;
+                font-size: 12px;
+                }
+                table.bordered_table tr td{
+                border: 2px solid black;
+                }
+                body {
+                font-family: Arial Unicode MS;
+                }
+            </style>
+        </head>
+        <body style="padding: 0;margin: 0;font-family: Arial, Helvetica, sans-serif;">
+            <div class="header" style="margin-left: 0px;margin-right: 0px;">
+                <table style="width: 100%;padding: 0;margin: 0;">
+                    <tr>
+                        <td style="width: 30%;padding-right:20px;border-right:1px solid black;"><apex:image style="margin-left: -10px;" height="64px" value="{!LogoUrl}"/></td>
+                        <td style="width: 50%;padding-left:20px;">
+                            <p></p>
+                            <p style="font-size: 7pt;margin:2px;line-height: 90%;">Núcleo Industrial de Murtede, Lote 5</p>
+                            <p style="font-size: 7pt;margin:2px;line-height: 90%;">3060-372 Murtede, Portugal</p>
+                            <p style="font-size: 7pt;margin:2px;line-height: 90%;"><b>t.</b> +351 231 209 980</p>
+                            <p style="font-size: 7pt;margin:2px;line-height: 90%;"><b>f.</b> +351 231 209 989</p>
+                            <p style="font-size: 7pt;margin:2px;line-height: 90%;"><b>e.</b> info@stricker.pt</p>
+                            <p style="font-size: 7pt;margin:2px;line-height: 90%;"><a><b>www.stricker.pt</b></a> <a><b>www.ambientes.pt</b></a></p>
+                        </td>
+                        <td style="width: 25%;text-align: right;padding: 0;margin: 0;">
+
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <div style="font-weight:bold;">
+                Date:
+                <apex:outputText value="{0, date, dd'.'MM'.'yyyy}">
+                    <apex:param value="{!NOW()}" /> 
+                </apex:outputText>
+            </div>
+            <div>                    
+                <table style="width:100%;border-spacing: inherit;">
+                    <thead>
+                        <tr style="background-color: black; color:white;">
+                            <th class="spacing" style="width:12%">
+                                {!$Label.Referencia}
+                            </th>
+                            <th class="spacing" style="width:12%">
+                                {!$ObjectType.Product2.fields.Taric__c.Label}
+                            </th>
+                            <th class="spacing" style="width:12%">
+                                {!$ObjectType.OpportunityLineItem.fields.Quantity.Label}
+                            </th>
+                            <th class="spacing" style="width:40%">
+                                {!$ObjectType.Opportunity.fields.Description.Label}
+                            </th>
+                            <th class="spacing" style="width:12%">
+                                {!$ObjectType.OpportunityLineItem.fields.Peso__c.Label}
+                            </th>
+                            <th class="spacing" style="width:12%">
+                                Peso Liquido
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td colspan="6">
+                                &nbsp;
+                            </td>
+                        </tr>
+                        <apex:repeat value="{!opp.OpportunityLineItems}" var="oli">
+                            <tr>
+                                <td>
+                                   {!oli.ProductCode}{!if(oli.Codigo_de_cor__c != null, '.' + oli.Codigo_de_cor__c, '')}{!if(oli.Product2.Tamanho__c != null, '-' + oli.Product2.Tamanho__c, '')}
+                                </td>
+                                <td style="text-align: center;">
+                                    {!oli.Product2.Taric__c}
+                                </td>
+                                <td style="text-align: right;">
+                                    {!oli.Quantity}
+                                </td>
+                                <td style="padding-left:10px;">
+                                    {!oli.Product2.Nome_para_user__c}
+                                </td>
+                                <td style="text-align: right;">
+                                    <apex:outputText value="{0, number, ###############.##}">
+                                        <apex:param value="{!if(VALUE(SUBSTITUTE(oli.Product2.Peso_caixa__c, ',' , '.')) != 0, 
+                                                           VALUE(SUBSTITUTE(oli.Product2.Peso_caixa__c, ',' , '.'))*oli.N_de_caixas__c,0)}" /> 
+                                    </apex:outputText> Kgs
+                                </td>
+                                <td style="text-align: right;">
+                                    <apex:outputText value="{0, number, ###############.##}">
+                                        <apex:param value="{!if(VALUE(SUBSTITUTE(oli.Product2.Peso_caixa__c, ',' , '.')) != 0, 
+                                                           VALUE(SUBSTITUTE(oli.Product2.Peso_caixa__c, ',' , '.'))*oli.N_de_caixas__c - (auxkilo * oli.N_de_caixas__c), 0)}" /> 
+                                    </apex:outputText> Kgs
+                                </td>
+                            </tr>
+                        </apex:repeat>
+                        <tr>
+                            <td colspan="6">
+                                &nbsp;
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="3">
+                                &nbsp;
+                            </td>
+                            <td colspan="3">
+                                <table class="bordered_table" style="width:100%; border:2px solid black;border-collapse: collapse;border-spacing: 2px;">
+                                    <tr>
+                                        <td width="80%">
+                                            Total weight gross (Kgs)
+                                        </td>
+                                        <td width="20%" style="text-align:right;">
+                                            {!totalPeso}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            Total weight net (Kgs)
+                                        </td>
+                                        <td style="text-align:right;">
+                                            {!totalLPeso}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            Total boxes
+                                        </td>
+                                        <td style="text-align:right;">
+                                            {!caixas}
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </body>
+    </html>
+</apex:page>

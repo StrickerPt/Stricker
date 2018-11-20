@@ -1,0 +1,27 @@
+<apex:page standardController="Opportunity" extensions="c_WebDocument">
+    <apex:includeScript value="/support/console/39.0/integration.js"/>
+    <apex:form >
+        <apex:actionFunction name="redirectOpp" action="{!RedirectOpp}" reRender="messagePanel"/>
+        <script>
+        window.onload =  function() { 
+            redirectOpp();
+        }
+        
+        function openFile(url){
+         	window.open(url);
+        }
+        
+        function openPrimaryTabConsole(){
+            //close current tab because the opp is already open
+            var openPrimaryTab = function openPrimaryTab(result) {
+                sforce.console.openPrimaryTab(result.id, "{!IdUrl}", true);
+            };
+            sforce.console.getFocusedPrimaryTabId(openPrimaryTab);
+            
+        }
+        </script>
+    </apex:form>
+    <apex:outputPanel id="messagePanel">
+        {!IF(sucess, $Label.A_procura_de_documentos, $Label.Nao_existem_documentos)}
+    </apex:outputPanel>
+</apex:page>

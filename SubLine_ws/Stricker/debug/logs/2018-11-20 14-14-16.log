@@ -1,0 +1,38 @@
+40.0 APEX_CODE,DEBUG;APEX_PROFILING,INFO;CALLOUT,INFO;DB,INFO;NBA,INFO;SYSTEM,DEBUG;VALIDATION,INFO;VISUALFORCE,INFO;WAVE,INFO;WORKFLOW,INFO
+14:14:11.0 (143182)|USER_INFO|[EXTERNAL]|0050Y000000OsfQ|marcoramos@stricker.pt|Western European Time|GMTZ
+14:14:11.0 (209279)|EXECUTION_STARTED
+14:14:11.0 (218423)|CODE_UNIT_STARTED|[EXTERNAL]|0660Y000005Vxql|VF: /apex/p_ViewerOnlineUsers
+14:14:11.0 (467018)|VF_DESERIALIZE_VIEWSTATE_BEGIN|0660Y000005Vxql
+14:14:11.0 (11152857)|VF_DESERIALIZE_VIEWSTATE_END
+14:14:11.11 (11886870)|SYSTEM_MODE_ENTER|true
+14:14:11.13 (13050422)|SYSTEM_MODE_ENTER|true
+14:14:11.0 (13546924)|SYSTEM_MODE_ENTER|true
+14:14:11.13 (13865311)|SYSTEM_MODE_ENTER|true
+14:14:11.0 (25626262)|CALLOUT_REQUEST|[351]|lstCountLoginsByCliente_element:[apex_schema_type_info=(https://www.stricker-europe.com/pt/, true, false), field_order_type_info=(numCliente), numCliente=12369, numCliente_type_info=(numCliente, https://www.stricker-europe.com/pt/, null, 1, 1, false)]::SOAPAction="https://www.stricker-europe.com/pt/lstCountLoginsByCliente" Accept=text/xml User-Agent=SFDC-Callout/44.0 SFDC_STACK_DEPTH=1 Content-Type=text/xml; charset=UTF-8 
+14:14:14.519 (3519474525)|CALLOUT_RESPONSE|[351]|
+14:14:14.530 (3530525149)|SYSTEM_MODE_ENTER|true
+14:14:14.530 (3530722544)|SYSTEM_MODE_ENTER|true
+14:14:14.519 (3531132004)|SYSTEM_MODE_ENTER|true
+14:14:14.542 (3542225002)|SYSTEM_MODE_ENTER|true
+14:14:14.542 (3542456343)|SYSTEM_MODE_ENTER|true
+14:14:14.519 (3594242601)|VF_SERIALIZE_VIEWSTATE_BEGIN|0660Y000005Vxql
+14:14:14.519 (3607539001)|VF_SERIALIZE_VIEWSTATE_END
+14:14:14.614 (3614374309)|CUMULATIVE_LIMIT_USAGE
+14:14:14.614 (3614374309)|LIMIT_USAGE_FOR_NS|(default)|
+  Number of SOQL queries: 0 out of 100
+  Number of query rows: 0 out of 1000000
+  Number of SOSL queries: 0 out of 20
+  Number of DML statements: 0 out of 0
+  Number of DML rows: 0 out of 0
+  Maximum CPU time: 0 out of 10000
+  Maximum heap size: 0 out of 6000000
+  Number of callouts: 1 out of 100
+  Number of Email Invocations: 0 out of 0
+  Number of future calls: 0 out of 50
+  Number of queueable jobs added to the queue: 0 out of 50
+  Number of Mobile Apex push calls: 0 out of 10
+
+14:14:14.614 (3614374309)|CUMULATIVE_LIMIT_USAGE_END
+
+14:14:14.519 (3614440169)|CODE_UNIT_FINISHED|VF: /apex/p_ViewerOnlineUsers
+14:14:14.519 (3615167648)|EXECUTION_FINISHED

@@ -1,0 +1,2 @@
+<apex:page cache="true" contentType="application/vnd.ms-excel#ImportacaoPrecosCliente.csv" showheader="false">Numero de cliente;Produto;Valor;Data de inicio;Data de fim
+</apex:page>

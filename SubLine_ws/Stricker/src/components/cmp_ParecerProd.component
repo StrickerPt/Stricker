@@ -1,0 +1,285 @@
+<apex:component >
+    <apex:attribute name="line" type="OrderItem" description="Linha reclamada"/>
+    <apex:attribute name="parecer" type="Pedido_de_parecer__c" description="Pedido de parecer"/>
+    <apex:attribute name="extraInfo" type="ExtraInfo" description="Extra"/>
+    <div xmlns:xlink="http://www.w3.org/1999/xlink">
+        <div class="slds-form-element__row">
+            <div class="slds-form-element slds-size_1-of-1">
+                <div class="slds-page-header">
+                    <c:cmp_ClaimsHeader title="{!$ObjectType.Pedido_de_parecer__c.label} {!parecer.Departamento__c}" subTitle="{!line.Reclamacao__r.CaseNumber}" library="standard" symbol="case" useHeader="false"/>
+                    
+                    <ul class="slds-grid slds-page-header__detail-row">
+                        <li class="slds-page-header__detail-block">
+                            <p class="slds-text-title slds-truncate slds-m-bottom_xx-small">{!$ObjectType.Account.label}</p>
+                            <p class="slds-text-body_regular"><a href="javascript:void(0);">{!line.Reclamacao__r.Account.Name}</a></p>
+                        </li>
+                        <li class="slds-page-header__detail-block">
+                            <p class="slds-text-title slds-truncate slds-m-bottom_xx-small">{!$ObjectType.OrderItem.fields.Tipologia__c.Label}</p>
+                            <p class="slds-text-body_regular">{!line.Tipologia__c}</p>
+                        </li>
+                        <li class="slds-page-header__detail-block {!if(line.Sub_tipologia__c != null, '', 'slds-hide')}">
+                            <p class="slds-text-title slds-truncate slds-m-bottom_xx-small">{!$ObjectType.OrderItem.fields.Sub_tipologia__c.Label}</p>
+                            <p class="slds-text-body_regular">{!line.Sub_tipologia__c}</p>
+                        </li>
+                        <li class="slds-page-header__detail-block">
+                            <p class="slds-text-title slds-truncate slds-m-bottom_xx-small">_Data de pedido de parecer</p>
+                            <p class="slds-text-body_regular"><apex:outputText value="{0,date,dd-MM-yyyy}"><apex:param value="{!parecer.CreatedDate}"/></apex:outputText></p>
+                        </li>
+                        <li class="slds-page-header__detail-block">
+                            <p class="slds-text-title slds-truncate slds-m-bottom_xx-small">_Data de reclamação</p>
+                            <p class="slds-text-body_regular"><apex:outputText value="{0,date,dd-MM-yyyy}"><apex:param value="{!line.Reclamacao__r.CreatedDate}"/></apex:outputText></p>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <!----------------------------------------------------------------------------------------------------------------------------->
+        <!----------------------------------------------------------------------------------------------------------------------------->
+        <!--------------------------------------------------PRODUÇÃO------------------------------------------------------------------->
+        <!----------------------------------------------------------------------------------------------------------------------------->
+        <!----------------------------------------------------------------------------------------------------------------------------->
+        <div class="slds-form-element__row">
+            <div class="slds-form-element slds-size_1-of-1">
+                <article class="slds-card">
+                    <div class="slds-card__body slds-card__body_inner">
+                        <div class="slds-form slds-p-around--xx-small" role="list">
+                            <div class="slds-grid slds-gutters_small">
+                                <div class="slds-col slds-has-flexi-truncate" role="listitem">
+                                    <div class="slds-form-element">
+                                        <span class="slds-form-element__label">_Numero de documento financeiro</span>
+                                        <div class="slds-form-element__control">
+                                            <span class="slds-form-element__static ">
+                                                {!line.Reclamacao__r.Tipo_de_documento_financeiro__c} 
+                                                {!line.Reclamacao__r.Numero_de_documento_financeiro__c} -
+                                                &nbsp;<apex:outputText value="{0,date,yyyy}">
+                                                <apex:param value="{!line.Reclamacao__r.Data_de_emissao_do_documento_financeiro__c}"/>
+                                                </apex:outputText>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="slds-col slds-has-flexi-truncate" role="listitem">
+                                    <div class="slds-form-element">
+                                        <span class="slds-form-element__label">_Numero de guia de remessa</span>
+                                        <div class="slds-form-element__control">
+                                            <span class="slds-form-element__static ">
+                                                {!extraInfo.nome_rem}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="slds-col slds-has-flexi-truncate" role="listitem">
+                                    <div class="slds-form-element">
+                                        <span class="slds-form-element__label">_Numero de dossier</span>
+                                        <div class="slds-form-element__control">
+                                            <span class="slds-form-element__static ">
+                                                {!if(line.Tipo_dossier_abreviado__c != null, line.Tipo_dossier_abreviado__c + ' - ' , '')} {!extraInfo.num_dos} -&nbsp;
+                                                <apex:outputText value="{0,date,yyyy}">
+                                                    <apex:param value="{!line.Reclamacao__r.Data_de_emissao_do_documento_financeiro__c}"/>
+                                                </apex:outputText>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+            </div>
+        </div>
+        <div class="slds-form-element__row">
+            <div class="slds-form-element slds-size_1-of-1">
+                <article class="slds-card slds-p-top--small">
+                    <div class="slds-card__body slds-card__body_inner">
+                        <div class="slds-form slds-p-around--xx-small" role="list">
+                            <div class="slds-grid slds-gutters_small slds-p-top--xx-small">
+                                <div class="slds-col slds-has-flexi-truncate" role="listitem">
+                                    <div class="slds-form-element">
+                                        <div class="slds-icon_container slds-m-right--medium">
+                                            <svg class="slds-button__icon" aria-hidden="false">
+                                                <use xlink:href="{!URLFOR($Asset.SLDS , '/assets/icons/utility-sprite/svg/symbols.svg#chevrondown')}"></use>
+                                            </svg>
+                                        </div>
+                                        {!line.Referencia_Sku__c} - {!if(line.Product2.ProductCode != 'NSGEN' , line.Product2.Nome_para_user__c, line.Description)}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="slds-grid slds-gutters_small">
+                                <div class="slds-col slds-has-flexi-truncate" role="listitem">
+                                    <div class="slds-form-element">
+                                        <span class="slds-form-element__label">{!$Label.Quantidade_total}</span>
+                                        <div class="slds-form-element__control">
+                                            <span class="slds-form-element__static ">
+                                                {!line.Quantidade_original__c}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="slds-col slds-has-flexi-truncate" role="listitem">
+                                    <div class="slds-form-element">
+                                        <span class="slds-form-element__label">{!$ObjectType.OrderItem.fields.Quantidade_reclamada__c.Label}</span>
+                                        <div class="slds-form-element__control">
+                                            <span class="slds-form-element__static ">
+                                                {!line.Quantidade_reclamada__c}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="slds-col slds-has-flexi-truncate" role="listitem">
+                                    <div class="slds-form-element">
+                                        <span class="slds-form-element__label">_Data de Produção</span>
+                                        <div class="slds-form-element__control">
+                                            <span class="slds-form-element__static ">
+                                               <apex:outputText value="{0,date,dd-MM-yyyy HH:mm}">
+                                                    <apex:param value="{!extraInfo.dat_pro}"/>
+                                                </apex:outputText>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="slds-grid slds-gutters_small">
+                                <div class="slds-col slds-has-flexi-truncate" role="listitem">
+                                    <div class="slds-form-element">
+                                        <span class="slds-form-element__label">{!$ObjectType.Product2.fields.Tecnica__c.Label}</span>
+                                        <div class="slds-form-element__control">
+                                            <span class="slds-form-element__static ">
+                                                {!extraInfo.tec}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="slds-col slds-has-flexi-truncate" role="listitem">
+                                    <div class="slds-form-element">
+                                        <span class="slds-form-element__label">{!$ObjectType.OpportunityLineItem.fields.Numero_de_impressoes__c.Label}</span>
+                                        <div class="slds-form-element__control">
+                                            <span class="slds-form-element__static ">
+                                                {!extraInfo.n_imp}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="slds-col slds-has-flexi-truncate" role="listitem">
+                                    <div class="slds-form-element">
+                                        <span class="slds-form-element__label">{!$ObjectType.OpportunityLineItem.fields.Numero_de_repeticoes__c.Label}</span>
+                                        <div class="slds-form-element__control">
+                                            <span class="slds-form-element__static ">
+                                               {!extraInfo.n_rep}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="slds-grid slds-gutters_small">
+                                <div class="slds-col slds-has-flexi-truncate" role="listitem">
+                                    <div class="slds-form-element">
+                                        <span class="slds-form-element__label">{!$ObjectType.Opportunity.fields.N_de_versao_de_maquete_aceite__c.Label}</span>
+                                        <div class="slds-form-element__control">
+                                            <span class="slds-form-element__static ">
+                                                {!extraInfo.v_maquete}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="slds-col slds-has-flexi-truncate" role="listitem">
+                                    <div class="slds-form-element">
+                                        <span class="slds-form-element__label">{!$ObjectType.Opportunity.fields.Data_de_aprovacao_de_maquete__c.Label}</span>
+                                        <div class="slds-form-element__control">
+                                            <span class="slds-form-element__static ">
+                                                 <apex:outputText value="{0,date,dd-MM-yyyy HH:mm}">
+                                                    <apex:param value="{!extraInfo.dat_maq}"/>
+                                                </apex:outputText>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="slds-col slds-has-flexi-truncate" role="listitem">
+                                    <div class="slds-form-element">
+                                        <span class="slds-form-element__label">_finalizado por</span>
+                                        <div class="slds-form-element__control">
+                                            <span class="slds-form-element__static ">
+                                                _Colaborador 2
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="slds-grid slds-gutters_small">
+                                <div class="slds-col slds-has-flexi-truncate" role="listitem">
+                                    <div class="slds-form-element">
+                                        <span class="slds-form-element__label">{!$ObjectType.Opportunity.fields.Data_de_envio__c.Label}</span>
+                                        <div class="slds-form-element__control">
+                                            <span class="slds-form-element__static ">
+                                                <apex:outputText value="{0,date,dd-MM-yyyy}">
+                                                    <apex:param value="{!extraInfo.dat_exp}"/>
+                                                </apex:outputText>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="slds-col slds-has-flexi-truncate" role="listitem">
+                                    <div class="slds-form-element">
+                                        <span class="slds-form-element__label">_Numero Total de Maquetes</span>
+                                        <div class="slds-form-element__control">
+                                            <span class="slds-form-element__static ">
+                                                {!extraInfo.v_maquete}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="slds-col slds-has-flexi-truncate" role="listitem">
+                                    <div class="slds-form-element">
+                                        <span class="slds-form-element__label">_Reclamação criada por</span>
+                                        <div class="slds-form-element__control">
+                                            <span class="slds-form-element__static ">
+                                                {!line.Reclamacao__r.CreatedBy.Name}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="slds-grid slds-gutters_small">
+                                <div class="slds-col slds-has-flexi-truncate" role="listitem">
+                                    <div class="slds-form-element">
+                                        <span class="slds-form-element__label">_Maquete</span>
+                                        <div class="slds-form-element__control">
+                                            <span class="slds-form-element__static ">
+                                                <span class="slds-icon_container slds-icon-doctype-xml" title="Description of icon when needed" onclick="openModal('pdfModal');" style="cursor:pointer;">
+                                                    <svg class="slds-icon" aria-hidden="true">
+                                                        <use xlink:href="{!URLFOR($Asset.SLDS , '/assets/icons/doctype-sprite/svg/symbols.svg#pdf')}"></use>
+                                                    </svg>
+                                                    <span class="slds-assistive-text">Description of icon when needed</span>
+                                                </span>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+            </div>
+        </div>
+        <div class="slds-modal" aria-hidden="false" role="dialog" id="pdfModal">
+            <div class="slds-modal__container">
+                <div class="slds-modal__header">
+                    <h2 class="slds-text-heading--medium">Maquete</h2>
+                </div>
+                <div class="slds-modal__content slds-p-around--medium" style="overflow:hidden;">
+                    <apex:iframe src="" id="prodFrame" html-class="myFrame"/>
+                    <!--iframe src="data:application/pdf;base64,{!maquete.base64}" title="tteste" width="100%" frameborder="0" height="600px"/-->
+                </div>
+                <div class="slds-modal__footer">
+                    <button class="slds-button slds-button--destructive" onclick="closeModal('pdfModal');" type="button">{!$Label.Fechar}</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+    var load = carregarFicheiro();
+    function carregarFicheiro(){
+        var frame = document.getElementsByClassName("myFrame")[0];
+        frame.src = "data:application/pdf;base64," + maquete.base64;
+    }
+    </script>
+</apex:component>

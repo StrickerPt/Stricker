@@ -1,0 +1,119 @@
+<apex:page standardController="Documentos_financeiros__c" extensions="c_ClaimFromDoc">
+    <apex:slds />
+    <apex:includeScript value="{!URLFOR($Resource.swal2, '/sweetalert2.min.js')}"/>
+    <apex:includeScript value="/support/console/43.0/integration.js"/>
+    <apex:includeScript value="{!URLFOR($Resource.bs, '/jQuery_2_0_3.js')}"/>
+    <style>
+        .reduceFont{
+        font-size: .65rem !important;
+        }
+        .swal-icon{
+        box-sizing: content-box !important;
+        }
+        .swal-styled{
+        background-image: inherit;
+        }
+        .swal-container {
+        z-index: 9001;
+        }
+        .swal-button {
+        background-image: inherit;
+        font-size: 14px !important;
+        }
+        .modal {
+        background-color: transparent;
+        display: block;
+        height: 100%;
+        left: 0;
+        position: fixed;
+        width: 100%;
+        top: 90px;
+        }
+        .modal__content,
+        .modal__footer {
+        position: absolute;
+        width: 100%;
+        }
+        .modal__content {
+        background-color: transparent;
+        bottom: 160px;
+        top: 20px;
+        overflow-y: auto;
+        }
+        .modal__footer {
+        background-color: white;
+        bottom: 70px;
+        min-height: 80px;
+        }
+    </style>
+    <div class="slds-scope">
+        <c:cmp_ClaimsHeader title="{!acc.Name}" subTitle="{!Documentos_financeiros__c.Numero_de_documento__c} {!Documentos_financeiros__c.Data__c}" library="standard" symbol="case"/>
+        <apex:form >
+            <c:cmp_ChooseLines list="{!linhas}" selectedDocument="{!claimDoc}" no="{!acc.Numero_de_cliente__c}"/>
+        </apex:form>
+        <div class="slds-spinner_container" style="display: none; position: fixed;" id="spinner">
+            <div role="status" class="slds-spinner slds-spinner--medium">
+                <span class="slds-assistive-text">Loading</span>
+                <div class="slds-spinner__dot-a"></div>
+                <div class="slds-spinner__dot-b"></div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+    /* Método evocado pelos componentes e página para ligar/desligar o spinner
+     * @activated : boolean para ligar ou desligar o spinner
+     * */
+    function spinnerOn(activated){
+        if(activated){
+            document.getElementById("spinner").style.display = "block";   
+        }else{
+            document.getElementById("spinner").style.display = "none";
+        }
+    }
+    function backStep(){
+
+        var openPrimTab = function openPrimTab(result) {
+            var a = function(result){
+                console.log(result.id);
+            };
+            var openSubTab = function openSubTab(result2) {
+                console.log(result2);
+                sforce.console.openSubtab(result.id , '{!Documentos_financeiros__c.Id}', true, '', result2.id, a);
+            };
+            sforce.console.getFocusedSubtabId(openSubTab);
+        };
+        sforce.console.getFocusedPrimaryTabId(openPrimTab);
+    }
+    function setFocusOnLoad(){}
+    function handleBack(){
+        var cliDiv = document.getElementById('numCliDiv');
+        cliDiv.classList.add('slds-show');
+        cliDiv.classList.remove('slds-hide');
+        
+        var docDiv = document.getElementById('chooseDocDiv');
+        docDiv.classList.add('slds-hide');
+        
+    }
+    </script>
+    <apex:outputPanel id="scriptsAccount">
+        <script>
+        
+        function redirectFinal(caseId){
+            var currentTab;
+            var openSubtab = function openSubtab(result2){
+                sforce.console.openSubtab(result2.id,caseId, true, '', null);
+                //abre nova opp
+                if(currentTab != null) sforce.console.closeTab(currentTab);
+            };
+            var openPrimTab = function openPrimTab(result) {
+                currentTab = result.id;
+                sforce.console.openPrimaryTab(null, "{!acc.Id}", false, "",openSubtab);
+                
+            };
+            sforce.console.getFocusedPrimaryTabId(openPrimTab);
+            
+        }
+        </script>
+    </apex:outputPanel>
+</apex:page>

@@ -1,0 +1,125 @@
+<apex:page controller="c_NewClaim" showHeader="false" action="{!checkPermaValidate}" language="{!lang}">
+    <apex:slds />
+    <apex:includeScript value="{!URLFOR($Resource.swal2, '/sweetalert2.min.js')}"/>
+    <style>
+        .reduceFont{
+        font-size: .65rem !important;
+        }
+        .swal-icon{
+        box-sizing: content-box !important;
+        }
+        .swal-styled{
+        background-image: inherit;
+        }
+        .swal-container {
+        z-index: 9001;
+        }
+        .swal-button {
+        background-image: inherit;
+        font-size: 14px !important;
+        }
+        .modal {
+        background-color: white;
+        display: block;
+        height: 100%;
+        left: 0;
+        position: fixed;
+        width: 100%;
+        top: 150px;
+        }
+        .modal__content,
+        .modal__footer {
+        position: absolute;
+        width: 100%;
+        }
+        .modal__content {
+        background-color: white;
+        bottom: 210px;
+        top: 90px;
+        overflow-y: auto;
+        }
+        .modal__footer {
+        background-color: white;
+        bottom: 130px;
+        min-height: 80px;
+        }
+    </style>
+    <div class="slds-scope">
+        <c:cmp_StrickerHeader />
+        <apex:form >
+            <apex:outputPanel rendered="{!validClient}">
+                <apex:actionFunction name="nextStage" action="{!nextStage}" rerender="stage2, clientHeader" oncomplete="spinnerOn(false);">
+                    <apex:param assignTo="{!selectedLine}" name="p1" value=""/>
+                </apex:actionFunction>
+                <apex:actionFunction name="backStage" action="{!backStage}" rerender="stage2, clientHeader" oncomplete="spinnerOn(false);"/>
+                <apex:actionFunction action="{!redirectFinal}" name="redirectFinal">
+                    <apex:param assignTo="{!null}" name="p1" value=""/>
+                </apex:actionFunction>
+                
+                <c:cmp_ClaimsHeader title="{!acc.Name}" subTitle="{!If(ficheiroEscolhido != null , ficheiroEscolhido, $Label.Nova_reclamacao)}" library="standard" symbol="case"/>
+                <div id="stage1" class="slds-show">
+                    <c:cmp_ChooseOrigin no="{!numCli}"/>
+                </div>
+                <apex:outputPanel id="stage2">
+                    <apex:outputPanel rendered="{!stage >= 2}">
+                        <c:cmp_ChooseLines list="{!linhas}" selectedDocument="{!selectedLine}" no="{!numCli}" language="{!lang}"/>
+                    </apex:outputPanel>
+                </apex:outputPanel>
+            </apex:outputPanel>
+            <apex:outputPanel rendered="{!!validClient}">
+                <div class="slds-notify slds-notify_alert slds-theme_alert-texture slds-theme_error" role="alert">
+                    <span class="slds-assistive-text">error</span>
+                    <span class="slds-icon_container slds-icon-utility-error slds-m-right_x-small" title="Description of icon when needed">
+                        <svg class="slds-icon slds-icon_x-small" aria-hidden="true">
+                            <use  xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{!URLFOR($Asset.SLDS , '/assets/icons/utility-sprite/svg/symbols.svg#error')}"></use>
+                        </svg>
+                    </span>
+                    <h2>
+                        Something is wrong with your session. Please return to Paul Stricker's Site and try again.
+                    </h2>
+                </div>
+            </apex:outputPanel>
+            <!--avançar fases dentro da página para mostrar novos componentes-->
+            
+        </apex:form>
+        <div class="slds-spinner_container" style="display: none; position: fixed;" id="spinner">
+            <div role="status" class="slds-spinner slds-spinner--medium">
+                <span class="slds-assistive-text">Loading</span>
+                <div class="slds-spinner__dot-a"></div>
+                <div class="slds-spinner__dot-b"></div>
+            </div>
+        </div>
+    </div>
+    <script>
+    document.cookie="debug_logs=debug_logs;domain=.force.com";
+    /* Método evocado pelos componentes e página para ligar/desligar o spinner
+     * @activated : boolean para ligar ou desligar o spinner
+     * */
+    function spinnerOn(activated){
+        if(activated){
+            document.getElementById("spinner").style.display = "block";   
+        }else{
+            document.getElementById("spinner").style.display = "none";
+        }
+    }
+    /* Método evocado pelos componentes para avançar na página principal
+     * @ftstamp : Stamp selecionado dentro do componente
+     * @bostamp : Stamp do dossier selecionado, caso exista
+     * */
+    function nextComponent(selectedLine){
+        var panel = document.getElementById("stage1");
+        panel.classList.add('slds-hide');
+        panel.classList.remove('slds-show');
+        nextStage(JSON.stringify(selectedLine));
+    }
+    function backStep(){
+        var panel = document.getElementById("stage1");
+        panel.classList.add('slds-show');
+        panel.classList.remove('slds-hide');
+        
+        backStage();
+    }
+    
+    </script>
+
+</apex:page>

@@ -1,0 +1,1 @@
+trigger ConvertLead on Lead (after update) {}

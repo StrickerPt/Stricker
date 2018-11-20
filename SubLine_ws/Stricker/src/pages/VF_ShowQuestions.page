@@ -1,0 +1,286 @@
+<apex:page standardController="Relatorio__c" extensions="c_ShowQuestionsController" sidebar="false" showHeader="false" >
+    <head>
+        
+        <apex:includeScript value="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"/>
+        <apex:includeScript value="{!URLFOR($Resource.bs, '/js/bootstrap.js')}"/>
+        <apex:includeScript value="{!URLFOR($Resource.bs, '/js/bootstrap-typeahead.js')}"/>
+        <apex:stylesheet value="{!URLFOR($Resource.bs, '/css/bootstrap.css')}"/>
+        <apex:stylesheet value="{!URLFOR($Resource.bs, '/css/bootstrap-theme.css')}"/>
+        <apex:includeScript value="/support/console/39.0/integration.js"/>
+        
+        <apex:includeScript value="{!URLFOR($Resource.swal2, '/sweetalert2.min.js')}"/>
+        
+        
+        <script>
+        function setFocusOnLoad() {}
+        
+        function openSubTab(recId){
+            if(sforce.console.isInConsole()){
+                var openSubtab = function openSubtab(result) {
+                    //Now that we have the primary tab ID, we can open a new subtab in it
+                    var primaryTabId = result.id;
+                    sforce.console.openSubtab(primaryTabId , recId, true, 
+                                              'Questions', null);
+                };
+                sforce.console.getEnclosingPrimaryTabId(openSubtab);
+            }else{
+                window.open(recId, "_blank");
+            }
+            
+        }
+        function closeWindow(){
+            if(sforce.console.isInConsole()){
+                
+                var closeSubtab = function closeSubtab(result) {
+                    //Now that we have the tab ID, we can close it
+                    var tabId = result.id;
+                    sforce.console.closeTab(tabId);
+                };
+                sforce.console.getEnclosingTabId(closeSubtab);
+            }else{
+                window.close();
+            }
+        }
+        function showTab(ele){
+            
+            var actives = document.getElementsByClassName("slds-is-active");
+            for(var i = 0; i < actives.length; i++){
+                actives[i].classList.remove("slds-is-active");
+            }
+            
+            document.getElementById(ele.parentElement.id).classList.add("slds-is-active");
+            
+            var actives2 = document.getElementsByClassName("slds-show");
+            for(var i = 0; i < actives2.length; i++){
+                var a = actives2[i];
+                a.classList.remove("slds-show");
+                a.classList.add('slds-hide');
+            }
+            
+            var toActivate = document.getElementById(ele.getAttribute("aria-controls"));
+            
+            toActivate.classList.add('slds-show');
+            toActivate.classList.remove('slds-hide');
+        }
+        function buttonsEnabled(enabled) {
+            // retrieve all of the buttons or links on the page
+            // with the css class of btn
+            var $buttons = jQuery('.btn');
+            if (enabled === false) {
+                // add the btnDisabled class to give it the look of being disabled
+                // add the disabled attribute to actually disable interactability
+                $buttons.toggleClass('btnDisabled', true).attr('disabled', 'disabled');
+            } else {
+                // remove the css class and the disabled attribute
+                $buttons.toggleClass('btnDisabled', false).attr('disabled', null);
+            } 
+        }
+        </script>
+        <style>
+            
+            .centered {
+            position: fixed;
+            left: 50%;
+            transform: translate(-50%, 0);
+            z-index: 1000;
+            background-color: white;
+            width: 25%;
+            height: 35px;
+            border-radius: 4px;
+            border: 1px solid #d8dde6;
+            text-align: center;
+            }
+            .message .messageText h4 {
+            font-weight: bold;
+            display: initial;
+            font-size: 8pt;
+            }
+            .messageTable > tbody > tr > td{
+            border: 0 !important;
+            width: 0.1rem;
+            }
+            body{
+            display:flex;
+            font: 13.3333px Arial !important;
+            }
+            .cellHeigth{
+            height:40px !important
+            }
+            .swal-icon{
+            box-sizing: content-box !important;
+            }
+            .swal-styled{
+            background-image: inherit;
+            }
+            .swal-container {
+            z-index: 9001;
+            }
+            .swal-button {
+            background-image: inherit;
+            font-size: 14px !important;
+            }
+        </style>
+    </head>
+    <apex:form id="frm" style="background-color: white;" styleClass="slds-size--1-of-1">
+        <apex:slds />
+        <div class="bs centered">
+            <apex:outputPanel id="centered">
+                <apex:commandButton onclick="closeWindow()" value="{!$Label.Botao_Voltar}" styleClass="btn btn-primary btn-xs"
+                                    style="top: 5px;position: relative;"/>
+                &nbsp;
+                &nbsp;
+                &nbsp;
+                <apex:commandButton action="{!updateRecord}" value="{!$Label.Botao_Salvar_Respostas}" reRender="questionsTab, progressBar, alertPanel" 
+                                    styleClass="btn btn-default btn-xs" style="top: 5px;position: relative;" oncomplete="checkSucess();buttonsEnabled(true);"
+                                    onclick="buttonsEnabled(false);"/>
+            </apex:outputPanel>
+        </div>
+        <apex:outputPanel id="questionsTab">
+            
+            <!-------------------------------------------DURING THE VISIT----------------------------------------------->
+            <div class="slds-section-title--divider slds-m-bottom--large">
+                {!$Label.Durante_a_visita}
+            </div>
+            <apex:dataTable value="{!duringQuestions}" var="question" rowClasses="cellHeigth" headerClass="slds-text-heading--small" styleClass="slds-table slds-table_bordered slds-table_cell-buffer">
+                <apex:column id="thePanels" headerValue="{!$ObjectType.Pergunta__c.fields.Pergunta__c.Label}">
+                    <p>
+                        <label class="slds-form-element__label" for="custCom">{!question.Pergunta__c}</label>
+                    </p>
+                    <apex:outputPanel rendered="{!question.RecordType.Name == 'Texto'}">
+                        <!-- painel de texto-->
+                        <apex:inputTextarea disabled="{!OR(reportApproved, question.N_A__c)}" value="{!answers[question.id].Resposta_em_texto__c}"
+                                            style="width:95%; resize: none" styleClass="slds-input"/>
+                    </apex:outputPanel>
+                    <apex:outputPanel rendered="{!AND(question.RecordType.Name == 'Número',NOT(reportApproved))}">
+                        <!-- painel de numero-->
+                        <apex:inputField html-disabled="{!OR(reportApproved, question.N_A__c)}" value="{!answers[question.id].Resposta_em_numero__c}"
+                                         style="width:95%; resize: none" styleClass="slds-input" id="number"/>
+                        <script>
+                        var ele = checkDisabled();
+                        
+                        function checkDisabled(){
+                            if(!{!OR(reportApproved, question.N_A__c)}){
+                                document.getElementById('{!$Component.number}').removeAttribute("disabled");
+                            }
+                        };
+                        </script>
+                    </apex:outputPanel>
+                    <apex:outputPanel rendered="{!question.RecordType.Name == 'Picklist'}">
+                        <!-- painel de dropdown-->
+                        <apex:selectList disabled="{!OR(reportApproved, question.N_A__c)}" value="{!answers[question.id].Resposta_em_picklist__c}" size="1"
+                                         styleClass="slds-input" style="width:95%; resize: none">
+                            <apex:selectOptions value="{!dropDownAnswers[question.id]}"/>
+                        </apex:selectList>
+                    </apex:outputPanel>
+                    <apex:outputPanel rendered="{!question.RecordType.Name == 'Moeda'}">
+                        <apex:inputField value="{!answers[question.id].Resposta_em_moeda__c}" style="width:95%; resize: none" styleClass="slds-input"
+                                         html-placeholder="€" html-disabled="{!OR(reportApproved, question.N_A__c)}" id="coin"/>
+                        
+                        <script>
+                        var ele = checkDisabled();
+                        
+                        function checkDisabled(){
+                            if(!{!OR(reportApproved, question.N_A__c)}){
+                                document.getElementById('{!$Component.coin}').removeAttribute("disabled");
+                            }
+                        };
+                        </script>
+                    </apex:outputPanel>
+                    <apex:outputPanel rendered="{!question.RecordType.Name == 'Multi picklist'}">
+                        <!-- painel de multidropdown-->
+                        <fieldset class="slds-form--compound" >
+                            <div class="slds-form-element__group ">
+                                <apex:repeat value="{!multipicklistvalues[question.Id]}" var="s">
+                                    <div class="slds-form-element__row">
+                                        <div class="slds-form-element">
+                                            <div class="slds-form-element__control">
+                                                <span class="slds-checkbox">
+                                                    <apex:inputCheckbox disabled="{!OR(reportApproved, question.N_A__c)}" value="{!s.selected}" id="checkbox"/>
+                                                    <apex:outputLabel styleClass="slds-checkbox__label" for="checkbox">
+                                                        <span class="slds-checkbox--faux"  style="{!If(OR(reportApproved, question.N_A__c),'cursor: not-allowed;', '')}"></span>{!s.value}
+                                                    </apex:outputLabel>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </apex:repeat>
+                            </div>
+                        </fieldset>
+                    </apex:outputPanel>
+                </apex:column>
+            </apex:dataTable>
+            <!-------------------------------------------AFTER THE VISIT----------------------------------------------->
+            <div class="slds-section-title--divider slds-m-bottom--large slds-m-top--large">
+                {!$Label.Apos_a_visita}
+            </div>
+            <apex:dataTable value="{!afterQuestions}" var="question" rowClasses="cellHeigth" headerClass="slds-text-heading--small" styleClass="slds-table slds-table_bordered slds-table_cell-buffer">
+                <apex:column id="thePanels" headerValue="{!$ObjectType.Pergunta__c.fields.Pergunta__c.Label}">
+                    <p>
+                        <label class="slds-form-element__label" for="custCom">{!question.Pergunta__c}</label>
+                    </p>
+                    <apex:outputPanel rendered="{!question.RecordType.Name == 'Texto'}">
+                        <!-- painel de texto-->
+                        <apex:inputTextarea disabled="{!OR(reportApproved, question.N_A__c)}" value="{!answers[question.id].Resposta_em_texto__c}"
+                                            style="width:95%; resize: none" styleClass="slds-input"/>
+                    </apex:outputPanel>
+                    <apex:outputPanel rendered="{!AND(question.RecordType.Name == 'Número',NOT(reportApproved))}">
+                        <!-- painel de numero-->
+                        <apex:inputField html-disabled="{!OR(reportApproved, question.N_A__c)}" value="{!answers[question.id].Resposta_em_numero__c}"
+                                         style="width:95%; resize: none" styleClass="slds-input" id="number"/>
+                        <script>
+                        var ele = checkDisabled();
+                        
+                        function checkDisabled(){
+                            if(!{!OR(reportApproved, question.N_A__c)}){
+                                document.getElementById('{!$Component.number}').removeAttribute("disabled");
+                            }
+                        };
+                        </script>
+                    </apex:outputPanel>
+                    <apex:outputPanel rendered="{!question.RecordType.Name == 'Picklist'}">
+                        <!-- painel de dropdown-->
+                        <apex:selectList disabled="{!OR(reportApproved, question.N_A__c)}" value="{!answers[question.id].Resposta_em_picklist__c}" size="1"
+                                         styleClass="slds-input" style="width:95%; resize: none">
+                            <apex:selectOptions value="{!dropDownAnswers[question.id]}"/>
+                        </apex:selectList>
+                    </apex:outputPanel>
+                    <apex:outputPanel rendered="{!question.RecordType.Name == 'Moeda'}">
+                        <apex:inputField value="{!answers[question.id].Resposta_em_moeda__c}" style="width:95%; resize: none" styleClass="slds-input"
+                                         html-placeholder="€" html-disabled="{!OR(reportApproved, question.N_A__c)}" id="coin"/>
+                        
+                        <script>
+                        var ele = checkDisabled();
+                        
+                        function checkDisabled(){
+                            if(!{!OR(reportApproved, question.N_A__c)}){
+                                document.getElementById('{!$Component.coin}').removeAttribute("disabled");
+                            }
+                        };
+                        </script>
+                    </apex:outputPanel>
+                    <apex:outputPanel rendered="{!question.RecordType.Name == 'Multi picklist'}">
+                        <!-- painel de multidropdown-->
+                        <fieldset class="slds-form--compound" >
+                            <div class="slds-form-element__group ">
+                                <apex:repeat value="{!multipicklistvalues[question.Id]}" var="s">
+                                    <div class="slds-form-element__row">
+                                        <div class="slds-form-element">
+                                            <div class="slds-form-element__control">
+                                                <span class="slds-checkbox">
+                                                    <apex:inputCheckbox disabled="{!OR(reportApproved, question.N_A__c)}" value="{!s.selected}" id="checkbox"/>
+                                                    <apex:outputLabel styleClass="slds-checkbox__label" for="checkbox">
+                                                        <span class="slds-checkbox--faux"  style="{!If(OR(reportApproved, question.N_A__c),'cursor: not-allowed;', '')}"></span>{!s.value}
+                                                    </apex:outputLabel>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </apex:repeat>
+                            </div>
+                        </fieldset>
+                    </apex:outputPanel>
+                </apex:column>
+            </apex:dataTable>
+        </apex:outputPanel>
+    </apex:form>
+</apex:page>

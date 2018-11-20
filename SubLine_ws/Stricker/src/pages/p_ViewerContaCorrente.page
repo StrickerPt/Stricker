@@ -1,0 +1,232 @@
+<apex:page standardController="Account" extensions="c_ViewerContaCorrente" readOnly="true">
+    
+
+    <head>
+        
+        <apex:includeScript value="{!URLFOR($Resource.bs, '/jQuery_2_0_3.js')}"/>
+        
+        <apex:includeScript value="{!URLFOR($Resource.DataTables_1100, 'DataTables-1.10.12/media/js/jquery.dataTables.js')}"/>
+        <apex:includeScript value="{!URLFOR($Resource.jQueryDataTables_TableToolsZip, 'TableTools-2.2.4/js/dataTables.tableTools.js')}"/>
+        
+        <apex:stylesheet value="{!URLFOR($Resource.DataTables_1100, 'DataTables-1.10.12/media/css/jquery.dataTables.css')}"/>
+        <apex:stylesheet value="{!URLFOR($Resource.jQueryDataTables_TableToolsZip, 'TableTools-2.2.4/css/dataTables.tableTools.css')}"/>
+        <style>
+            .dataTables_wrapper .dataTables_paginate .paginate_button.current{
+            border-radius: 2px;
+            color: #005fb2 !important;
+            transition: color 0.05s linear, background-color 0.05s linear !important;
+            background: linear-gradient(to bottom, white 0%, #f4f6f9 100%);
+            background-color: #f4f6f9;
+            border: 1px solid #d8dde6;
+            }
+            .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover{
+            background: linear-gradient(to bottom, white 0%, #f4f6f9 100%);
+            }
+            .dataTables_wrapper .dataTables_paginate .paginate_button:hover{
+            background: linear-gradient(to bottom, #005fb2 0%, #0070d2 100%);
+            border: 1px solid transparent;
+            }
+            table.dataTable.no-footer {
+            border-bottom: none;
+            }
+            table.dataTable thead th, table.dataTable thead td {
+            border-bottom: none;
+            }
+            
+            .dataTables_filter{
+            margin: 1rem;
+            }
+            
+            .dataTables_filter input{
+            background-color: white;
+            color: #16325c;
+            border: 1px solid #d8dde6;
+            border-radius: 0.25rem;
+            width: 100%;
+            transition: border 0.1s linear, background-color 0.1s linear;
+            display: inline-block;
+            padding: 0 1rem 0 0.75rem;
+            line-height: 1.875rem;
+            min-height: calc(1.875rem + (1px * 2));
+            }
+            .dataTables_filter input:focus, input:active{
+            outline: 0;
+            border-color: #1589ee;
+            background-color: white;
+            box-shadow: 0 0 3px #0070D2;
+            }
+            .dataTables_length select{
+            background-color: white;
+            color: #16325c;
+            border: 1px solid #d8dde6;
+            border-radius: 0.25rem;
+            width: 5rem;
+            transition: border 0.1s linear, background-color 0.1s linear;
+            display: inline-block;
+            padding: 0 1rem 0 0.75rem;
+            line-height: 1.875rem;
+            min-height: calc(1.875rem + (1px * 2));
+            }
+            .dataTables_length select:focus, select:active{
+            outline: 0;
+            border-color: #1589ee;
+            background-color: white;
+            box-shadow: 0 0 3px #0070D2;
+            }
+            table.dataTable thead .sorting::after{
+            display:none;
+            }
+            table.dataTable thead .sorting_asc::after {
+            display:none;
+            }
+            table.dataTable thead .sorting_desc::after {
+            display:none;
+            }
+        </style>
+        <script>
+        j$ = jQuery.noConflict();
+        
+        function tablesort(){
+            j$("[id$='dataTable1']").dataTable({
+                scrollY: 250,
+                "bDestroy": true,
+                "sPaginationType": "full_numbers",
+                "iDisplayLength": 5,
+                "aLengthMenu": [[5, 10, 25, 50, 100, 150, -1], [5, 10, 25, 50, 100, 150, "All"]],
+                "aoColumnDefs" : [],
+                "oLanguage": {
+                    "sProcessing":   "Processing...",
+                    "sLengthMenu":   "Show _MENU_ records",
+                    "sZeroRecords":  "No results found",
+                    "sInfo":         "_START_ to _END_ of _TOTAL_ total records",
+                    "sInfoEmpty":    "0 of 0 records",
+                    "sInfoFiltered": "(filtered of _MAX_ total records)",
+                    "sInfoPostFix":  "",
+                    "sSearch":       "Search:",
+                    "sUrl":          "",
+                    "oPaginate": {
+                        "sFirst":    "<<",
+                        "sPrevious": "<",
+                        "sNext":     ">",
+                        "sLast":     ">>"
+                    }
+                }
+            });
+        }
+        function spinnerOn(activated){
+            if(activated){
+                document.getElementById("spinner").style.display = "block";
+            }else{
+                document.getElementById("spinner").style.display = "none";
+            }
+        }
+        </script>
+    </head>
+    <apex:outputPanel id="errorMessages">
+        <apex:pageMessages escape="false"></apex:pageMessages>
+    </apex:outputPanel>
+    <apex:slds />
+    <div class="slds-scope">
+        <apex:form >
+            <apex:actionFunction name="init" action="{!init}" rerender="tablePanel,saldoCliente, faltaBtt,errorMessages" oncomplete="tablesort();spinnerOn(false);"/>
+            <apex:actionFunction name="emFalta" action="{!mostrarEmFalta}" rerender="tablePanel, faltaBtt,errorMessages" oncomplete="tablesort();spinnerOn(false);"/>
+            <script>
+            window.onload = function(){
+                spinnerOn(true);
+                init();
+            }
+            </script>
+            <div class="slds-page-header">
+                <div class="slds-media">
+                    <div class="slds-media__figure">
+                        <span class="slds-icon_container slds-icon-standard-account">
+                            <svg class="slds-icon" aria-hidden="true">
+                                <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{!URLFOR($Asset.SLDS , '/assets/icons/standard-sprite/svg/symbols.svg#account')}"></use>
+                            </svg>
+                        </span>
+                    </div>
+                    <div class="slds-media__body">  
+                        <h1 class="slds-page-header__title slds-truncate slds-align-middle">{!$Label.Conta_Corrente}</h1>
+                        <p class="slds-text-body_small slds-line-height_reset">{!Account.Name}</p>
+                    </div>
+                    <div class="slds-media__body">
+                        <apex:outputPanel id="faltaBtt">
+                            <a class="slds-button slds-button_{!if(emFalta, 'brand', 'neutral')}" onclick="spinnerOn(true);{!if(emFalta, 'init();', 'emFalta();')}">{!if(emFalta, $Label.Todos, $Label.Em_falta)}</a>
+                        </apex:outputPanel>
+                    </div>
+                    <div class="slds-media__figure">
+                        <span class="slds-icon_container slds-icon-custom-custom17">
+                            <svg class="slds-icon" aria-hidden="true">
+                                <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{!URLFOR($Asset.SLDS , '/assets/icons/custom-sprite/svg/symbols.svg#custom17')}"></use>
+                            </svg>
+                        </span>
+                    </div>
+                    <div class="slds-media__body">
+                        <h1 class="slds-page-header__title slds-truncate slds-align-middle">{!$Label.Saldo} </h1>
+                        <apex:outputPanel id="saldoCliente">
+                            <p class="slds-text-body_small slds-line-height_reset">
+                                <apex:outPutText value="{0,number,#,###,###,##0.00}">
+                                    <apex:param value="{!saldoCliente}"/>
+                                </apex:outPutText>&nbsp;{!Account.CurrencyIsoCode}</p>
+                        </apex:outputPanel>
+                    </div>
+                </div>
+            </div>
+            <apex:outputPanel id="tablePanel">
+                
+                <apex:variable id="index" value="{!0}" var="c"/>
+                <apex:dataTable value="{!linhas}" var="linha" id="dataTable1" styleClass="slds-table slds-table_bordered slds-table_cell-buffer" 
+                                headerClass="slds-text-body_small">
+                    <apex:column >
+                        <apex:variable id="index" value="{!c + 1}" var="c"/>
+                        {!c}
+                    </apex:column>
+                    <apex:column headerValue="{!$Label.Data}">
+                        <apex:outputText value="{0, date, MMMM d','  yyyy}">
+                            <apex:param value="{!linha.dat}" />
+                        </apex:outputText>
+                    </apex:column>
+                    <apex:column headerValue="{!$Label.Vencimento}">
+                        <apex:outputText value="{0, date, MMMM d',' yyyy}">
+                            <apex:param value="{!linha.dat_venc}" />
+                        </apex:outputText>
+                    </apex:column>
+                    <apex:column value="{!linha.doc}" headerValue="{!$Label.Documento}"/>
+                    <apex:column value="{!linha.ndoc}" headerValue="{!$Label.Numero_de_documento}"/>
+                    <apex:column headerValue="{!$Label.Debito}">
+                        <apex:outPutText value="{0,number,#,##0.00}" rendered="{!!emFalta}">
+                           <apex:param value="{!if(linha.moe = 'PTE ou EURO', linha.deb,linha.deb_moe)}"/>
+                        </apex:outPutText> 
+                        <apex:outPutText value="{0,number,#,##0.00}" rendered="{!emFalta}">
+                           <apex:param value="{!if(linha.moe = 'PTE ou EURO', linha.deb-linha.deb_reg,linha.deb_moe-linha.deb_moe_reg)}"/>
+                        </apex:outPutText> 
+                    </apex:column>
+                    <apex:column headerValue="{!$Label.Credito}">
+                        <apex:outputText value="{0,number,#,##0.00}" rendered="{!!emFalta}">
+                            <apex:param value="{!if(linha.moe = 'PTE ou EURO', linha.cred,linha.cred_moe)}"/>
+                        </apex:outputText> 
+                        <apex:outputText value="{0,number,#,##0.00}" rendered="{!emFalta}">
+                            <apex:param value="{!if(linha.moe = 'PTE ou EURO', linha.cred-linha.cred_reg_eur,linha.cred_moe-linha.cred_reg)}"/>
+                        </apex:outputText> 
+                    </apex:column>
+                    <apex:column headerValue="Valor a regularizar">
+                        <apex:outputText value="{0,number,#,##0.00}">
+                            <apex:param value="{!if(linha.cred != 0,
+                                               if(linha.moe = 'PTE ou EURO', linha.cred-linha.cred_reg_eur,linha.cred_moe-linha.cred_reg),
+                                               if(linha.moe = 'PTE ou EURO', linha.deb-linha.deb_reg,linha.deb_moe-linha.deb_moe_reg))}"/>
+                        </apex:outputText> 
+                    </apex:column>
+                    <apex:column value="{!linha.moe}" headerValue="{!$ObjectType.Account.Fields.CurrencyIsoCode.Label}"/>
+                    <apex:column value="{!linha.descr}" headerValue="{!$Label.Descricao}"/>
+                </apex:dataTable>
+            </apex:outputPanel>
+        </apex:form>
+        <div class="slds-spinner_container" style="display: none; position: fixed;" id="spinner">
+            <div role="status" class="slds-spinner slds-spinner--medium">
+                <span class="slds-assistive-text">Loading</span>
+                <div class="slds-spinner__dot-a"></div>
+                <div class="slds-spinner__dot-b"></div>
+            </div>
+        </div>
+    </div>
+</apex:page>

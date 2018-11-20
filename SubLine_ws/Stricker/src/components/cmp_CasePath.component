@@ -1,0 +1,32 @@
+<apex:component controller="c_CasePath">
+    <apex:attribute name="case" type="String" description="Numero do caso" assignTo="{!caseId}"/>
+    
+   
+    <div class="slds-path">
+  <div class="slds-grid slds-path__track">
+    <div class="slds-grid slds-path__scroller-container">
+      <div class="slds-path__scroller" role="application">
+        <div class="slds-path__scroller_inner">
+            <ul class="slds-path__nav" role="listbox" aria-orientation="horizontal">
+                <apex:variable id="index" value="{!0}" var="index"/>
+                <apex:repeat value="{!stages}" var="stg">
+                    <apex:variable id="index" value="{!index + 1}" var="index"/>
+                    <li class="slds-path__item {!if(stg.isComplete , 'slds-is-complete', if(stg.isCurrent,'slds-is-current', 'slds-is-incomplete') )}" role="presentation">
+                        <a aria-selected="true" class="slds-path__link" id="path-{!index}" role="option" tabindex="0">
+                            <span class="slds-path__stage">
+                                <svg class="slds-icon slds-icon_x-small" aria-hidden="true">
+                                    <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{!URLFOR($Asset.SLDS , '/assets/icons/utility-sprite/svg/symbols.svg#check')}" />
+                                </svg>
+                                <span class="slds-assistive-text">Stage Complete</span>
+                            </span>
+                            <span class="slds-path__title">{!stg.label}</span>
+                        </a>
+                    </li>
+                </apex:repeat>
+            </ul>
+          </div>
+        </div>
+    </div>
+  </div>
+</div>
+</apex:component>

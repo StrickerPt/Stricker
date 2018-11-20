@@ -1,0 +1,120 @@
+41.0 APEX_CODE,DEBUG;APEX_PROFILING,INFO;CALLOUT,INFO;DB,INFO;NBA,INFO;SYSTEM,DEBUG;VALIDATION,INFO;VISUALFORCE,INFO;WAVE,INFO;WORKFLOW,INFO
+14:42:36.0 (122778)|USER_INFO|[EXTERNAL]|0050Y000000P4Th|stepadmin@pstricker.proj|Fuso horário da Europa Ocidental|GMTZ
+14:42:36.0 (173197)|EXECUTION_STARTED
+14:42:36.0 (180387)|CODE_UNIT_STARTED|[EXTERNAL]|01p0Y00000OOb0g|b_UpdateDossierWeb
+14:42:36.0 (14460846)|SOQL_EXECUTE_BEGIN|[434]|Aggregations:0|SELECT id, Referencia_relacionada__c, OpportunityId FROM OpportunityLineItem 
+14:42:36.0 (111994487)|SOQL_EXECUTE_END|[434]|Rows:4
+14:42:36.0 (112910395)|SOQL_EXECUTE_BEGIN|[444]|Aggregations:0|SELECT Id, Stamp__c FROM OpportunityLineItem WHERE Stamp__c = :tmpVar1
+14:42:36.0 (116404250)|SOQL_EXECUTE_END|[444]|Rows:0
+14:42:36.0 (116766851)|DML_BEGIN|[456]|Op:Update|Type:OpportunityLineItem|Rows:3
+14:42:36.0 (127884319)|CODE_UNIT_STARTED|[EXTERNAL]|01q0Y000001JlYc|t_Oli on OpportunityLineItem trigger event BeforeUpdate|__sfdc_trigger/t_Oli
+14:42:36.0 (160670174)|SOQL_EXECUTE_BEGIN|[31]|Aggregations:0|SELECT Id, Peso__c, Volume__c FROM Product2 WHERE Id IN (SELECT Product2Id FROM OpportunityLineItem WHERE Id IN :tmpVar1)
+14:42:36.0 (164997427)|SOQL_EXECUTE_END|[31]|Rows:1
+14:42:36.165 (165571417)|CUMULATIVE_LIMIT_USAGE
+14:42:36.165 (165571417)|LIMIT_USAGE_FOR_NS|(default)|
+  Number of SOQL queries: 3 out of 200
+  Number of query rows: 5 out of 50000
+  Number of SOSL queries: 0 out of 20
+  Number of DML statements: 1 out of 150
+  Number of DML rows: 3 out of 10000
+  Maximum CPU time: 0 out of 60000
+  Maximum heap size: 0 out of 12000000
+  Number of callouts: 0 out of 100
+  Number of Email Invocations: 0 out of 10
+  Number of future calls: 0 out of 0
+  Number of queueable jobs added to the queue: 0 out of 1
+  Number of Mobile Apex push calls: 0 out of 10
+
+14:42:36.165 (165571417)|CUMULATIVE_LIMIT_USAGE_END
+
+14:42:36.0 (166553413)|CODE_UNIT_FINISHED|t_Oli on OpportunityLineItem trigger event BeforeUpdate|__sfdc_trigger/t_Oli
+14:42:36.0 (173694057)|CODE_UNIT_STARTED|[EXTERNAL]|Validation:OpportunityLineItem:00k1n00000ZRPXe
+14:42:36.0 (173720556)|VALIDATION_RULE|03d0Y0000002J94|Reserva_aberta_cativa
+14:42:36.0 (175057637)|VALIDATION_FORMULA|AND (  Opportunity.RecordType.Name  = 'Reserva', TEXT( Opportunity.StageName ) = 'Aberto',  Stock_cativo__c = true)|Opportunity.RecordType.Name=Folha de Obra , Stock_cativo__c=1 , Opportunity.StageName=Fechado faturado
+14:42:36.0 (175082584)|VALIDATION_PASS
+14:42:36.0 (175220542)|CODE_UNIT_FINISHED|Validation:OpportunityLineItem:00k1n00000ZRPXe
+14:42:36.0 (175258075)|CODE_UNIT_STARTED|[EXTERNAL]|Validation:OpportunityLineItem:00k1n00000ZRPXg
+14:42:36.0 (175266550)|VALIDATION_RULE|03d0Y0000002J94|Reserva_aberta_cativa
+14:42:36.0 (175514296)|VALIDATION_FORMULA|AND (  Opportunity.RecordType.Name  = 'Reserva', TEXT( Opportunity.StageName ) = 'Aberto',  Stock_cativo__c = true)|Opportunity.RecordType.Name=Folha de Obra , Stock_cativo__c=1 , Opportunity.StageName=Fechado faturado
+14:42:36.0 (175522430)|VALIDATION_PASS
+14:42:36.0 (175600272)|CODE_UNIT_FINISHED|Validation:OpportunityLineItem:00k1n00000ZRPXg
+14:42:36.0 (175622374)|CODE_UNIT_STARTED|[EXTERNAL]|Validation:OpportunityLineItem:00k1n00000ZRPXh
+14:42:36.0 (175628650)|VALIDATION_RULE|03d0Y0000002J94|Reserva_aberta_cativa
+14:42:36.0 (175830892)|VALIDATION_FORMULA|AND (  Opportunity.RecordType.Name  = 'Reserva', TEXT( Opportunity.StageName ) = 'Aberto',  Stock_cativo__c = true)|Opportunity.RecordType.Name=Folha de Obra , Stock_cativo__c=1 , Opportunity.StageName=Fechado faturado
+14:42:36.0 (175849361)|VALIDATION_PASS
+14:42:36.0 (175936025)|CODE_UNIT_FINISHED|Validation:OpportunityLineItem:00k1n00000ZRPXh
+14:42:36.0 (191050187)|CODE_UNIT_STARTED|[EXTERNAL]|01q0Y000001JlYc|t_Oli on OpportunityLineItem trigger event AfterUpdate|__sfdc_trigger/t_Oli
+14:42:36.0 (197971391)|SOQL_EXECUTE_BEGIN|[6]|Aggregations:0|SELECT Id, Nao_calcula_portes_automaticos__c FROM Opportunity WHERE Id IN (SELECT OpportunityId FROM OpportunityLineItem WHERE Id IN :tmpVar1)
+14:42:36.0 (201840287)|SOQL_EXECUTE_END|[6]|Rows:1
+14:42:36.202 (202644886)|CUMULATIVE_LIMIT_USAGE
+14:42:36.202 (202644886)|LIMIT_USAGE_FOR_NS|(default)|
+  Number of SOQL queries: 4 out of 200
+  Number of query rows: 6 out of 50000
+  Number of SOSL queries: 0 out of 20
+  Number of DML statements: 1 out of 150
+  Number of DML rows: 3 out of 10000
+  Maximum CPU time: 0 out of 60000
+  Maximum heap size: 0 out of 12000000
+  Number of callouts: 0 out of 100
+  Number of Email Invocations: 0 out of 10
+  Number of future calls: 0 out of 0
+  Number of queueable jobs added to the queue: 0 out of 1
+  Number of Mobile Apex push calls: 0 out of 10
+
+14:42:36.202 (202644886)|CUMULATIVE_LIMIT_USAGE_END
+
+14:42:36.0 (203540654)|CODE_UNIT_FINISHED|t_Oli on OpportunityLineItem trigger event AfterUpdate|__sfdc_trigger/t_Oli
+14:42:36.0 (203640861)|CODE_UNIT_STARTED|[EXTERNAL]|Workflow:OpportunityLineItem
+14:42:36.0 (217705360)|WF_RULE_EVAL_BEGIN|Fluxo de trabalho
+14:42:36.0 (217761443)|WF_CRITERIA_BEGIN|[Produto de oportunidade:  00k1n00000ZRPXe]|Verificação de produto da oportunidade|01Q0Y0000009mnT|ON_ALL_CHANGES|0
+14:42:36.0 (218008538)|WF_RULE_FILTER|[Produto de oportunidade : Referência SKU não igual a ]
+14:42:36.0 (218024606)|WF_RULE_EVAL_VALUE|NSIMPT
+14:42:36.0 (218030198)|WF_CRITERIA_END|true
+14:42:36.0 (218370649)|WF_CRITERIA_BEGIN|[Produto de oportunidade:  00k1n00000ZRPXe]|Verificação de têxtil cativo|01Q1n000000Ujgc|ON_CREATE_OR_TRIGGERING_UPDATE|0
+14:42:36.0 (218432756)|WF_RULE_FILTER|[Produto de oportunidade : Stock cativo igual a false] 
+E [Produto de oportunidade : Tamanho igual a XS, S, M, L, XL, XXL]
+14:42:36.0 (218440541)|WF_RULE_EVAL_VALUE|true
+14:42:36.0 (218444450)|WF_CRITERIA_END|false
+14:42:36.0 (218454684)|WF_CRITERIA_BEGIN|[Produto de oportunidade:  00k1n00000ZRPXg]|Verificação de produto da oportunidade|01Q0Y0000009mnT|ON_ALL_CHANGES|0
+14:42:36.0 (218473440)|WF_RULE_FILTER|[Produto de oportunidade : Referência SKU não igual a ]
+14:42:36.0 (218479075)|WF_RULE_EVAL_VALUE|NSIMPT
+14:42:36.0 (218482560)|WF_CRITERIA_END|true
+14:42:36.0 (218490784)|WF_CRITERIA_BEGIN|[Produto de oportunidade:  00k1n00000ZRPXg]|Verificação de têxtil cativo|01Q1n000000Ujgc|ON_CREATE_OR_TRIGGERING_UPDATE|0
+14:42:36.0 (218516652)|WF_RULE_FILTER|[Produto de oportunidade : Stock cativo igual a false] 
+E [Produto de oportunidade : Tamanho igual a XS, S, M, L, XL, XXL]
+14:42:36.0 (218521103)|WF_RULE_EVAL_VALUE|true
+14:42:36.0 (218524366)|WF_CRITERIA_END|false
+14:42:36.0 (218530891)|WF_CRITERIA_BEGIN|[Produto de oportunidade:  00k1n00000ZRPXh]|Verificação de produto da oportunidade|01Q0Y0000009mnT|ON_ALL_CHANGES|0
+14:42:36.0 (218544957)|WF_RULE_FILTER|[Produto de oportunidade : Referência SKU não igual a ]
+14:42:36.0 (218549397)|WF_RULE_EVAL_VALUE|NSIMPT
+14:42:36.0 (218552572)|WF_CRITERIA_END|true
+14:42:36.0 (218560097)|WF_CRITERIA_BEGIN|[Produto de oportunidade:  00k1n00000ZRPXh]|Verificação de têxtil cativo|01Q1n000000Ujgc|ON_CREATE_OR_TRIGGERING_UPDATE|0
+14:42:36.0 (218585103)|WF_RULE_FILTER|[Produto de oportunidade : Stock cativo igual a false] 
+E [Produto de oportunidade : Tamanho igual a XS, S, M, L, XL, XXL]
+14:42:36.0 (218589286)|WF_RULE_EVAL_VALUE|true
+14:42:36.0 (218592213)|WF_CRITERIA_END|false
+14:42:36.0 (218610485)|WF_SPOOL_ACTION_BEGIN|Fluxo de trabalho
+14:42:36.0 (225922294)|WF_ACTION| Atualização de campo: 6;
+14:42:36.0 (225934185)|WF_RULE_EVAL_END
+14:42:36.0 (226010969)|WF_ACTIONS_END| Atualização de campo: 6;
+14:42:36.0 (226021460)|CODE_UNIT_FINISHED|Workflow:OpportunityLineItem
+14:42:36.0 (238523504)|DML_END|[456]
+14:42:36.286 (286707797)|CUMULATIVE_LIMIT_USAGE
+14:42:36.286 (286707797)|LIMIT_USAGE_FOR_NS|(default)|
+  Number of SOQL queries: 0 out of 200
+  Number of query rows: 0 out of 50000
+  Number of SOSL queries: 0 out of 20
+  Number of DML statements: 0 out of 150
+  Number of DML rows: 0 out of 10000
+  Maximum CPU time: 0 out of 60000
+  Maximum heap size: 0 out of 12000000
+  Number of callouts: 0 out of 0
+  Number of Email Invocations: 0 out of 10
+  Number of future calls: 0 out of 0
+  Number of queueable jobs added to the queue: 0 out of 1
+  Number of Mobile Apex push calls: 0 out of 10
+
+14:42:36.286 (286707797)|CUMULATIVE_LIMIT_USAGE_END
+
+14:42:36.0 (286757639)|CODE_UNIT_FINISHED|b_UpdateDossierWeb
+14:42:36.0 (287697434)|EXECUTION_FINISHED

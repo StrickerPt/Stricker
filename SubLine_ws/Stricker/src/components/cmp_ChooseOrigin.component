@@ -1,0 +1,447 @@
+<apex:component controller="c_ChooseOrigin">
+    <apex:attribute name="no" type="String" description="Numero de Cliente" assignTo="{!numCli}"/>
+    <apex:attribute name="showBackPage" type="boolean" description="Mostra ou não botão de voltar para trás" assignTo="{!showBackPageButton}"/>
+    <!-------FUNCAO DE PARA R BUSCAR AS LINHAS E AS SUAS VALIDACOES FINAIS------->
+    <apex:actionFunction name="getDocuments" action="{!getDocuments}" rerender="componentBody,headerPanel, footerPanel,choiceFinalScript" oncomplete="checkLinesSuccess();">
+        <apex:param assignTo="{!choice}" name="p1" value=""/>
+    </apex:actionFunction>
+    <apex:outputPanel id="choiceFinalScript">
+        <script>
+        function checkLinesSuccess(){
+            spinnerOn(false);
+            if({!choiceSucess}){
+                var ele = document.getElementsByClassName("modal__content")[0];
+                ele.style="top: 90px;";
+            }else{
+                swal('{!$Label.Erro}','{!$Label.De_momento_nao_foi}','error')
+                .catch(swal.noop)
+                .then((value) => {
+                    redirectFinal();
+                });
+            }
+        }
+        </script>
+    </apex:outputPanel>
+    <!-------------->
+    <apex:actionFunction name="goBackServer" action="{!goBack}" rerender="componentBody,headerPanel, footerPanel" oncomplete="goBack();"/>
+    <apex:actionFunction name="checkLines" action="{!checkLines}" rerender="scriptLines" oncomplete="chamarLinhas();"/>
+    <apex:actionFunction name="buildShowFaturas" action="{!buildShowFaturas}" rerender="panelModal" oncomplete="openModalFats();"/>
+    <apex:actionFunction name="filterDocs" action="{!filterList}" rerender="componentBody" oncomplete="spinnerOn(false);"/>
+    <div class="modal">
+        <apex:outputPanel id="headerPanel">
+            <apex:outputPanel rendered="{!isChosen}">
+                <div class="modal_header">
+                    <div class="slds-tabs_card slds-m-around--small">
+                        <span class="tabs__nav">
+                            <apex:inputText id="filter" label="" styleClass="slds-input searchText" value="{!filter}" html-placeholder="{!$Label.Procurar}..." onkeyup="spinnerOn(true);filterDocs();"/>
+                        </span>
+                    </div>
+                </div>
+            </apex:outputPanel>
+        </apex:outputPanel>
+        <!-- ADD  PAGE -->
+        <div class="modal__content">
+            <fieldset class="slds-form--compound">
+                <div class="slds-form-element__group ">
+                    <div id="choicePanel" class="slds-show">
+                        <div class="slds-form-element__row">
+                            <div class="slds-form-element slds-p-around--small slds-size_1-of-1">
+                                <div class="slds-form-element__control slds-align_absolute-center">
+                                    <div class="slds-visual-picker slds-visual-picker_medium slds-m-right--small">
+                                        <input type="radio" id="DOCS" name="options" value="on" onclick="nextButton();" class="vPicker"/>
+                                        <label for="DOCS">
+                                            <span class="slds-visual-picker__figure slds-visual-picker__icon slds-align_absolute-center">
+                                                <span class="slds-is-selected">
+                                                    <span class="slds-icon_container" title="{!$ObjectType.Documentos_financeiros__c.labelPlural}">
+                                                        <svg class="slds-icon slds-icon_large slds-icon-action-check" aria-hidden="true">
+                                                            <use xmlns:xlink="http://www.w3.org/1999/xlink"
+                                                                 xlink:href="{!URLFOR($Asset.SLDS , '/assets/icons/utility-sprite/svg/symbols.svg#check')}"></use>
+                                                        </svg>
+                                                    </span>
+                                                </span>
+                                                <span class="slds-is-not-selected">
+                                                    <span class="slds-icon_container" title="{!$ObjectType.Documentos_financeiros__c.labelPlural}">
+                                                        <svg class="slds-icon slds-icon-utility-copy slds-icon_large slds-icon-text-default" aria-hidden="true">
+                                                            <use xmlns:xlink="http://www.w3.org/1999/xlink"
+                                                                 xlink:href="{!URLFOR($Asset.SLDS , '/assets/icons/utility-sprite/svg/symbols.svg#copy')}"></use>
+                                                        </svg>
+                                                    </span>
+                                                </span>
+                                            </span>
+                                            <div class="slds-m-top--xx-small">
+                                                <span class="slds-text-heading_small ">{!$ObjectType.Documentos_financeiros__c.labelPlural}</span>
+                                            </div>
+                                        </label>
+                                    </div>
+                                    <div class="slds-visual-picker slds-visual-picker_medium slds-m-right--small">
+                                        <input type="radio" id="DOSS" name="options" value="on" onclick="nextButton();" class="vPicker"/>
+                                        <label for="DOSS">
+                                            <span class="slds-visual-picker__figure slds-visual-picker__icon slds-align_absolute-center">
+                                                <span class="slds-is-selected">
+                                                    <span class="slds-icon_container" title="{!$ObjectType.Opportunity.labelPlural}">
+                                                        <svg class="slds-icon slds-icon_large slds-icon-action-check" aria-hidden="true">
+                                                            <use xmlns:xlink="http://www.w3.org/1999/xlink"
+                                                                 xlink:href="{!URLFOR($Asset.SLDS , '/assets/icons/utility-sprite/svg/symbols.svg#check')}"></use>
+                                                        </svg>
+                                                    </span>
+                                                </span>
+                                                <span class="slds-is-not-selected">
+                                                    <span class="slds-icon_container" title="{!$ObjectType.Opportunity.labelPlural}">
+                                                        <svg class="slds-icon slds-icon-utility-color_swatch slds-icon_large slds-icon-text-default" aria-hidden="true">
+                                                            <use xmlns:xlink="http://www.w3.org/1999/xlink"
+                                                                 xlink:href="{!URLFOR($Asset.SLDS , '/assets/icons/utility-sprite/svg/symbols.svg#color_swatch')}"></use>
+                                                        </svg>
+                                                    </span>
+                                                </span>
+                                            </span>
+                                            <div class="slds-m-top--xx-small">
+                                                <span class="slds-text-heading_small ">{!$ObjectType.Opportunity.labelPlural}</span>
+                                            </div>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <apex:outputPanel id="componentBody">
+                        <apex:outputPanel rendered="{!isChosen}">
+                            <div class="slds-form-element__row">
+                                <div class="slds-form-element slds-size_1-of-1">
+                                    <apex:outputPanel rendered="{!docs.size > 0}">
+                                        
+                                        <apex:outputPanel rendered="{!choice == 'DOCS'}">
+                                            <table class="slds-table slds-table_bordered slds-table_cell-buffer">
+                                                <thead>
+                                                    <tr>
+                                                        <th width="1%">
+                                                            &nbsp;
+                                                        </th>
+                                                        <th>
+                                                            {!$ObjectType.Documentos_financeiros__c.fields.Tipo_de_documento__c.Label}
+                                                        </th>
+                                                        <th>
+                                                            {!$ObjectType.Documentos_financeiros__c.fields.Data__c.Label}
+                                                        </th>
+                                                        <th>
+                                                            {!$Label.Data_de_vencimento}
+                                                        </th>
+                                                        <th>
+                                                            {!$Label.Data_de_pagamento}
+                                                        </th>
+                                                        <th>
+                                                            {!$ObjectType.Documentos_financeiros__c.fields.Valor_debito__c.Label}
+                                                        </th>
+                                                        <th>
+                                                            {!$Label.Credito_emitido}
+                                                        </th>
+                                                        <th>
+                                                            {!$Label.Custo_transporte}
+                                                        </th>
+                                                        <th>
+                                                            {!$ObjectType.Atribuicao_de_zonas__c.fields.Pais__c.Label}
+                                                        </th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <apex:repeat value="{!docs}" var="line">
+                                                        <tr>
+                                                            <td width="1%">
+                                                                <div class="slds-form-element__control">
+                                                                    <span class="slds-checkbox">
+                                                                        <apex:inputCheckbox value="{!line.selected}" id="checkbox" styleClass="checkDisable" onchange="changeCheckboxes(this.checked, '{!line.fats}', 'checkDisable')"/>
+                                                                        <apex:outputLabel styleClass="slds-checkbox__label" for="checkbox">
+                                                                            <span class="slds-checkbox--faux"></span>
+                                                                        </apex:outputLabel>
+                                                                    </span>
+                                                                </div>
+                                                            </td>
+                                                            <td>
+                                                                {!line.name}
+                                                            </td>
+                                                            <td>
+                                                                <apex:outputText value="{0,date,dd-MM-yyyy}">
+                                                                    <apex:param value="{!line.data_emissao}"/>
+                                                                </apex:outputText>
+                                                            </td>
+                                                            <td>
+                                                                <apex:outputText value="{0,date,dd-MM-yyyy}">
+                                                                    <apex:param value="{!line.data_vencime}"/>
+                                                                </apex:outputText>
+                                                            </td>
+                                                            <td>
+                                                                <apex:outputText value="{0,date,dd-MM-yyyy}">
+                                                                    <apex:param value="{!line.data_pagamento}"/>
+                                                                </apex:outputText>
+                                                            </td>
+                                                            <td>
+                                                                <apex:outputText value="{0,number,0.00}">
+                                                                    <apex:param value="{!IF(line.moeda == 'EUR', line.deb_emitido_euro, line.deb_emitido_moeda)}"/>
+                                                                </apex:outputText>
+                                                                &nbsp;{!line.moedaSymbol}
+                                                            </td>
+                                                            <td>
+                                                                <apex:outputText value="{0,number,0.00}">
+                                                                    <apex:param value="{!IF(line.moeda == 'EUR', line.cred_emitido_euro, line.cred_emitido_moed)}"/>
+                                                                </apex:outputText>
+                                                                &nbsp;{!line.moedaSymbol}
+                                                            </td>
+                                                            <td>
+                                                                <apex:outputText value="{0,number, 0.00}">
+                                                                    <apex:param value="{!line.custo_portes}"/>
+                                                                </apex:outputText>
+                                                                &nbsp;{!line.moedaSymbol}
+                                                            </td>
+                                                            <td>
+                                                                {!line.codigo_pais}
+                                                            </td>
+                                                        </tr>
+                                                    </apex:repeat>
+                                                </tbody>
+                                            </table>
+                                        </apex:outputPanel>
+                                        <apex:outputPanel rendered="{!choice == 'DOSS'}">
+                                            <table class="slds-table slds-table_bordered slds-table_cell-buffer reduceFont">
+                                                <thead>
+                                                    <tr>
+                                                        <th width="1%">
+                                                            &nbsp;
+                                                        </th>
+                                                        <th>
+                                                            {!$Label.Encomenda}
+                                                        </th>
+                                                        <th>
+                                                            {!$ObjectType.Opportunity.fields.Referencia_interna__c.Label}
+                                                        </th>
+                                                        <th>
+                                                            {!$ObjectType.Opportunity.fields.Data_de_faturacao__c.Label}
+                                                        </th>
+                                                        <th>
+                                                            {!$ObjectType.Opportunity.fields.Data_de_envio__c.Label}
+                                                        </th>
+                                                        <th>
+                                                            {!$Label.Total}
+                                                        </th>
+                                                        <th>
+                                                            {!$ObjectType.Case.fields.Vendedor__c.Label}
+                                                        </th>
+                                                        <th>
+                                                            {!$Label.Moradas}
+                                                        </th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <apex:repeat value="{!docs}" var="line">
+                                                        <tr>
+                                                            <td width="1%">
+                                                                <div class="slds-form-element__control">
+                                                                    <span class="slds-checkbox">
+                                                                        <apex:inputCheckbox value="{!line.selected}" id="checkbox" styleClass="checkDisable" onchange="changeCheckboxes(this.checked, '{!line.fats}', 'checkDisable')"/>
+                                                                        <apex:outputLabel styleClass="slds-checkbox__label" for="checkbox">
+                                                                            <span class="slds-checkbox--faux"></span>
+                                                                        </apex:outputLabel>
+                                                                    </span>
+                                                                </div>
+                                                            </td>
+                                                            <td>
+                                                                {!line.name}
+                                                            </td>
+                                                            <td>
+                                                                {!line.refInterna}
+                                                            </td>
+                                                            <td>
+                                                                <apex:outputText value="{0,date,dd-MM-yyyy}" title="{!line.ftstamp}">
+                                                                    <apex:param value="{!line.data_emissao}"/>
+                                                                </apex:outputText>
+                                                            </td>
+                                                            <td>
+                                                                <apex:outputText value="{0,date,dd-MM-yyyy}">
+                                                                    <apex:param value="{!line.data_env}"/>
+                                                                </apex:outputText>
+                                                            </td>
+                                                            <td>
+                                                                <apex:outputText value="{0,number, 0.00}">
+                                                                    <apex:param value="{!line.custo_total}"/>
+                                                                </apex:outputText>&nbsp;{!line.moedaSymbol}
+                                                            </td>
+                                                            <td>
+                                                                {!line.vendedor}
+                                                            </td>
+                                                            <td>
+                                                                <apex:repeat value="{!line.moradas}" var="mor">
+                                                                    <p>
+                                                                        - {!mor.rua} {!mor.codPost} {!mor.local} {!mor.pais} {!mor.transp}
+                                                                    </p>
+                                                                </apex:repeat>
+                                                            </td>
+                                                        </tr>
+                                                    </apex:repeat>
+                                                </tbody>
+                                            </table>
+                                        </apex:outputPanel>
+                                        
+                                    </apex:outputPanel>
+                                    <apex:outputPanel rendered="{!docs.size = 0}">
+                                        <div class="slds-text-heading_small slds-text-align_center">_Não existem documentos para reclamar.</div>
+                                    </apex:outputPanel>
+                                </div>
+                            </div>
+                            
+                            <script>
+                            function changeCheckboxes(checked, fats, className){
+                                var faturas;
+                                if(fats != "") faturas = JSON.parse(fats);
+                                var eles = document.getElementsByClassName(className);
+                                var intDisabled = -1;
+                                var btt = document.getElementById("{!$Component.choseBtt}");
+                                var search = document.getElementsByClassName("searchText"); 
+                                if(checked){
+                                    search[0].setAttribute("disabled", "true");
+                                    if(faturas == null || faturas.length <= 1){
+                                        btt.removeAttribute("disabled");
+                                        btt.onclick = function(){
+                                            spinnerOn(true);
+                                            checkLines();
+                                        };
+                                    }else{
+                                        buildShowFaturas();
+                                    }
+                                    
+                                    for(var i = 0 ; i < eles.length ; i++){
+                                        if(!eles[i].checked){
+                                            eles[i].setAttribute("disabled", "true");
+                                            eles[i].checked = false;
+                                        }else{
+                                            intDisabled = i;
+                                        }
+                                    }
+                                }else{
+                                    btt.setAttribute("disabled","true");
+                                    search[0].removeAttribute("disabled");
+                                    for(var i = 0 ; i < eles.length ; i++){
+                                        eles[i].removeAttribute("disabled");
+                                    }
+                                }
+                            }
+                            
+                            </script>
+                            <apex:outputPanel id="scriptLines">
+                                <script>
+                                function chamarLinhas(checked){
+                                    //metodo da página mãe
+                                    nextComponent({!selectedLine});
+                                }
+                                </script>
+                            </apex:outputPanel>
+                        </apex:outputPanel>
+                    </apex:outputPanel>
+                </div>
+            </fieldset>
+        </div>
+        <!-- FOOTER -->
+        <apex:outputPanel id="footerPanel">
+            <div class="modal__footer">
+                <div class="slds-modal__footer" style="position:sticky;bottom:0px;">
+                    <div class="slds-clearfix">
+                        <div class="slds-float_right">
+                            <apex:commandButton rendered="{!showBackPageButton && !isChosen}" id="backPageBtt" value="{!$Label.Botao_Voltar}" reRender="dummy" styleClass="slds-button slds-button--destructive" 
+                                                onclick="handleBack();"/>
+                            <apex:commandButton id="nextBtt" rendered="{!!isChosen}" value="{!$Label.Confirmar}" disabled="true" reRender="dummy" styleClass="slds-button slds-button--brand" />
+                            <script>
+                            var toShow = true;
+                            function nextButton(){
+                                if(toShow){
+                                    toShow = false;
+                                    var btt = document.getElementById("{!$Component.nextBtt}");
+                                    btt.removeAttribute("disabled");
+                                    btt.onclick = function(){
+                                        openList();
+                                        spinnerOn(true);
+                                    };
+                                }
+                            }
+                            
+                            function openList(){
+                                var panel = document.getElementById("choicePanel");
+                                panel.classList.add('slds-hide');
+                                panel.classList.remove('slds-show');
+                                
+                                var eles = document.getElementsByClassName("vPicker");
+                                for(var i = 0; i < eles.length ; i++){
+                                    if(eles[i].checked){
+                                        getDocuments(eles[i].id);
+                                        break;
+                                    }
+                                }
+                            }
+                            </script>   
+                            <apex:commandButton rendered="{!isChosen}" id="backBtt" value="{!$Label.Botao_Voltar}" reRender="dummy" styleClass="slds-button slds-button--destructive" onclick="spinnerOn(true);document.getElementsByClassName('modal__content')[0].removeAttribute('style');goBackServer();"/>
+                            <apex:commandButton rendered="{!isChosen}" id="choseBtt" value="{!$Label.Confirmar}" reRender="dummy" styleClass="slds-button slds-button--brand" disabled="true"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </apex:outputPanel>
+    </div>
+    
+    
+    <div class="slds-modal" aria-hidden="false" role="dialog" id="modalFats">
+        <div class="slds-modal__container">
+            <div class="slds-modal__header">
+                <button class="slds-button slds-button--icon-inverse slds-modal__close" onclick="closeModalFats()" type="button">
+                    <div class="slds-icon_container slds-icon-utility-close">
+                        <svg class="slds-icon slds-icon-text-default" aria-hidden="false">
+                            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{!URLFOR($Asset.SLDS , '/assets/icons/utility-sprite/svg/symbols.svg#close')}"></use>
+                        </svg>
+                    </div>
+                </button>
+                <h2 class="slds-text-heading--medium"></h2>
+            </div>
+            <div class="slds-modal__content slds-p-around--medium">
+                <apex:outputPanel id="panelModal">
+                    <apex:dataTable value="{!faturas}" var="fat" styleClass="slds-table slds-table_bordered slds-table_cell-buffer">
+                        <apex:column width="1%">
+                            <div class="slds-form-element__control">
+                                <span class="slds-checkbox">
+                                    <apex:inputCheckbox value="{!fat.selected}" id="checkbox" styleClass="modalDisable" onchange="changeCheckboxes(this.checked, 'null', 'modalDisable')"/>
+                                    <apex:outputLabel styleClass="slds-checkbox__label" for="checkbox">
+                                        <span class="slds-checkbox--faux"></span>
+                                    </apex:outputLabel>
+                                </span>
+                            </div>
+                        </apex:column>
+                        <apex:column headerValue="Nome" value="{!fat.name}"/>
+                        <apex:column headerValue="Nome" value="{!fat.ftstamp}"/>
+                        <apex:column headerValue="Nome" value="{!fat.bostamp}"/>
+                    </apex:dataTable>
+                </apex:outputPanel>
+            </div>
+            <div class="slds-modal__footer">
+                <button class="slds-button slds-button--neutral" onclick="closeModalFats()" type="button">{!$Label.Cancelar}</button>
+                <button class="slds-button slds-button--neutral slds-button--brand" type="button" onclick="closeModalFats();">{!$Label.Confirmar}</button>
+            </div>
+        </div>
+    </div>
+    <div class="slds-backdrop" id="backdropFats"></div>
+    
+    <!-- Modal Toggle Script -->
+    <script>
+    //Modal Open
+    function openModalFats(){
+        document.getElementById("backdropFats").classList.add('slds-backdrop--open');
+        document.getElementById("modalFats").classList.add('slds-fade-in-open');
+    }
+    
+    //Modal Close
+    function closeModalFats(){
+        document.getElementById("modalFats").classList.remove('slds-fade-in-open');
+        document.getElementById("backdropFats").classList.remove('slds-backdrop--open');
+    }
+    
+    function goBack(){
+        var panel = document.getElementById("choicePanel");
+        panel.classList.add('slds-show');
+        panel.classList.remove('slds-hide');
+        spinnerOn(false);
+    }
+    </script>
+</apex:component>

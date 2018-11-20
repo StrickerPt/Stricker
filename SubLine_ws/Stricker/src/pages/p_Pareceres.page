@@ -1,0 +1,642 @@
+<apex:page standardController="Pedido_de_parecer__c" extensions="c_Pareceres" action="{!callExtraInfo}">
+    <apex:includeScript value="{!URLFOR($Resource.swal2, '/sweetalert2.min.js')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.bs, '/jQuery_2_0_3.js')}"/>
+    <apex:includeScript value="/support/console/43.0/integration.js"/>
+    <style>
+        .swal-icon{
+        box-sizing: content-box !important;
+        }
+        .swal-styled{
+        background-image: inherit;
+        }
+        .swal-container {
+        z-index: 9001;
+        }
+        .swal-button {
+        background-image: inherit;
+        font-size: 14px !important;
+        }
+    </style>
+    <apex:slds />
+    <apex:form >
+        <script>
+        var clickedBtt;
+        function updateParecerJS(btt){
+            spinnerOn(true);
+            clickedBtt = JSON.parse(btt);
+            console.log(clickedBtt);
+            if(clickedBtt.value == "Aprovo parcialmente" && clickedBtt.hasQttParcial){
+                //abrir modal
+                openModal("modal_qttParcial");
+            }else if(clickedBtt.value == "Aprovo" && clickedBtt.hasRespOptions){
+                //abrir modal
+                openModal("modal_MotivoAprov");
+            }else if(clickedBtt.value == "Não aprovo" && clickedBtt.hasRespOptions){
+                //abrir modal
+                openModal("modal_MotivoNaoAprov");
+            }else if(clickedBtt.field == "Pedido_de_recolha__c"){
+                //abrir modal
+                openModal("modal_qttRecolher");
+            }else{
+                updateParecer(clickedBtt.value, clickedBtt.field);
+            }
+        }
+        function spinnerOn(activated){
+            if(activated){
+                document.getElementById("spinner").style.display = "block";
+            }else{
+                document.getElementById("spinner").style.display = "none";
+            }
+        }
+        function openModal(modalToOpen){
+            spinnerOn(false);
+            document.getElementById("backdrop").classList.add('slds-backdrop--open');
+            document.getElementById(modalToOpen).classList.add('slds-fade-in-open');
+        }
+        
+        //Modal Close
+        function closeModal(modalToOpen){
+            document.getElementById(modalToOpen).classList.remove('slds-fade-in-open');
+            document.getElementById("backdrop").classList.remove('slds-backdrop--open');
+        }
+        
+        function aproveQttParcial(){
+            var input = document.getElementById("{!$Component.qttParcial}");
+            console.log(input);
+            if(input.value != ""){
+                closeModal('modal_qttParcial');
+                spinnerOn(true);
+                updateParecer(clickedBtt.value, clickedBtt.field);
+            }else{
+                swal('{!$Label.Erro}','_Por favor preencha uma quantidade.','error');
+            }
+            
+        }
+        function confirmRecolha(){
+            var input = document.getElementById("{!$Component.qttRecolher}");
+            var input2 = document.getElementById("{!$Component.dptRecolher}");
+
+            if(input.value != ""){
+                if(input2.value != ""){
+                    closeModal('modal_qttRecolher');
+                    spinnerOn(true);
+                    updateParecer(clickedBtt.value, clickedBtt.field);
+                }else{
+                    swal('{!$Label.Erro}','_Por favor indique um departamento destino.','error');
+                }
+            }else{
+                swal('{!$Label.Erro}','_Por favor preencha uma quantidade.','error');
+            }
+            
+        }
+        function changeSection(ele, parEle){
+            var classList = parEle.classList.value;
+            if(classList.includes("slds-is-open")){
+                parEle.classList.remove("slds-is-open");
+            }else{
+                parEle.classList.add("slds-is-open");
+            }
+            
+        }
+        function openDoc(docId){
+            if(sforce.console.isInConsole()){
+                var openSubTab = function openSubTab(result) {
+                    sforce.console.openSubtab(result.id, docId, true);
+                };
+                sforce.console.getFocusedPrimaryTabId(openSubTab);
+            }else{
+             	window.open("/" +docId ,"_blank");
+            }
+        }
+        var maquete = JSON.parse('{!maquete}');
+        </script>
+        <apex:outputPanel id="checkRedirect">
+            <script>
+            function checkRedirect(){
+                if({!parecer.Resposta_final__c != ''}){
+                  setTimeout("window.open('/{!ParecerPrefix}?fcf={!ListViewId}', '_self');",5000);
+                }
+            }
+            </script>
+        </apex:outputPanel>
+        <apex:actionFunction name="updateParecer" action="{!escreverValor}" rerender="headerPanel, footerPanel, checkRedirect" oncomplete="spinnerOn(false);checkRedirect();">
+            <apex:param assignTo="{!updateValue}" name="p1" value=""/>
+            <apex:param assignTo="{!updateField}" name="p2" value=""/>
+        </apex:actionFunction>
+        <apex:actionFunction name="newFile" action="{!newFile}" reRender="filesPanel" oncomplete="spinnerOn(false);">
+            <apex:param assignTo="{!blobFile}" name="p1" value=""/>
+            <apex:param assignTo="{!fileName}" name="p3" value=""/>
+        </apex:actionFunction>
+        <div class="slds-scope">
+            <fieldset class="slds-form--compound">
+                <div class="slds-form-element__group ">
+                    <apex:outputPanel id="headerPanel">
+                        <apex:outputPanel rendered="{!parecer.Pedido_de_fotos_aberto__c}">
+                            <div class="slds-form-element__row">
+                                <div class="slds-form-element slds-size_1-of-1">
+                                    <div class="slds-notify slds-notify_alert slds-theme_alert-texture slds-theme_warning" role="alert">
+                                        <h2>
+                                            Este parecer tem um pedido de fotos adicionais a decorrer.
+                                        </h2>
+                                    </div>
+                                </div>
+                            </div>
+                        </apex:outputPanel>                        
+                        <apex:outputPanel rendered="{!parecer.Pedido_de_recolha_aberto__c}">
+                            <div class="slds-form-element__row">
+                                <div class="slds-form-element slds-size_1-of-1">
+                                    <div class="slds-notify slds-notify_alert slds-theme_alert-texture slds-theme_warning" role="alert">
+                                        <h2>
+                                            Este parecer tem um pedido de recolha a decorrer.
+                                        </h2>
+                                    </div>
+                                </div>
+                            </div>
+                        </apex:outputPanel>
+                        <apex:outputPanel rendered="{!conf == null}">
+                            <div class="slds-form-element__row">
+                                <div class="slds-form-element slds-size_1-of-1">
+                                    <div class="slds-notify slds-notify_alert slds-theme_alert-texture slds-theme_error" role="alert">
+                                        <h2>
+                                            Este parecer não tem uma configuração no backoffice, por favor contacte o administrador do sistema.
+                                        </h2>
+                                    </div>
+                                </div>
+                            </div>
+                        </apex:outputPanel>   
+                    </apex:outputPanel>
+                    <apex:outputPanel rendered="{!parecer.Departamento__c == 'Produção'}">
+                        <c:cmp_ParecerProd line="{!line}" parecer="{!parecer}" extraInfo="{!extraInfo}"/>
+                    </apex:outputPanel>
+                    <apex:outputPanel rendered="{!parecer.Departamento__c == 'Compras e CQ'}">
+                        <c:cmp_ParecerCompras line="{!line}" parecer="{!parecer}" alerta="{!alerta}" extraInfo="{!extraInfo}"/>
+                    </apex:outputPanel>
+                    <apex:outputPanel rendered="{!parecer.Departamento__c == 'Armazém'}">
+                        <c:cmp_ParecerArmazem line="{!line}" parecer="{!parecer}" extraInfo="{!extraInfo}"/>
+                    </apex:outputPanel>
+                    <apex:outputPanel rendered="{!parecer.Departamento__c == 'Administrativo'}">
+                        <c:cmp_ParecerAdmin line="{!line}" parecer="{!parecer}" extraInfo="{!extraInfo}"/>
+                    </apex:outputPanel>
+                    <apex:outputPanel rendered="{!parecer.Departamento__c == 'Product Compliance'}">
+                        <c:cmp_ParecerProdComp line="{!line}" parecer="{!parecer}" hist="{!historico}" extraInfo="{!extraInfo}"/>
+                    </apex:outputPanel>
+                    <apex:outputPanel rendered="{!parecer.Departamento__c == 'Informática'}">
+                        <c:cmp_ParecerInformatica line="{!line}" parecer="{!parecer}" extraInfo="{!extraInfo}"/>
+                    </apex:outputPanel>
+                    <apex:outputPanel rendered="{!conf.Upload_de_imagem__c}">
+                        <article class="slds-card">
+                            <div class="slds-card__body slds-card__body_inner">
+                                <div class="slds-form slds-p-around--xx-small" role="list">
+                                    <apex:outputPanel rendered="{!ficheirosLinha.size > 0}">
+                                        <div class="slds-grid slds-gutters_small">
+                                            <div class="slds-col slds-has-flexi-truncate" role="listitem">
+                                                <div class="slds-section">
+                                                    <h3 class="slds-section__title">
+                                                        <a aria-controls="expando-unique-id" aria-expanded="true" class="slds-button slds-section__title-action" onclick="changeSection(this, this.parentElement.parentElement);">
+                                                            <span class="slds-truncate" style="width: 100%; text-align: left;">
+                                                                <div class="slds-icon_container slds-m-right--medium">
+                                                                    <svg class="slds-section__title-action-icon slds-button__icon" aria-hidden="false">
+                                                                        <use xmlns:xlink="http://www.w3.org/1999/xlink"
+                                                                             xlink:href="{!URLFOR($Asset.SLDS , '/assets/icons/utility-sprite/svg/symbols.svg#switch')}"></use>
+                                                                    </svg>
+                                                                </div>
+                                                                _Ficheiros da linha
+                                                            </span>
+                                                        </a>
+                                                    </h3>
+                                                    <div aria-hidden="true" class="slds-section__content" id="expando-unique-id">
+                                                        <apex:outputPanel id="lineFilesPanel">
+                                                            <apex:outputPanel rendered="{!ficheirosLinha.size > 0}">
+                                                                <table class="slds-table slds-table_bordered slds-table_cell-buffer">
+                                                                    <thead>
+                                                                        <tr>
+                                                                            <th>
+                                                                                _Nome do ficheiro
+                                                                            </th>
+                                                                            <th>
+                                                                                _Data de criação
+                                                                            </th>
+                                                                            <th>
+                                                                                _Criado por
+                                                                            </th>
+                                                                        </tr>
+                                                                    </thead>
+                                                                    <tbody>
+                                                                        <apex:repeat value="{!ficheirosLinha}" var="fi">
+                                                                            <tr>
+                                                                                <td>
+                                                                                    <a onclick="openDoc('{!fi.Id}')">{!fi.Title}</a>
+                                                                                </td>
+                                                                                <td>
+                                                                                    <apex:outputText value="{0,date,dd-MM-yyyy HH:mm}"><apex:param value="{!fi.CreatedDate}"/></apex:outputText>
+                                                                                </td>
+                                                                                <td>
+                                                                                    {!fi.CreatedBy.Name}
+                                                                                </td>
+                                                                            </tr>
+                                                                        </apex:repeat>
+                                                                    </tbody>
+                                                                </table>
+                                                            </apex:outputPanel>
+                                                        </apex:outputPanel>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </apex:outputPanel>
+                                    <div class="slds-grid slds-gutters_small">
+                                        <div class="slds-col slds-has-flexi-truncate" role="listitem">
+                                            <div class="slds-section">
+                                                <h3 class="slds-section__title">
+                                                    <a aria-controls="expando-unique-id" aria-expanded="true" class="slds-button slds-section__title-action" onclick="changeSection(this, this.parentElement.parentElement);">
+                                                        <span class="slds-truncate" style="width: 100%; text-align: left;">
+                                                            <div class="slds-icon_container slds-m-right--medium">
+                                                                <svg class="slds-section__title-action-icon slds-button__icon" aria-hidden="false">
+                                                                    <use xmlns:xlink="http://www.w3.org/1999/xlink"
+                                                                         xlink:href="{!URLFOR($Asset.SLDS , '/assets/icons/utility-sprite/svg/symbols.svg#switch')}"></use>
+                                                                </svg>
+                                                            </div>
+                                                            _Ficheiros carregados
+                                                        </span>
+                                                    </a>
+                                                </h3>
+                                                <div aria-hidden="true" class="slds-section__content" id="expando-unique-id">
+                                                    <apex:outputPanel id="filesPanel">
+                                                        <apex:outputPanel rendered="{!files.size > 0}">
+                                                            <table class="slds-table slds-table_bordered slds-table_cell-buffer">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th>
+                                                                            _Nome do ficheiro
+                                                                        </th>
+                                                                        <th>
+                                                                            _Data de criação
+                                                                        </th>
+                                                                        <th>
+                                                                            _Criado por
+                                                                        </th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    <apex:repeat value="{!files}" var="fi">
+                                                                        <tr>
+                                                                            <td>
+                                                                                <a onclick="openDoc('{!fi.Id}')">{!fi.Title}</a>
+                                                                            </td>
+                                                                            <td>
+                                                                                <apex:outputText value="{0,date,dd-MM-yyyy HH:mm}"><apex:param value="{!fi.CreatedDate}"/></apex:outputText>
+                                                                            </td>
+                                                                            <td>
+                                                                                {!fi.CreatedBy.Name}
+                                                                            </td>
+                                                                        </tr>
+                                                                    </apex:repeat>
+                                                                </tbody>
+                                                            </table>
+                                                        </apex:outputPanel>
+                                                    </apex:outputPanel>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="slds-grid slds-gutters_small">
+                                        <div class="slds-col slds-has-flexi-truncate" role="listitem">
+                                            
+                                            <div class="slds-form-element__control">
+                                                <!-- fileBtt{linha.uniqueId} => JS:validateInputs() -->
+                                                <div class="slds-form-element__row" style="margin-bottom:0;">
+                                                    <button class="slds-button slds-button--neutral fileBtt{!parecer.Id} slds-input" onclick="buildFilesTable();openModal('filesModal');" type="button">{!$Label.Carregar}</button>
+                                                </div>
+                                                <div class="slds-form-element__row" style="margin-bottom:0;">
+                                                    <span id="auxDiv{!parecer.Id}" class="slds-badge"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </article>
+                    </apex:outputPanel>
+                    <script>
+                    j$ = jQuery.noConflict();
+                    function buildFilesTable(){
+                        j$("#filesTable").empty();
+                        if("{!parecer.Id}" in filesMap){
+                            if(filesMap["{!parecer.Id}"].length > 0){
+                                var table = j$('<table/>', {
+                                    class: 'slds-table slds-table_bordered slds-table_cell-buffer',
+                                });
+                                table.append(buildTableHeader());
+                                var aux = filesMap["{!parecer.Id}"];
+                                for(var i = 0; i < aux.length; i++){
+                                    var tr = j$("<tr/>", {});
+                                    var td1 = j$("<td>" + aux[i].name + "</td>", {});
+                                    var td2 = j$("<td>" + aux[i].extension + "</td>", {});
+                                    var td3 = j$("<td/>", {});
+                                    var bttString = j$("<a/>", {
+                                        class: "slds-button slds-button--neutral",
+                                        html: "{!$Label.Apagar}",
+                                        index: i,
+                                    });
+                                    j$(bttString).attr("onclick", "removeFileFromMap(" + i + ", '{!parecer.Id}');");
+                                    
+                                    //arranjar um separador para poder apagar no mapa, o indice correcto.
+                                    td3.append(bttString);
+                                    tr.append(td1);
+                                    tr.append(td2);
+                                    tr.append(td3);
+                                    table.append(tr);
+                                }
+                            }
+                        }
+                        j$("#filesTable").prepend(table);
+                        j$("#filesTable").html(j$("#filesTable").html());
+                    }
+                    var filesMap= [];
+                    //File handle functions
+                    function readFile(uniqueId){
+                        var file = document.querySelector('input[type=file]').files[0];
+                        if(file != null){
+                            if(check_extension(file.name)){
+                                if(file.size < 6291456){
+                                    var reader = new FileReader();
+                                    reader.readAsDataURL(file);
+                                    reader.addEventListener("load", function () {
+                                        
+                                        //insere ficheiro na estrutura
+                                        if(!(uniqueId in filesMap)) filesMap[uniqueId] = [];
+                                        var auxList = filesMap[uniqueId];
+                                        
+                                        var re = /\..+$/;
+                                        var ext = file.name.match(re)[0];
+                                        
+                                        auxList.push({body: reader.result, name : file.name, extension : ext});
+                                        filesMap[uniqueId] = auxList;
+                                        buildFileDiv(auxList.length, uniqueId);
+                                        buildFilesTable();
+                                    }, false);
+                                }else{
+                                    swal('{!$Label.Erro}','{!$Label.Tamanho_de_ficheiro_excedido}','error');
+                                }
+                            }else{
+                                swal('{!$Label.Erro}','{!$Label.Ficheiro_invalido}','error');
+                            }
+                        }
+                    }
+                    
+                    function buildTableHeader(){
+                        var table = j$("<thead/>", {});
+                        var tr = j$("<tr/>", {});
+                        var th1 = j$("<th>{!$Label.Nome}</th>");
+                        var th2 = j$("<th>{!$Label.Extensao}</th>");
+                        var th3 = j$("<th>{!$Label.Apagar}</th>");
+                        tr.append(th1);
+                        tr.append(th2);
+                        tr.append(th3);
+                        
+                        return table.append(tr);
+                    }
+                    
+                    function buildFileDiv(size, uniqueId){
+                        
+                        var auxString = size + "";
+                        if(size == 1) auxString +=  " {!$Label.Ficheiro}";
+                        else auxString +=  " {!$Label.Ficheiros}";
+                        var auxDiv = document.getElementById("auxDiv" + uniqueId);
+                        if(size == 0) {
+                            auxDiv.classList.add("slds-hide");
+                        }else{
+                            auxDiv.classList.remove("slds-hide");
+                        }
+                        auxDiv.innerHTML = "<span class=\"slds-badge\">" + auxString + "</span>";
+                    }
+                    var hash = {
+                        ".pdf" : 1,
+                        ".jpg" : 1,
+                        ".png" : 1,
+                        ".gif" : 1,
+                        ".mp4" : 1,
+                        ".mov" : 1,
+                        ".flv" : 1,
+                        ".avi" : 1,
+                        ".xls" : 1,
+                        ".xlsx" : 1,
+                        ".csv" : 1,
+                        ".docx" : 1,
+                        ".doc" : 1,
+                    };
+                    function check_extension(filename) {
+                        var re = /\..+$/;
+                        var ext = filename.match(re);
+                        
+                        if (hash[ext[0].toLowerCase()]) {
+                            return true;
+                        } else {
+                            return false;
+                        }
+                    }
+                    function removeFileFromMap(index, uniqueId){
+                        if(uniqueId in filesMap){
+                            filesMap[uniqueId].splice(index, 1);
+                        }
+                        buildFileDiv(filesMap[uniqueId].length, uniqueId);
+                        buildFilesTable();
+                    }
+                    
+                    function saveFiles(){
+                        for(var key in filesMap){
+                            spinnerOn(true);
+                            for(var i = 0; i < filesMap[key].length; i++){
+                                newFile(filesMap[key][i].body,filesMap[key][i].name);
+                            }
+                            
+                            filesMap = [];
+                            buildFileDiv(0, key);
+                        }
+                        
+                    }
+                    </script>
+                    <!-- FOOTER -->
+                    <apex:outputPanel id="footerPanel">
+                        <apex:outputPanel rendered="{!parecer.Resposta_final__c == '' && isAllowed}">
+                            <div class="slds-form-element__row">
+                                <div class="slds-form-element slds-size_1-of-1">
+                                    <div class="slds-form slds-p-around--xx-small" role="list">
+                                        <div class="slds-grid slds-gutters_small slds-text-align--center">
+                                            <apex:repeat value="{!btts}" var="btt">
+                                                <div class="slds-col slds-has-flexi-truncate" role="listitem">
+                                                    <div class="slds-form-element">
+                                                        <a class="slds-button slds-button_brand" onclick="updateParecerJS('{!btt.serialized}');">{!btt.label}</a>
+                                                    </div>
+                                                </div>
+                                            </apex:repeat>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </apex:outputPanel>                        
+                        <apex:outputPanel rendered="{!parecer.Resposta_final__c != ''}">
+                            <div class="slds-form-element__row">
+                                <div class="slds-form-element slds-size_1-of-1">
+                                    <div class="slds-notify slds-notify_alert slds-theme_alert-texture slds-theme_info" role="alert">
+                                        <h2>
+                                            Este parecer já foi respondido.
+                                        </h2>
+                                    </div>
+                                </div>
+                            </div>
+                        </apex:outputPanel>
+                    </apex:outputPanel>
+                </div>
+            </fieldset>
+            <div class="slds-modal" aria-hidden="false" role="dialog" id="modal_qttParcial">
+                <div class="slds-modal__container">
+                    <div class="slds-modal__header">
+                        <h2 class="slds-text-heading--medium">_Que quantidade aprova?</h2>
+                    </div>
+                    <div class="slds-modal__content slds-p-around--medium">
+                        <span class="slds-form-element__label">{!$ObjectType.Pedido_de_parecer__c.fields.Quantidade_parcial__c.Label}</span>
+                        <div class="slds-form-element__control">
+                            <span class="slds-form-element__static ">
+                                <apex:inputField value="{!parecer.Quantidade_parcial__c}" styleClass="slds-input" id="qttParcial"/>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="slds-modal__footer">
+                        <button class="slds-button slds-button--destructive" onclick="closeModal('modal_qttParcial');" type="button">{!$Label.Fechar}</button>
+                        <button class="slds-button slds-button--brand" onclick="aproveQttParcial();" type="button">{!$Label.Confirmar}</button>
+                    </div>
+                </div>
+            </div>
+            <div class="slds-modal" aria-hidden="false" role="dialog" id="modal_qttRecolher">
+                <div class="slds-modal__container">
+                    <div class="slds-modal__header">
+                        <h2 class="slds-text-heading--medium">Informação adicional</h2>
+                    </div>
+                    <div class="slds-modal__content slds-p-around--medium">
+                        <span class="slds-form-element__label">{!$ObjectType.Pedido_de_parecer__c.fields.Quantidade_a_recolher__c.Label}</span>
+                        <div class="slds-form-element__control">
+                            <span class="slds-form-element__static ">
+                                <apex:inputField value="{!parecer.Quantidade_a_recolher__c}" styleClass="slds-input" id="qttRecolher"/>
+                            </span>
+                        </div>
+                        <span class="slds-form-element__label">{!$ObjectType.Pedido_de_parecer__c.fields.Departamento_para_envio_de_recolha__c.Label}</span>
+                        <div class="slds-form-element__control">
+                            <span class="slds-form-element__static ">
+                                <apex:inputField value="{!parecer.Departamento_para_envio_de_recolha__c}" styleClass="slds-input" id="dptRecolher"/>
+                            </span>
+                        </div>
+                        <span class="slds-form-element__label">{!$ObjectType.Pedido_de_parecer__c.fields.Quantidade_para_Controlo_de_Qualidade__c.Label}</span>
+                        <div class="slds-form-element__control">
+                            <span class="slds-form-element__static ">
+                                <apex:inputField value="{!parecer.Quantidade_para_Controlo_de_Qualidade__c}" styleClass="slds-input" id="qttCQ"/>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="slds-modal__footer">
+                        <button class="slds-button slds-button--destructive" onclick="closeModal('modal_qttRecolher');" type="button">{!$Label.Fechar}</button>
+                        <button class="slds-button slds-button--brand" onclick="confirmRecolha();" type="button">{!$Label.Confirmar}</button>
+                    </div>
+                </div>
+            </div>
+            <div class="slds-modal" aria-hidden="false" role="dialog" id="modal_MotivoAprov">
+                <div class="slds-modal__container">
+                    <div class="slds-modal__header">
+                        _Motivo de aprovação
+                    </div>
+                    <div class="slds-modal__content slds-p-around--medium">
+                        <apex:outputPanel rendered="{!conf.Motivo__c}">
+                            <span class="slds-form-element__label">{!$ObjectType.Pedido_de_parecer__c.fields.Motivo_de_aprovacao__c.Label}</span>
+                            <div class="slds-form-element__control">
+                                <span class="slds-form-element__static ">
+                                    <apex:inputField value="{!parecer.Motivo_de_aprovacao__c}" styleClass="slds-input" id="mtvAprov"/>
+                                </span>
+                            </div>
+                        </apex:outputPanel>
+                        <apex:outputPanel rendered="{!conf.Causa__c}">
+                            <span class="slds-form-element__label">{!$ObjectType.Pedido_de_parecer__c.fields.Causa__c.Label}</span>
+                            <div class="slds-form-element__control">
+                                <span class="slds-form-element__static ">
+                                    <apex:inputField value="{!parecer.Causa__c}" styleClass="slds-input" id="causaAprov"/>
+                                </span>
+                            </div>
+                        </apex:outputPanel>
+                    </div>
+                    <div class="slds-modal__footer">
+                        <button class="slds-button slds-button--destructive" onclick="closeModal('modal_MotivoAprov');" type="button">{!$Label.Fechar}</button>
+                        <button class="slds-button slds-button--brand" onclick="spinnerOn(true);closeModal('modal_MotivoAprov');updateParecer(clickedBtt.value, clickedBtt.field);" type="button">{!$Label.Confirmar}</button>
+                    </div>
+                </div>
+            </div>
+            <div class="slds-modal" aria-hidden="false" role="dialog" id="modal_MotivoNaoAprov">
+                <div class="slds-modal__container">
+                    <div class="slds-modal__header">
+                        _Motivo de não aprovação
+                    </div>
+                    <div class="slds-modal__content slds-p-around--medium">
+                        <span class="slds-form-element__label">{!$ObjectType.Pedido_de_parecer__c.fields.Motivo_de_nao_aprovacao__c.Label}</span>
+                        <div class="slds-form-element__control">
+                            <span class="slds-form-element__static ">
+                                <apex:inputField value="{!parecer.Motivo_de_nao_aprovacao__c}" styleClass="slds-input" id="mtvNAprov"/>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="slds-modal__footer">
+                        <button class="slds-button slds-button--destructive" onclick="closeModal('modal_MotivoNaoAprov');" type="button">{!$Label.Fechar}</button>
+                        <button class="slds-button slds-button--brand" onclick="spinnerOn(true);closeModal('modal_MotivoNaoAprov');updateParecer(clickedBtt.value, clickedBtt.field);" type="button">{!$Label.Confirmar}</button>
+                    </div>
+                </div>
+            </div>
+            <div class="slds-modal" aria-hidden="false" role="dialog" id="filesModal">
+                <div class="slds-modal__container" style="width: auto;max-width: max-content;">
+                    <div class="slds-modal__header">
+                        <h2 class="slds-text-heading--medium">{!$Label.Ficheiros_carregados}</h2>
+                    </div>
+                    <div class="slds-modal__content slds-p-around--medium">
+                        <div class="slds-form-element__row">
+                            <div class="slds-form-element">
+                                <div class="slds-notify slds-notify_alert slds-theme_alert-texture slds-theme_warning" style="border-radius: 0.2rem; color:black;" role="alert">
+                                    <h2 class="reduceFont">
+                                        {!$Label.Nao_poder_carregar_ficheiros}
+                                    </h2>
+                                </div>
+                            </div>
+                        </div>
+                        <apex:outputPanel id="filesModalContent">
+                            <div class="slds-form-element__row slds-m-vertical--small slds-m-left--small">
+                                <div class="slds-form-element">
+                                    <div class="slds-file-selector slds-file-selector_files">
+                                        <input type="file" class="slds-file-selector__input slds-assistive-text" id="file-upload-input-01" accept=".jpg,.png,.gif,.pdf,.mp4,.mov,.flv,.avi"
+                                               aria-labelledby="file-selector-primary-label file-selector-secondary-label" onchange="readFile('{!parecer.Id}');"/>
+                                        <label class="slds-file-selector__body" for="file-upload-input-01" id="file-selector-secondary-label">
+                                            <span class="slds-file-selector__button slds-button slds-button_neutral">{!$Label.Carregar}</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="slds-form-element__row slds-scrollable">
+                                <div class="slds-form-element" id="filesTable">
+                                    <!-- AQUI É CRIADA A TABELA COM A LISTA DOS FICHEIROS JÁ ADICIONADOS PARA ESTA LINHA -->
+                                </div>
+                            </div>
+                        </apex:outputPanel>
+                    </div>
+                    <div class="slds-modal__footer">
+                        <button class="slds-button slds-button--destructive" onclick="closeModal('filesModal');" type="button">{!$Label.Fechar}</button>
+                        <button class="slds-button slds-button--brand" onclick="closeModal('filesModal');saveFiles();" type="button">{!$Label.Confirmar}</button>
+                    </div>
+                </div>
+            </div>
+            <div class="slds-spinner_container" style="display: none; position: fixed;" id="spinner">
+                <div role="status" class="slds-spinner slds-spinner--medium">
+                    <span class="slds-assistive-text">Loading</span>
+                    <div class="slds-spinner__dot-a"></div>
+                    <div class="slds-spinner__dot-b"></div>
+                </div>
+            </div>
+            <apex:inputField value="{!parecer.Departamento__c}" styleClass="slds-hide" id="depHidden"/>
+            <apex:inputField value="{!parecer.Tipologia__c}" styleClass="slds-hide" id="tipHidden"/>
+            <div class="slds-backdrop" id="backdrop"></div>
+        </div>
+    </apex:form>
+</apex:page>

@@ -1,0 +1,1391 @@
+<apex:component controller="c_ChooseLines" allowDML="true">
+    <apex:attribute name="selectedDocument" type="String" description="Doc selecionado" assignTo="{!selectedDoc}"/>
+    <apex:attribute name="no" type="String" description="Numero do cliente" assignTo="{!noCliente}"/>
+    <apex:attribute name="list" type="Object[]" description="Lista de linhas" assignTo="{!linhas}"/>
+    <apex:attribute name="language" type="String" description="Lang" assignTo="{!lang}"/>
+    <apex:includeScript value="{!URLFOR($Resource.bs, '/jQuery_2_0_3.js')}"/>
+    <style>
+        .slds-scope .slds-table_cell-buffer tr>th:last-child, .slds-scope .slds-table_cell-buffer tr>td:last-child, .slds-scope .slds-table--cell-buffer tr>th:last-child, .slds-scope .slds-table--cell-buffer tr>td:last-child {
+        padding-right: 0.25rem;
+        padding-left: 0.25rem;
+        }
+        .slds-scope .slds-table_cell-buffer tr>th:first-child, .slds-scope .slds-table_cell-buffer tr>td:first-child, .slds-scope .slds-table--cell-buffer tr>th:first-child, .slds-scope .slds-table--cell-buffer tr>td:first-child {
+        padding-left: 0.2rem;
+        }
+        .tooltip {
+        position: relative;
+        display: inline-block;
+        border-bottom: 1px dotted black;
+        }
+        
+        .tooltip .tooltiptext {
+        visibility: hidden;
+        font-size: 0.6rem;
+        width: 250px;
+        background-color: #555;
+        color: #fff;
+        text-align: center;
+        border-radius: 6px;
+        padding: 5px 2px;
+        position: absolute;
+        z-index: 1;
+        bottom: 125%;
+        left: 50%;
+        margin-left: -230px;
+        opacity: 0;
+        transition: opacity 0.3s;
+        }
+        
+        .tooltip .tooltiptext::after {
+        content: "";
+        position: absolute;
+        top: 100%;
+        left: 92%;
+        margin-left: -5px;
+        border-width: 5px;
+        border-style: solid;
+        border-color: #555 transparent transparent transparent;
+        }
+        
+        .tooltip:hover .tooltiptext {
+        visibility: visible;
+        opacity: 1;
+        }
+        .dateFormat{
+        display:none;
+        }
+        .reduceFont{
+        font-size: .65rem !important;
+        }
+        .slds-scope .slds-dropdown-trigger_click .slds-dropdown, .slds-scope .slds-dropdown-trigger_click:hover .slds-dropdown, .slds-scope .slds-dropdown-trigger--click .slds-dropdown, .slds-scope .slds-dropdown-trigger--click:hover .slds-dropdown {
+        display: block;
+        }
+    </style>
+    <apex:outputPanel id="linesPanel">
+        
+        <apex:actionFunction name="filterLines" action="{!dummy}" rerender="docLines" oncomplete="spinnerOn(false);"/>
+        <div class="slds-tabs_card slds-m-around--small">
+            <span class="tabs__nav">
+                <apex:inputText id="linesFilter" label="" styleClass="slds-input" value="{!filter}" html-placeholder="{!$Label.Procurar}..." onkeyup="spinnerOn(true);filterLines();"/>
+            </span>
+        </div>
+        <fieldset class="slds-form--compound">
+            <div class="slds-form-element__group ">
+                <div class="slds-form-element__row">
+                    <div class="slds-form-element slds-size_1-of-1">
+                        <apex:outputPanel id="docLines">
+                            <apex:outputPanel rendered="{!lines.size > 0}">
+                                
+                                <table class="slds-table slds-table_bordered slds-table_cell-buffer">
+                                    <thead>
+                                        <tr>
+                                            <th>
+                                                &nbsp;
+                                            </th>
+                                            <th>
+                                                {!$Label.Referencia}
+                                            </th>
+                                            <th width="40%">
+                                                {!$Label.Descricao}
+                                            </th>
+                                            <th>
+                                                {!$Label.Quantidade}
+                                            </th>
+                                            <th>
+                                                {!$Label.Preco}
+                                            </th>
+                                            <th>
+                                                {!$Label.IVA}
+                                            </th>
+                                            <th>
+                                                {!$Label.Total}
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <apex:repeat value="{!lines}" var="linha">
+                                            <tr class="{!if(linha.selected, 'slds-color__background_gray-7', '')}">
+                                                <td width="1%">
+                                                    <div class="slds-form-element__control">
+                                                        <span class="slds-checkbox">
+                                                            <apex:inputCheckbox value="{!linha.selected}" id="checkbox" disabled="{!linha.selected}"/>
+                                                            <apex:outputLabel styleClass="slds-checkbox__label" for="checkbox">
+                                                                <span class="slds-checkbox--faux"></span>
+                                                            </apex:outputLabel>
+                                                        </span>
+                                                    </div>
+                                                </td>
+                                                <td class="{!linha.details.Referencia_SKU__c}">
+                                                    {!linha.details.Referencia_SKU__c}
+                                                </td>
+                                                <td class="{!linha.details.Description}">
+                                                    {!linha.details.Description}
+                                                </td>
+                                                <td class="{!linha.details.Quantidade_original__c}">
+                                                    {!linha.details.Quantidade_original__c}
+                                                </td>
+                                                <td class="{!linha.details.UnitPrice}">
+                                                    <apex:outputText value="{0,number,#,###########0.00}">
+                                                        <apex:param value="{!linha.details.UnitPrice}"/>
+                                                    </apex:outputText>&nbsp;{!linha.moedaSymbol}
+                                                </td>
+                                                <td class="{!linha.details.Taxa_de_IVA__c}">
+                                                    {!linha.details.Taxa_de_IVA__c}%
+                                                </td>
+                                                <td class="total">
+                                                    <apex:outputText value="{0,number,#,###########0.00}">
+                                                        <apex:param value="{!linha.total}"/>
+                                                    </apex:outputText>&nbsp;{!linha.moedaSymbol}
+                                                </td>
+                                            </tr>
+                                        </apex:repeat>
+                                    </tbody>
+                                </table>     
+                                
+                            </apex:outputPanel>
+                            <apex:outputPanel rendered="{!lines.size == 0}">
+                                <div class="slds-text-heading_small slds-text-align_center">{!$Label.Nao_existem_linhas_validas}</div>
+                            </apex:outputPanel>
+                        </apex:outputPanel>
+                    </div>
+                </div>
+                <div class="slds-form-element__row slds-float--right">
+                    <div class="slds-form-element slds-p-around--medium">
+                        
+                        <button class="slds-button slds-button--destructive" onclick="spinnerOn(true);clearLst();" type="button">{!$Label.Botao_Voltar}</button>
+                        <apex:outputPanel rendered="{!lines.size > 0}">
+                            <button class="slds-button slds-button--brand" onclick="spinnerOn(true);selectLines();" type="button">{!$Label.Selecionar}</button>
+                        </apex:outputPanel>
+                    </div>
+                </div>
+                <div class="slds-form-element__row">
+                    <apex:outputPanel rendered="{!selectedLines.size > 0}" id="tabelaLinhas">
+                        <div class="slds-form-element slds-size_1-of-1">
+                            <div class="slds-card slds-m-around--medium">
+                                <div class="slds-card__header slds-grid">
+                                    <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                                        <div class="slds-media__body">
+                                            <h2 class="slds-card__header-link slds-truncate" >
+                                                <span class="slds-text-heading_small">{!$Label.Linhas_Selecionadas}</span>
+                                            </h2>
+                                        </div>
+                                    </header>
+                                </div>
+                                <div class="slds-card__body reduceFont">
+                                    <table class="slds-table slds-table_bordered slds-table_cell-buffer">
+                                        <thead>
+                                            <tr>
+                                                <th width="1%">
+                                                    {!$Label.Referencia}
+                                                </th>
+                                                <th width="1%">
+                                                    {!$Label.Quantidade}
+                                                </th>
+                                                <th width="5%">
+                                                    {!$ObjectType.OrderItem.fields.Quantidade_reclamada__c.Label}
+                                                </th>
+                                                <th width="28%">
+                                                    {!$ObjectType.OrderItem.fields.Tipologia__c.Label}
+                                                </th><!-- header => JS:show/hidePicklists() -->
+                                                <th class="header slds-hide">
+                                                    {!$ObjectType.OrderItem.fields.Sub_tipologia__c.Label}
+                                                </th><!-- extraInfo => JS:show/hideExtraInfo() -->
+                                                <th class="extraInfo slds-hide">
+                                                    {!$Label.Outras_informacoes}
+                                                </th>
+                                                <th width="15%">
+                                                    <apex:outputPanel rendered="{!currentUser == 'Site'}">
+                                                        {!$Label.Observacoes}
+                                                    </apex:outputPanel>
+                                                    <apex:outputPanel rendered="{!currentUser == 'User SF'}">
+                                                        _Sugestões comerciais
+                                                    </apex:outputPanel>
+                                                </th>
+                                                <th width="1%">
+                                                    {!$Label.Anexos} <div class="tooltip">?
+                                                    <span class="tooltiptext">
+                                                        <p>{!$Label.Imagens_e_videos}, {!$Label.fotografias_do_produto},</p>
+                                                        <p>{!$Label.manifesto_da_transportadora},</p>
+                                                        <p>{!$Label.caixa_de_embalamento}</p>
+                                                    </span>
+                                                    </div>
+                                                </th>
+                                                <th width="1%">
+                                                    &nbsp;
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <apex:variable value="{!0}" var="index"/>
+                                            <apex:repeat value="{!selectedLines}" var="linha">
+                                                <apex:variable value="{!index + 1}" var="index"/>
+                                                <!-- claimLine => JS:validateInputs()-->
+                                                <tr class="claimLine" line="{!linha.uniqueId}" index="{!index}">
+                                                    <td>
+                                                        <apex:outputText value="{!linha.details.Referencia_SKU__c}"/>
+                                                    </td>
+                                                    <td>
+                                                        <apex:outputText value="{0,number,#,###########0}">
+                                                            <apex:param value="{!linha.details.Quantidade_original__c}"/>
+                                                        </apex:outputText>
+                                                    </td>
+                                                    <!-- qttCell{linha.details.Fistamp__c} => JS:validateQtt()-->
+                                                    <td class="qttCell{!linha.details.Fistamp__c}">
+                                                        <!-- qttInput => JS:validateQttAllLines()-->
+                                                        <!-- qttInput{linha.uniqueId} => JS:validateInputs()-->
+                                                        <!-- {linha.details.Fistamp__c} => JS:validateQtt()-->
+                                                        <apex:inputField styleClass="slds-input {!linha.details.Fistamp__c} qttInput qttInput{!linha.uniqueId}" value="{!linha.details.Quantidade_reclamada__c}"
+                                                                         onkeyup="validateQtt(this, '{!linha.details.Fistamp__c}', '{!linha.details.Quantidade_original__c}');"/>
+                                                        
+                                                        <!-- qttError{linha.details.Fistamp__c} => JS:validateQtt()--><!-- qttError{linha.uniqueId} => JS:validateInputs()-->
+                                                        <div class="slds-form-element__help slds-hide qttError{!linha.details.Fistamp__c} qttError{!linha.uniqueId} reduceFont">
+                                                            <div style="position: absolute;bottom: 0;z-index: 8999;">
+                                                                {!$Label.Quantidade_ultrapassada}
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <!-- {index}tipoCell => JS:validateInputs()-->
+                                                    <td class="{!index}tipoCell">
+                                                        <!-- {index}tipo => JS:show/hideExtraInfo();validateInputs(); -->
+                                                        <!-- picklists => JS:fillAllOptions(); -->
+                                                        <apex:inputField value="{!linha.details.Tipologia__c}" styleClass="slds-input {!index}tipo picklists" style="width: 90%;"
+                                                                         onchange="hidePicklists();hideExtraInfos();fillAllOptions(this);spinnerOn(true);dummyPicklist()"/>
+                                                        
+                                                        <!-- customIcon => JS:renderAdd(); -->
+                                                        <span id="Icon{!index}" class="customIcon" onclick="spinnerOn(true);cloneFi('{!linha.uniqueId}');">
+                                                            <!-- AQUI É CRIADO O BOTÃO COM O ICON -->
+                                                        </span>
+                                                    </td><!-- line => JS:show/hidePicklists() -->
+                                                    <td class="line slds-hide">
+                                                        <!--subPicklists => JS:checkPicklists();--><!--subPicklists{index} => JS:validateInputs();-->
+                                                        <div class="subPicklists subPicklists{!index}">
+                                                            <apex:inputField value="{!linha.details.Sub_tipologia__c}" styleClass="slds-input" style="font-size: 0.65rem;"/>
+                                                        </div>
+                                                    </td><!-- extraInfoLine => JS:show/hideExtraInfo() -->
+                                                    <td class="extraInfoLine slds-hide">
+                                                        <div class="slds-m-left--medium">
+                                                            <!-- {index}ImpTer => JS:show/hideExtraInfo(); = sabe que painel mostrar para a linha (index) correspondente com a ajuda do mapeamento feito na variavel map(tipologia, valores a mostrar) -->
+                                                            <!-- extraPanels => JS:hideExtraInfo() -->
+                                                            <div class="{!index}ImpTer slds-hide extraPanels">
+                                                                <div class="slds-form-element__row">
+                                                                    
+                                                                    <div class="slds-form-element__control">
+                                                                        <span class="slds-checkbox">
+                                                                            <apex:inputCheckbox value="{!linha.details.Impressao_por_terceiros__c}" id="checkboxRefRecErrada"/>
+                                                                            <apex:outputLabel styleClass="slds-checkbox__label" for="checkboxRefRecErrada">{!$ObjectType.OrderItem.fields.Impressao_por_terceiros__c.Label}?
+                                                                                <span class="slds-checkbox--faux"></span>
+                                                                            </apex:outputLabel>
+                                                                        </span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <!-- {index}ImpTer => JS:show/hideExtraInfo(); -->
+                                                            <div class="{!index}PrecInc slds-hide extraPanels">
+                                                                <div class="slds-form-element__row">
+                                                                    <apex:outputLabel styleClass="" for="precoErroPreco">{!$ObjectType.OrderItem.fields.Preco_correto__c.Label}:&nbsp;
+                                                                    </apex:outputLabel>
+                                                                </div>
+                                                                <div class="slds-form-element__row">
+                                                                    <!-- {index}PrecIncInput => JS:validateInputs() -->
+                                                                    <apex:inputField id="precoErroPreco" value="{!linha.details.Preco_correto__c}" styleClass="slds-input slds-size_1-of-1 {!index}PrecIncInput"/>
+                                                                </div>
+                                                            </div>
+                                                            <!-- {index}IvaInc => JS:show/hideExtraInfo(); -->
+                                                            <div class="{!index}IvaInc slds-hide extraPanels">
+                                                                <div class="slds-form-element__row">
+                                                                    <apex:outputLabel styleClass="" for="precoErroIVA">{!$Objecttype.OrderItem.fields.IVA_correto__c.Label}:&nbsp;
+                                                                    </apex:outputLabel>
+                                                                </div>
+                                                                <div class="slds-form-element__row">
+                                                                    <!-- {index}IvaIncInput => JS:validateInputs() -->
+                                                                    <apex:inputField id="precoErroIVA" value="{!linha.details.IVA_correto__c}" styleClass="slds-input slds-size_1-of-1 {!index}IvaIncInput"/>
+                                                                </div>
+                                                            </div>
+                                                            <!-- {index}Mor => JS:show/hideExtraInfo(); -->
+                                                            <div class="{!index}Mor slds-hide extraPanels">
+                                                                <div class="slds-form-element__row">
+                                                                    
+                                                                    <apex:outputLabel styleClass="" for="dataRefRecErrada">
+                                                                        {!$ObjectType.OrderItem.fields.Morada_correta__c.Label}:&nbsp;
+                                                                    </apex:outputLabel>
+                                                                </div>
+                                                                <div class="slds-form-element__row">
+                                                                    
+                                                                    <div class="slds-form-element slds-size--4-of-5">
+                                                                        <!--morada{linha.uniqueId} => moradasModal--><!--{index}MorInput => JS:validateInputs()-->
+                                                                        <input style="background-color: rgb(236, 235, 234) !important;" class="slds-input morada{!linha.uniqueId} {!index}MorInput" disabled="true" value="{!linha.details.Rua_Correta__c}"/>
+                                                                        <!--moradaHidden{linha.uniqueId} => moradasModal-->
+                                                                        <apex:inputText styleClass="moradaHidden{!linha.uniqueId} slds-hide" value="{!linha.details.Morada_correta__c}"/>
+                                                                        <!--moradaRuaHidden{linha.uniqueId} => moradasModal-->
+                                                                        <apex:inputText styleClass="moradaRuaHidden{!linha.uniqueId} slds-hide" value="{!linha.details.Rua_Correta__c}"/>
+                                                                        <!--moradaMseqHidden{linha.uniqueId} => moradasModal-->
+                                                                        <apex:inputText styleClass="moradaMseqHidden{!linha.uniqueId} slds-hide" value="{!linha.details.MSEQ_Morada_correta__c}"/>
+                                                                    </div>
+                                                                    
+                                                                    <div class="slds-form-element slds-size--1-of-12" style="padding-left:0;">
+                                                                        <!--search{index} => JS:renderSearch()-->
+                                                                        <span id="search{!index}" class="lookIcon slds-align--absolute-center" onclick="spinnerOn(true);callMoradas('{!linha.uniqueId}');">
+                                                                            <!-- AQUI É CRIADO O BOTÃO COM O ICON -->
+                                                                        </span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <!-- {index}DataRec => JS:show/hideExtraInfo(); -->
+                                                            <div class="{!index}DataRec slds-hide extraPanels">
+                                                                <div class="slds-m-top--small">
+                                                                    <div class="slds-form-element__row">
+                                                                        
+                                                                        <apex:outputLabel styleClass="" for="dataRefRecErrada">{!$ObjectType.OrderItem.fields.data_de_rececao_dos_artigos_reclamados__c.Label}:&nbsp;
+                                                                        </apex:outputLabel>
+                                                                    </div>
+                                                                    <div class="slds-form-element__row">
+                                                                        <!-- {index}DataRecInput => JS:validateInputs() -->
+                                                                        <apex:inputText id="dataRefRecErrada" value="{!linha.auxData}" html-placeholder="dd-mm-yyyy"
+                                                                                        styleClass="slds-input slds-size_1-of-1 {!index}DataRecInput"/>
+                                                                        <div id="auxDate{!index}" recData="{!linha.auxData}" style="display:none;"/>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="slds-form-element">
+                                                            <div class="slds-form-element__control">
+                                                                <apex:outputPanel rendered="{!currentUser == 'Site'}">
+                                                                    <apex:inputTextarea value="{!linha.details.Comentario_do_cliente__c}" styleClass="slds-textarea"/>
+                                                                </apex:outputPanel>
+                                                                <apex:outputPanel rendered="{!currentUser == 'User SF' && linha.details.Tipologia__c != null}">
+                                                                    <div class="slds-form" role="list">
+                                                                        <div class="slds-grid slds-gutters_small">
+                                                                            <div class="slds-col slds-has-flexi-truncate" role="listitem">
+                                                                                <div class="slds-form-element slds-form-element_edit slds-hint-parent">
+                                                                                    <div class="slds-form-element__control">
+                                                                                        <span>{!$ObjectType.OrderItem.fields.Acao_corretiva_sugerida__c.Label}</span>
+                                                                                        
+                                                                                        <div class="actionPick">
+                                                                                            <apex:inputField value="{!linha.details.Acao_corretiva_sugerida__c}" styleClass="slds-input"/>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="slds-grid slds-gutters_small">
+                                                                            <div class="slds-col slds-has-flexi-truncate" role="listitem">
+                                                                                <div class="slds-form-element slds-form-element_edit slds-hint-parent">
+                                                                                    <div class="slds-form-element__control">
+                                                                                        <span>{!$ObjectType.OrderItem.fields.Departamento_de_origem__c.Label}</span>
+                                                                                        
+                                                                                        <div class="actionPick">
+                                                                                            <apex:inputField value="{!linha.details.Departamento_de_origem__c}" styleClass="slds-input"/>
+                                                                                        </div>
+                                                                                        
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </apex:outputPanel>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="slds-form-element__control">
+                                                            <!-- fileBtt{linha.uniqueId} => JS:validateInputs() -->
+                                                            <div class="slds-form-element__row" style="margin-bottom:0;">
+                                                                <button class="slds-button slds-button--neutral fileBtt{!linha.uniqueId} slds-input" onclick="spinnerOn(true);console.log('{!linha.uniqueId}');chooseLine('{!linha.uniqueId}');" type="button">{!$Label.Carregar}</button>
+                                                            </div>
+                                                            <div class="slds-form-element__row" style="margin-bottom:0;">
+                                                                <span id="auxDiv{!linha.uniqueId}" class="slds-badge"></span>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <!-- delete{index} => JS:renderDel() -->
+                                                        <span id="delete{!index}" class="deleteIcon slds-align--absolute-center" onclick="spinnerOn(true);deleteFi('{!index}', '{!linha.uniqueId}');">
+                                                            <!-- AQUI É CRIADO O BOTÃO COM O ICON -->
+                                                        </span>
+                                                    </td>
+                                                </tr>
+                                            </apex:repeat>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="slds-card__footer">
+                                    <div class="slds-form-element__row">
+                                        <div class="slds-form-element slds-size--1-of-1">
+                                            <div class="slds-notify slds-notify_alert slds-theme_alert-texture slds-theme_error slds-hide" id="alertasErros" role="alert">
+                                                <h2 id="alertasErrosMensagem">
+                                                </h2>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <apex:outputPanel rendered="{!currentUser == 'User SF'}">
+                                        <div class="slds-form-element__row">
+                                            <div class="slds-form-element slds-align-middle">
+                                                <div class="slds-form-element__control">
+                                                    <span class="slds-checkbox" style="text-align: left;">
+                                                        <apex:inputCheckbox value="{!notifyClient}" id="checkbox" onchange="validateNotify(this);"/>
+                                                        <apex:outputLabel styleClass="slds-checkbox__label" for="checkbox">
+                                                            <span class="slds-checkbox--faux"></span>Notificar cliente
+                                                        </apex:outputLabel>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <div class="slds-form-element slds-size--1-of-6">
+                                                <div class="slds-form-element__control">
+                                                    <div class="slds-combobox_container">
+                                                        <apex:actionFunction name="callFilter" action="{!applyFilter}" reRender="contactFilterPanel, idFilterPanel" oncomplete="console.log('done');renderAccount();"/>
+                                                        <div class="slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click" aria-expanded="false" aria-haspopup="listbox" role="combobox" id="combobox">
+                                                            <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right" role="none">
+                                                                <apex:inputText html-autocomplete="off" value="{!filterContacts}" onfocus="showList();" onkeyup="callFilter();" styleClass="slds-input slds-combobox__input" 
+                                                                                id="contactFilter" html-placeholder="Search..." />
+                                                                
+                                                                <apex:outputPanel id="idFilterPanel">
+                                                                    <apex:inputHidden value="{!caso.ContactId}" id="hiddenContId"/>
+                                                                </apex:outputPanel>
+                                                                <span class="slds-icon_container slds-icon-utility-search slds-input__icon slds-input__icon_right">
+                                                                    <svg class="slds-icon slds-icon slds-icon_x-small slds-icon-text-default" aria-hidden="true">
+                                                                        <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{!URLFOR($Asset.SLDS , '/assets/icons/utility-sprite/svg/symbols.svg#search')}" />
+                                                                    </svg>
+                                                                </span>
+                                                            </div>
+                                                            <apex:outputPanel id="contactFilterPanel">
+                                                                <apex:outputPanel rendered="{!filteredListContacts.size > 0}">
+                                                                    <div id="listbox-id-1" class="slds-dropdown slds-dropdown_length-with-icon-7 slds-dropdown_fluid" role="listbox">
+                                                                        <ul class="slds-listbox slds-listbox_vertical" role="presentation">
+                                                                            <!-- REPEAT -->
+                                                                            <apex:repeat value="{!filteredListContacts}" var="contact">
+                                                                                <li role="presentation" class="slds-listbox__item" 
+                                                                                    onclick="document.getElementById('{!$Component.contactFilter}').value = '{!contact.Name}'; 
+                                                                                             document.getElementById('{!$Component.hiddenContId}').value = '{!contact.Id}'; 
+                                                                                             hideList();
+                                                                                             callFilter();">
+                                                                                    <div id="option1" class="slds-media slds-listbox__option slds-listbox__option_entity slds-listbox__option_has-meta" role="option">
+                                                                                        <span class="slds-media__figure">
+                                                                                            <span class="slds-icon_container slds-icon-standard-contact contactIcon" id="contact{!contact.Id}">
+                                                                                                <!-- AQUI É CRIADO O BOTÃO COM O ICON -->
+                                                                                            </span>
+                                                                                        </span>
+                                                                                        <span class="slds-media__body">
+                                                                                            <span class="slds-listbox__option-text slds-listbox__option-text_entity">{!contact.Name}</span>
+                                                                                            <span class="slds-listbox__option-meta slds-listbox__option-meta_entity">
+                                                                                                {!if(contact.Email != null, contact.Email + ';', '')}
+                                                                                                {!if(contact.Phone != null, contact.Phone + ';', '')}
+                                                                                                {!if(contact.MobilePhone != null, contact.MobilePhone + ';', '')}</span>
+                                                                                        </span>
+                                                                                    </div>
+                                                                                </li>
+                                                                            </apex:repeat>      
+                                                                        </ul>
+                                                                    </div>   
+                                                                </apex:outputPanel>                                       
+                                                            </apex:outputPanel>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </apex:outputPanel>
+                                    <div class="slds-form-element__row">
+                                        <div class="slds-form-element slds-size--1-of-1">
+                                            <button class="slds-button slds-button--success" onclick="spinnerOn(true);validateInputs();" type="button">{!$Label.Submeter}</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </apex:outputPanel>
+                </div>
+            </div>
+        </fieldset>
+        
+    </apex:outputPanel>
+    <div class="slds-modal" aria-hidden="false" role="dialog" id="filesModal">
+        <div class="slds-modal__container" style="width: auto;max-width: max-content;">
+            <div class="slds-modal__header">
+                <h2 class="slds-text-heading--medium">{!$Label.Ficheiros_carregados}</h2>
+            </div>
+            <div class="slds-modal__content slds-p-around--medium">
+                <div class="slds-form-element__row">
+                    <div class="slds-form-element">
+                        <div class="slds-notify slds-notify_alert slds-theme_alert-texture slds-theme_warning" style="border-radius: 0.2rem; color:black;" role="alert">
+                            <h2 class="reduceFont">
+                                {!$Label.Nao_poder_carregar_ficheiros}
+                            </h2>
+                        </div>
+                    </div>
+                </div>
+                <apex:outputPanel id="filesModalContent">
+                    <div class="slds-form-element__row slds-m-vertical--small slds-m-left--small">
+                        <div class="slds-form-element">
+                            <div class="slds-file-selector slds-file-selector_files">
+                                <input type="file" class="slds-file-selector__input slds-assistive-text" id="file-upload-input-01" accept=".jpg,.png,.gif,.pdf,.mp4,.mov,.flv,.avi"
+                                       aria-labelledby="file-selector-primary-label file-selector-secondary-label" onchange="readFile('{!lineUniqueId}');"/>
+                                <label class="slds-file-selector__body" for="file-upload-input-01" id="file-selector-secondary-label">
+                                    <span class="slds-file-selector__button slds-button slds-button_neutral">{!$Label.Carregar}</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="slds-form-element__row slds-scrollable">
+                        <div class="slds-form-element" id="filesTable">
+                            <!-- AQUI É CRIADA A TABELA COM A LISTA DOS FICHEIROS JÁ ADICIONADOS PARA ESTA LINHA -->
+                        </div>
+                    </div>
+                    
+                    <script>
+                    function buildFilesTable(){
+                        j$("#filesTable").empty();
+                        
+                        if("{!lineUniqueId}" in filesMap){
+                            if(filesMap["{!lineUniqueId}"].length > 0){
+                                var table = j$('<table/>', {
+                                    class: 'slds-table slds-table_bordered slds-table_cell-buffer',
+                                });
+                                table.append(buildTableHeader());
+                                var aux = filesMap["{!lineUniqueId}"];
+                                for(var i = 0; i < aux.length; i++){
+                                    var tr = j$("<tr/>", {});
+                                    var td1 = j$("<td>" + aux[i].name + "</td>", {});
+                                    var td2 = j$("<td>" + aux[i].extension + "</td>", {});
+                                    var td3 = j$("<td/>", {});
+                                    var bttString = j$("<a/>", {
+                                        class: "slds-button slds-button--neutral",
+                                        html: "{!$Label.Apagar}",
+                                        index: i,
+                                    });
+                                    j$(bttString).attr("onclick", "removeFileFromMap(" + i + ", '{!lineUniqueId}');");//console.log('{!lineUniqueId}'+"+ i +");
+                                    
+                                    //arranjar um separador para poder apagar no mapa, o indice correcto.
+                                    td3.append(bttString);
+                                    tr.append(td1);
+                                    tr.append(td2);
+                                    tr.append(td3);
+                                    table.append(tr);
+                                }
+                            }
+                        }
+                        j$("#filesTable").prepend(table);
+                        j$("#filesTable").html(j$("#filesTable").html());
+                    }
+                    </script>
+                </apex:outputPanel>
+            </div>
+            <div class="slds-modal__footer">
+                <button class="slds-button slds-button--destructive" onclick="closeModal('filesModal')" type="button">{!$Label.Fechar}</button>
+                
+            </div>
+        </div>
+    </div>
+    <div class="slds-modal" aria-hidden="false" role="dialog" id="moradasModal">
+        <div class="slds-modal__container" style="width: auto;max-width: max-content;min-width: 40rem;">
+            <div class="slds-modal__header">
+                <h2 class="slds-text-heading--medium">
+                    <p>
+                        {!$Label.Moradas}
+                    </p>
+                </h2>
+                <p>
+                    <apex:actionFunction name="subindex" action="{!subIndexmor}" rerender="moradasModalContent, headerMor" oncomplete="spinnerOn(false);"/>
+                    <apex:actionFunction name="addIndex" action="{!addIndexmor}" rerender="moradasModalContent, headerMor" oncomplete="spinnerOn(false);"/>
+                    <apex:outputPanel id="headerMor">
+                        <apex:outputPanel rendered="{!indexMor > 0}"> 
+                            <a onclick="spinnerOn(true);subindex()">&lt;</a>
+                        </apex:outputPanel>
+                        &nbsp;{!indexMor * MAX_PAG} - {!MIN((indexMor + 1) * MAX_PAG, maxMor)} {!$Label.de} {!maxMor}&nbsp;
+                        <apex:outputPanel rendered="{!maxMor > (indexMor + 1) * MAX_PAG}"> 
+                            <a onclick="spinnerOn(true);addIndex()">&gt;</a>
+                        </apex:outputPanel>
+                    </apex:outputPanel>
+                </p>
+            </div>
+            <div class="slds-modal__content slds-p-around--medium">
+                <apex:outputPanel id="moradasModalContent">
+                    
+                    <div class="slds-tabs_card slds-m-bottom--small">
+                        <span class="tabs__nav">
+                            <apex:inputText id="moradasFilter" label="" styleClass="slds-input" value="{!filterMoradas}" html-placeholder="{!$Label.Procurar}..." onkeyup="spinnerOn(true);callMoradas('{!lineUniqueId}');"/>
+                        </span>
+                    </div>
+                    <table class="slds-table slds-table_bordered slds-table_cell-buffer reduceFont">
+                        <thead>
+                            <tr>
+                                <th>
+                                    {!$Label.Rua}
+                                </th>
+                                <th>
+                                    {!$ObjectType.Morada_de_entrega__c.fields.Codigo_postal__c.Label}
+                                </th>
+                                <th>
+                                    {!$ObjectType.Morada_de_entrega__c.fields.Localidade__c.Label}
+                                </th>
+                                <th>
+                                    {!$ObjectType.Morada_de_entrega__c.fields.Pais__c.Label}
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <apex:repeat value="{!moradas}" var="mor">
+                                    <tr onclick="document.getElementsByClassName('morada{!lineUniqueId}')[0].value = '{!mor.rua}';
+                                                 document.getElementsByClassName('moradaRuaHidden{!lineUniqueId}')[0].value = '{!mor.rua}';
+                                                 document.getElementsByClassName('moradaHidden{!lineUniqueId}')[0].value = '{!mor.rua} {!mor.codPost} {!mor.local} {!mor.pais}';
+                                                 document.getElementsByClassName('moradaMseqHidden{!lineUniqueId}')[0].value = '{!mor.mseq}';
+                                                 closeModal('moradasModal');" style="cursor:pointer;">
+                                        <td>
+                                            <apex:outputText value="{!mor.rua}"/>{!mor.mseq}
+                                        </td>
+                                        <td>
+                                            <apex:outputText value="{!mor.codPost}"/>
+                                        </td>
+                                        <td>
+                                            <apex:outputText value="{!mor.local}"/>
+                                        </td>
+                                        <td>
+                                            <apex:outputText value="{!mor.pais}"/>
+                                        </td>
+                                    </tr>
+                            </apex:repeat>
+                        </tbody>
+                    </table>
+                </apex:outputPanel>
+            </div>
+            <div class="slds-modal__footer">
+                <button class="slds-button slds-button--destructive" onclick="closeModal('moradasModal')" type="button">{!$Label.Fechar}</button>
+            </div>
+        </div>
+    </div>
+    <div class="slds-backdrop" id="backdropLines"></div>
+    <script>
+    function validateNotify(checkbox){
+        if(!checkbox.checked){
+            swal({
+                title: "{!$Label.Tem_a_certeza}",
+                text: "{!$Label.Ao_confirmar_o_cliente}",
+                icon: "warning",
+                buttons: true,
+                dangerMode: true,
+            })
+            .then((willDelete) => {
+                if (willDelete) {
+                console.log("willDelete");
+            } else {
+                  checkbox.checked = !checkbox.checked;
+                  }
+                  });
+        }
+    }
+    //show/hide/disabled/enable sub picklists
+    function checkPicklist(){
+        spinnerOn(false);
+        var fixActions = document.getElementsByClassName("actionPick");
+        console.log(fixActions);
+        for(var i = 0; i < fixActions.length; i++){
+            console.log(fixActions[i].children[0].children[0]);
+            fixActions[i].children[0].children[0].classList.add('slds-input');
+        }
+        
+        var eles = document.getElementsByClassName("subPicklists");
+        for(var i = 0; i < eles.length; i++){
+            eles[i].children[0].children[0].classList.add('slds-input');
+        }
+        var isToShow = false;
+        for(var i = 0; i< eles.length ; i++){
+            var l = eles[i].children[0].children[0].children.length;
+            
+            if(l > 1){
+                isToShow = true;
+                break;
+            }
+        }
+        
+        if(isToShow){
+            showPicklists();
+        }
+        //check if has to show extra infos panels
+        showExtraInfo();
+    }
+    function showPicklists(){
+        var header = document.getElementsByClassName("header")[0];
+        var celsTd = document.getElementsByClassName("line");
+        //mostra cabeçalho
+        
+        header.classList.remove('slds-hide');
+        
+        //mostra todas as celulas
+        for(var i = 0; i < celsTd.length; i++){
+            
+            celsTd[i].classList.remove('slds-hide');
+        }
+    }
+    function hidePicklists(){
+        var header = document.getElementsByClassName("header")[0];
+        var celsTd = document.getElementsByClassName("line");
+        //mostra cabeçalho
+        
+        header.classList.add('slds-hide');
+        
+        //mostra todas as celulas
+        for(var i = 0; i < celsTd.length; i++){
+            
+            celsTd[i].classList.add('slds-hide');
+        }
+    }
+    var map = {"Referência rececionada errada": ["ImpTer", "DataRec"],
+               "Quantidade rececionada errada": ["ImpTer", "DataRec"],
+               "Qualidade de impressão": ["ImpTer", "DataRec"],
+               "Handling errado ou incompleto": ["ImpTer", "DataRec"],
+               "Qualidade do produto": ["ImpTer", "DataRec"],
+               "Transporte – Atraso": ["DataRec"],
+               "Transporte – Mercadoria danificada": ["ImpTer", "DataRec"],
+               "Transporte – Mercadoria extraviada": ["ImpTer"],
+               "Erro de preço submetido": ["PrecInc"],
+               "Erro no IVA": ["IvaInc"],
+               "Erro na morada de entrega":  ["Mor", "DataRec"],
+               "Atraso no envio da mercadoria": ["ImpTer", "DataRec"],
+              };
+    //show/hide extra info collumn and respective panel
+    function showExtraInfo(){
+        
+        
+        var isToShow = false;
+        var celsTd = document.getElementsByClassName("extraInfoLine");
+        
+        for(var i = 0; i < celsTd.length; i++){
+            
+            var aux = i + 1;
+            var picklist = document.getElementsByClassName(aux+"tipo")[0];
+            
+            if(picklist.value in map){
+                for(var u = 0; u < map[picklist.value].length; u++){
+                    //aux+map[picklist.value][u] => mostra o painel correcto
+                    var divShow = document.getElementsByClassName(aux+map[picklist.value][u])[0];
+                    
+                    divShow.classList.remove('slds-hide');
+                    
+                }
+                isToShow = true;
+            }
+        }
+        
+        if(isToShow){
+            var header = document.getElementsByClassName("extraInfo")[0];
+            header.classList.remove('slds-hide');
+            
+            for(var i = 0; i < celsTd.length; i++){
+                celsTd[i].classList.remove('slds-hide');
+            }
+        }
+    }
+    function hideExtraInfos(){
+        var header = document.getElementsByClassName("extraInfo")[0];
+        var celsTd = document.getElementsByClassName("extraInfoLine");
+        //mostra cabeçalho
+        
+        header.classList.add('slds-hide');
+        
+        //mostra todas as celulas
+        for(var i = 0; i < celsTd.length; i++){
+            
+            celsTd[i].classList.add('slds-hide');
+        }
+        
+        var panels = document.getElementsByClassName("extraPanels");
+        
+        for(var i = 0; i < panels.length; i++){
+            panels[i].classList.add('slds-hide');
+        }
+    }
+    
+    //first time user selects a tipology aplies it to all the selected lines.
+    var selectAll = true;                                    
+    function fillAllOptions(ele){
+        if(selectAll){
+            selectAll = false;
+            var eles = document.getElementsByClassName("picklists");
+            for(var i = 0; i < eles.length ; i++){
+                eles[i].value = ele.value;
+            }
+        }
+    }
+    
+    //build svg icons after a rerender
+    var j$ = jQuery.noConflict();
+    function renderAdd(){
+        var imageURL = "{!URLFOR($Asset.SLDS , '/assets/icons/utility-sprite/svg/symbols.svg#add')}";
+        var SVG = j$('<svg/>', {
+            class: 'slds-icon slds-icon-text-default',
+            style: "width: 20px;",
+        });
+        var SVGUse = j$('<use/>');
+        SVGUse.attr('xlink:href',imageURL);
+        
+        var tooltip = j$('<span/>', {
+            class: 'tooltiptext',
+        });
+        var tooltipFinal = tooltip.append("{!$Label.Adicionar_tipologia_de_reclamacao}");
+        var eles = document.getElementsByClassName("customIcon");
+        for(var i = 0; i < eles.length; i++){
+            var aux ="#"+eles[i].id;
+            eles[i].classList.add("slds-button--neutral");
+            eles[i].classList.add("tooltip");
+            eles[i].style = "width: auto;padding-right:  0.5rem;;padding-left: 0.5rem;height: 32px;vertical-align: bottom;cursor:pointer;border: 1px solid rgb(221, 219, 218);border-radius: .25rem;";
+            j$(aux).prepend(SVG.append(SVGUse));
+            j$(aux).prepend(tooltipFinal);
+            j$(aux).html(j$(aux).html());
+            
+        }
+    }
+    function renderDel(){
+        var imageURL = "{!URLFOR($Asset.SLDS , '/assets/icons/utility-sprite/svg/symbols.svg#delete')}";
+        var SVG = j$('<svg/>', {
+            class: 'slds-icon slds-icon-text-default',
+            style: "width: 15px;height:15px;",
+        });
+        var SVGUse = j$('<use/>');
+        SVGUse.attr('xlink:href',imageURL);
+        
+        var eles = document.getElementsByClassName("deleteIcon");
+        for(var i = 0; i < eles.length; i++){
+            var aux ="#"+eles[i].id;
+            eles[i].classList.add("slds-input", "slds-button--neutral");
+            eles[i].style = "width: auto;padding-right:  0.5rem;;padding-left: 0.5rem;height: 32px;vertical-align: bottom;cursor:pointer;";
+            j$(aux).prepend(SVG.append(SVGUse));
+            j$(aux).html(j$(aux).html());
+        }
+    }
+    function renderSearch(){
+        var imageURL = "{!URLFOR($Asset.SLDS , '/assets/icons/utility-sprite/svg/symbols.svg#search')}";
+        var SVG = j$('<svg/>', {
+            class: 'slds-icon slds-icon-text-default',
+            style: "width: 15px;height:15px;",
+        });
+        var SVGUse = j$('<use/>');
+        SVGUse.attr('xlink:href',imageURL);
+        
+        var eles = document.getElementsByClassName("lookIcon");
+        for(var i = 0; i < eles.length; i++){
+            var aux ="#"+eles[i].id;
+            //eles[i].classList.add("slds-input");
+            eles[i].style = "width: auto;padding-right:  0.5rem;;padding-left: 0.5rem;height: 32px;vertical-align: bottom;cursor:pointer;background-color: transparent;border-color: transparent;position: absolute;border: 1px solid rgb(221, 219, 218);border-radius: 0.25rem;";
+            j$(aux).prepend(SVG.append(SVGUse));
+            j$(aux).html(j$(aux).html());
+        }
+    }
+    function renderSVGS(){
+        renderAdd();
+        renderDel();
+        renderSearch();
+    }
+    
+    //validations to the line's quantity
+    function validateQttAllLines(){
+        var inputs = document.getElementsByClassName("qttInput");
+        
+        for(var i = 0; i < inputs.length; i++){
+            inputs[i].dispatchEvent(new KeyboardEvent('keyup',{'key':'a'}));
+        }
+    }
+    
+    //elemento tem de trazer quantidade total e o fistamp
+    //para poder ir buscar todas as linhas(inputs das quantidades reclamadas) correspondentes à linha do documento
+    //somar as suas respectivas quantidades e comparar com a quantidade total.
+    function validateQtt(ele, fistamp, totalQtt){
+        
+        //faz o somatório de todas as linhas 
+        var allLines = document.getElementsByClassName(fistamp);
+        var total = 0;
+        for(var i = 0; i < allLines.length; i++){
+            if(allLines[i].value != "" && allLines[i].value != null){
+                try{
+                    allLines[i].value = allLines[i].value.replaceAll(".", "");
+                    total += parseFloat(allLines[i].value);
+                }catch(ex){console.log(ex);}
+            }
+        }
+        
+        if(total > totalQtt){
+            
+            var cells = document.getElementsByClassName("qttCell"+fistamp);
+            for(var i = 0; i < cells.length; i++){
+                cells[i].classList.add("slds-has-error");
+            }
+            
+            var messages = document.getElementsByClassName("qttError"+fistamp);
+            for(var i = 0; i < messages.length; i++){
+                messages[i].classList.remove("slds-hide");
+            }
+        }else{
+            
+            var cells = document.getElementsByClassName("qttCell"+fistamp);
+            for(var i = 0; i < cells.length; i++){
+                cells[i].classList.remove("slds-has-error");
+            }
+            
+            var messages = document.getElementsByClassName("qttError"+fistamp);
+            for(var i = 0; i < messages.length; i++){
+                messages[i].classList.add("slds-hide");
+            }
+        }
+    }
+    
+    String.prototype.replaceAll = function(searchStr, replaceStr) {
+        var str = this;
+        
+        // no match exists in string?
+        if(str.indexOf(searchStr) === -1) {
+            // return string
+            return str;
+        }
+        
+        // replace and remove first match, and do another recursirve search/replace
+        return (str.replace(searchStr, replaceStr)).replaceAll(searchStr, replaceStr);
+    }
+    
+    //Modal Functions
+    //Modal Open
+    function openModal(modalToOpen){
+        buildFilesTable();
+        document.getElementById("backdropLines").classList.add('slds-backdrop--open');
+        document.getElementById(modalToOpen).classList.add('slds-fade-in-open');
+    }
+    
+    function buildTableHeader(){
+        var table = j$("<thead/>", {});
+        var tr = j$("<tr/>", {});
+        var th1 = j$("<th>{!$Label.Nome}</th>");
+        var th2 = j$("<th>{!$Label.Extensao}</th>");
+        var th3 = j$("<th>{!$Label.Apagar}</th>");
+        tr.append(th1);
+        tr.append(th2);
+        tr.append(th3);
+        
+        return table.append(tr);
+    }
+    
+    //Modal Close
+    function closeModal(modalToOpen){
+        document.getElementById(modalToOpen).classList.remove('slds-fade-in-open');
+        document.getElementById("backdropLines").classList.remove('slds-backdrop--open');
+    }
+    
+    var filesMap= [];
+    //File handle functions
+    function readFile(uniqueId){
+        var file = document.querySelector('input[type=file]').files[0];
+        if(file != null){
+            if(check_extension(file.name)){
+                if(file.size < 6291456){
+                    var reader = new FileReader();
+                    reader.readAsDataURL(file);
+                    reader.addEventListener("load", function () {
+                        
+                        //insere ficheiro na estrutura
+                        if(!(uniqueId in filesMap)) filesMap[uniqueId] = [];
+                        var auxList = filesMap[uniqueId];
+                        
+                        var re = /\..+$/;
+                        var ext = file.name.match(re)[0];
+                        
+                        auxList.push({body: reader.result, name : file.name, extension : ext});
+                        filesMap[uniqueId] = auxList;
+                        console.log(uniqueId);
+                        buildFileDiv(auxList.length, uniqueId);
+                        buildFilesTable();
+                    }, false);
+                }else{
+                    swal('{!$Label.Erro}','{!$Label.Tamanho_de_ficheiro_excedido}','error');
+                }
+            }else{
+                swal('{!$Label.Erro}','{!$Label.Ficheiro_invalido}','error');
+            }
+        }
+    }
+    
+    function buildFileDiv(size, uniqueId){
+        
+        var auxString = size + "";
+        if(size == 1) auxString +=  " {!$Label.Ficheiro}";
+        else auxString +=  " {!$Label.Ficheiros}";
+        var auxDiv = document.getElementById("auxDiv" + uniqueId);
+        console.log(uniqueId);
+        if(size == 0) {
+            auxDiv.classList.add("slds-hide");
+        }else{
+            auxDiv.classList.remove("slds-hide");
+        }
+        auxDiv.innerHTML = "<span class=\"slds-badge\">" + auxString + "</span>";
+    }
+    
+    function buildAllFileDiv(){
+        for(var uniqueId in filesMap){
+            buildFileDiv(filesMap[uniqueId].length, uniqueId);
+        }
+    }
+    var hash = {
+        ".pdf" : 1,
+        ".jpg" : 1,
+        ".png" : 1,
+        ".gif" : 1,
+        ".mp4" : 1,
+        ".mov" : 1,
+        ".flv" : 1,
+        ".avi" : 1,
+        ".xls" : 1,
+        ".xlsx" : 1,
+        ".csv" : 1,
+        ".docx" : 1,
+        ".doc" : 1,
+    };
+    function check_extension(filename) {
+        var re = /\..+$/;
+        var ext = filename.match(re);
+        
+        if (hash[ext[0].toLowerCase()]) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+    
+    function saveFiles(){
+        for(var key in filesMap){
+            for(var i = 0; i < filesMap[key].length; i++){
+                newFile(filesMap[key][i].body,key,filesMap[key][i].name);
+            }
+        }
+    }
+    
+    function removeFileFromMap(index, uniqueId){
+        if(uniqueId in filesMap){
+            filesMap[uniqueId].splice(index, 1);
+        }
+        buildFileDiv(filesMap[uniqueId].length, uniqueId);
+        buildFilesTable();
+    }
+    
+    //intermediate method to allow deletion of the files from the map
+    function deleteFi(index, uniqueId){
+        if(uniqueId in filesMap){
+            delete filesMap[uniqueId];
+        }
+        deleteFiServer(index);
+    }
+    
+    //auxiliar function to run the rebuild functions that need to be runned after rerendering
+    function doOnCompleteForRerenders(){
+        console.log("asdasdasdsa");
+        spinnerOn(false);
+        checkPicklist();
+        renderSVGS();
+        buildAllFileDiv();
+        validateQttAllLines();
+    }
+    
+    var checkHasFiles  = ["Referência rececionada errada",
+                          "Qualidade de impressão",
+                          "Handling errado ou incompleto",
+                          "Qualidade do produto",
+                          "Transporte – Mercadoria danificada",
+                          "Transporte – Mercadoria extraviada",
+                          "Atraso no envio da mercadoria"];
+    //before server validations
+    function validateInputs(){
+        var linhas = document.getElementsByClassName("claimLine");
+        var mensagem = document.getElementById("alertasErrosMensagem");
+        while (mensagem.hasChildNodes()) {
+            mensagem.removeChild(mensagem.firstChild);
+        }
+        var isValid = true;
+        var errorQtt = false;
+        var errorTipo = false;
+        var errorSubTipo = false;
+        var errorInfos = false;
+        var errorAnexo = false;
+        //valida valores de todas as linhas
+        for(var i  =0 ; i < linhas.length ; i++){
+            var index = linhas[i].getAttribute("index");
+            var line = linhas[i].getAttribute("line");
+            
+            //quantidade
+            var qttsInputs = document.getElementsByClassName("qttInput"+line);
+            
+            if(qttsInputs[0].value == "" || qttsInputs[0].value <= 0){
+                qttsInputs[0].parentElement.classList.add("slds-has-error");
+                if(!errorQtt) showAlert("{!$Label.Existem_quantidades_nao_conformes};", true);
+                isValid = false;
+                errorQtt = true;
+            }else{
+                var qtts = document.getElementsByClassName("qttError"+line);
+                if(qtts.length > 0){
+                    if(!qtts[0].classList.contains("slds-hide")){
+                        if(!errorQtt) showAlert("{!$Label.Existem_quantidades_nao_conformes};", true);
+                        isValid = false;
+                        errorQtt = true;
+                    }
+                }
+            }//if quantidade
+            
+            //tipologia
+            var tipos = document.getElementsByClassName(index+"tipo");
+            var tiposCell = document.getElementsByClassName(index+"tipoCell");
+            if(tipos.length > 0){
+                if(tipos[0].value == ""){
+                    tiposCell[0].classList.add("slds-has-error");
+                    console.log(errorTipo);
+                    if(!errorTipo) showAlert("{!$Label.Existem_tipologias_nao_preenchidas};", true);
+                    isValid = false;
+                    errorTipo = true;
+                }else{
+                    tiposCell[0].classList.remove("slds-has-error");
+                    //subtipologia
+                    var eles = document.getElementsByClassName("subPicklists"+index);
+                    var l;
+                    if(eles[0].children[0].children[0].children != null){
+                        l = eles[0].children[0].children[0].children.length;
+                    }
+                    if(l > 1){
+                        if(eles[0].children[0].children[0].value == ""){
+                            eles[0].parentElement.classList.add("slds-has-error");
+                            if(!errorSubTipo) showAlert("{!$Label.Existem_sub_tipologias_nao_preenchidas};", true);
+                            isValid = false;
+                            errorSubTipo = true;
+                        }else{
+                            eles[0].parentElement.classList.remove("slds-has-error");   
+                        }
+                        
+                    }
+                }
+            }//if tipologia
+            //outras infos
+            if(tipos[0].value in map){
+                
+                for(var u = 0; u < map[tipos[0].value].length; u++){
+                    var check = map[tipos[0].value][u];
+                    if(check != "ImpTer"){
+                        var inputCheck = document.getElementsByClassName(index + check + "Input");
+                        var div =  document.getElementsByClassName(index + check);
+                        if(inputCheck[0].value == ""){
+                            div[0].classList.add("slds-has-error"); 
+                            if(!errorInfos) showAlert("{!$Label.Existem_informacoes_nao_preenchidas};", true);
+                            isValid = false;
+                            errorInfos = true;
+                        }else{
+                            //VALIDAR SE A DATA ESTÁ ENTRE O DIA DE HOJE E A DATA DE ENVIO DA MERCADORIA REGISTADA EM SISTEMA
+                            if(check == "DataRec"){
+                                var errorDatas = false;
+                                var inputDate = getDate(inputCheck[0].value);
+                                if(inputDate != null){
+                                    var today = new Date();
+                                    
+                                    var auxDate = new Date(document.getElementById("auxDate" + index).getAttribute("recdata"));
+                                    if(inputDate > today || inputDate < auxDate){
+                                        //console.log("{!$Label.Data_inserida_maior};");
+                                        errorDatas = true
+                                    }
+                                    
+                                    if(errorDatas){
+                                        div[0].classList.add("slds-has-error"); 
+                                        showAlert("{!$Label.Data_invalida} " + formatDate(auxDate) + " {!$Label.e} " + formatDate(today) + ";", true);
+                                        isValid = false;
+                                    }else{
+                                        div[0].classList.remove("slds-has-error");
+                                    }
+                                }else{
+                                    div[0].classList.add("slds-has-error"); 
+                                    showAlert("{!$Label.Formato_de_data_invalido};", true);
+                                    isValid = false;
+                                }
+                            }else{
+                                div[0].classList.remove("slds-has-error");
+                            }
+                        }
+                    }
+                }
+            }//if infos
+            //anexos
+            var hasFile = true;
+            if(checkHasFiles.includes(tipos[0].value)){
+                if(!(line in filesMap)){
+                    document.getElementsByClassName("fileBtt"+line)[0].parentElement.classList.add("slds-has-error");
+                    if(!errorAnexo) showAlert("{!$Label.Existem_anexos_nao_fornecidos};", true);
+                    isValid = false;
+                    errorAnexo = true;
+                }else if(filesMap[line].length == 0){
+                    document.getElementsByClassName("fileBtt"+line)[0].parentElement.classList.add("slds-has-error");
+                    if(!errorAnexo) showAlert("{!$Label.Existem_informacoes_nao_preenchidas};", true);
+                    isValid = false;
+                    errorAnexo = true;
+                }else{
+                    document.getElementsByClassName("fileBtt"+line)[0].parentElement.classList.remove("slds-has-error");
+                }
+            }//if anexos
+        }//for
+        
+        if(isValid){
+            hideAlert();
+            saveClaim();
+        }else{
+            spinnerOn(false);
+        }
+    }
+    
+    function formatDate(date){//dd-mm-yyyy
+        
+        var dd = date.getDate();
+        var mm = date.getMonth()+1; //January is 0!
+        
+        var yyyy = date.getFullYear();
+        if(dd<10){
+            dd='0'+dd;
+        } 
+        if(mm<10){
+            mm='0'+mm;
+        } 
+        var finalDate = dd+'-'+mm+'-'+yyyy;
+        return finalDate;
+    }
+    
+    function getDate(date){
+        if(date != null){
+            if(date.includes("-")){
+                return trataVector(date.split("-"));
+            }else if(date.includes("/")){
+                return trataVector(date.split("/"));
+            }else if(date.includes(".")){
+                return trataVector(date.split("."));
+            }else return;
+        }else return;
+    }
+    
+    function trataVector(vec){
+        var year, month, day;
+        console.log(vec);
+        if(vec.length == 3){
+            if(vec[0].length == 4){
+                year = vec[0];
+                day = vec[2];
+            }else if(vec[2].length == 4){
+                year = vec[2];
+                day = vec[0];
+            }
+            month = vec[1];
+            var retDate = new Date(parseInt(year), parseInt(month)-1, parseInt(day));
+            if(retDate == 'Invalid Date') return;
+            return retDate;
+        }else{
+            return;   
+        }
+    }
+    
+    function showAlert(message, concat){
+        var divAlert = document.getElementById("alertasErros");
+        var mensagem = document.getElementById("alertasErrosMensagem");
+        var startP = "<p>";
+        var endP = "</p>";
+        divAlert.classList.remove("slds-hide");
+        if(mensagem.innerHTML == null) mensagem.innerHTML = "";
+        if(concat){
+            mensagem.innerHTML += message;
+        }else{
+            mensagem.innerHTML = message;
+        }
+    }
+    
+    function hideAlert(){
+        var divAlert = document.getElementById("alertasErros");
+        divAlert.classList.add("slds-hide");
+    }
+    
+    //FUNCOES DE LOOKUP DE CONTACTO
+    function renderAccount(){
+        var imageURL = "{!URLFOR($Asset.SLDS , '/assets/icons/standard-sprite/svg/symbols.svg#contact')}";
+        var SVG = j$('<svg/>', {
+            class: 'slds-icon slds-icon_small',
+        });
+        var SVGUse = j$('<use/>');
+        SVGUse.attr('xlink:href',imageURL);
+        
+        var eles = document.getElementsByClassName("contactIcon");
+        for(var i = 0; i < eles.length; i++){
+            var aux ="#"+eles[i].id;
+            j$(aux).html("");
+            j$(aux).prepend(SVG.append(SVGUse));
+            j$(aux).html(j$(aux).html());
+        }
+    }
+    function showList(){
+        var ele = document.getElementById("combobox");
+        ele.classList.add("slds-is-open");
+    }
+    
+    function hideList(){
+        var ele = document.getElementById("combobox");
+        ele.classList.remove("slds-is-open");
+    }
+    </script>
+    <!-- Server call to push the selected lines to the bottom part -->
+    <apex:actionFunction name="selectLines" action="{!selectLines}" rerender="linesPanel" oncomplete="doOnCompleteForRerenders();"/>
+    <!-- Server call dummy to force the spinner to show -->
+    <apex:actionFunction name="dummyPicklist" action="{!dummy}" rerender="tabelaLinhas" oncomplete="doOnCompleteForRerenders();"/>
+    <!-- Server call clear all the records on a back step -->
+    <apex:actionFunction name="clearLst" action="{!clearLst}" rerender="dummy" oncomplete="backStep();"/>
+    <!-- Server call clone one line -->
+    <apex:actionFunction name="cloneFi" action="{!cloneLine}" rerender="tabelaLinhas" oncomplete="doOnCompleteForRerenders();">
+        <apex:param assignTo="{!cloneFi}" name="p1" value=""/>
+    </apex:actionFunction>
+    <!-- Server call delete one line -->
+    <apex:actionFunction name="deleteFiServer" action="{!deleteLine}" rerender="linesPanel" oncomplete="doOnCompleteForRerenders();">
+        <apex:param assignTo="{!delIndex}" name="p1" value=""/>
+    </apex:actionFunction>
+    <!-- Server call to pass the chosen line to be able to rerender the files modal content -->
+    <apex:actionFunction name="chooseLine" action="{!dummy}" reRender="filesModalContent" oncomplete="spinnerOn(false);openModal('filesModal');">
+        <apex:param assignTo="{!lineUniqueId}" name="p1" value=""/>
+    </apex:actionFunction>
+    <!-- Server call to pass the chosen line to be able to rerender the files modal content -->
+    <apex:actionFunction name="callMoradas" action="{!callMoradas}" reRender="moradasModalContent, headerMor" oncomplete="spinnerOn(false);openModal('moradasModal');">
+        <apex:param assignTo="{!lineUniqueId}" name="p2" value=""/>
+    </apex:actionFunction>
+    <!-- Server call to create one file -->
+    <apex:actionFunction name="newFile" action="{!newFile}" reRender="dummy" oncomplete="spinnerOn(false);">
+        <apex:param assignTo="{!blobFile}" name="p1" value=""/>
+        <apex:param assignTo="{!lineUniqueId}" name="p2" value=""/>
+        <apex:param assignTo="{!fileName}" name="p3" value=""/>
+    </apex:actionFunction>
+    
+    <apex:actionFunction name="saveClaim" action="{!saveClaim}" rerender="finalScript" oncomplete="afterServerValidations();"/>
+    <apex:outputPanel id="finalScript">
+        <script>
+        function afterServerValidations(){
+            spinnerOn(false);
+            if({!isSucess}){
+                //se sucesso criar os ficheiros.
+                if("{!caseId}" != ""){
+                    saveFiles();
+                    swal('{!$Label.Sucesso}','{!$Label.A_sua_reclamacao_foi_criada}','success')
+                    .then((value) => {
+                        var final = function(){
+                            console.log("redirecting");
+                            redirectFinal("{!caseId}");
+                            spinnerOn(false);
+                        };
+                        //metodo da página principal
+                        setTimeout(final, 2000);
+                    	spinnerOn(true);
+                    });
+                }else{
+                    spinnerOn(false);
+                }
+            }else{
+                spinnerOn(false);
+                if({!errorType == 'Qtt'}){
+                    validateQtt(document.getElementsByClassName("qttInput{!errorUniqueId}")[0], "{!errorFistamp}", -1);
+                    showAlert("{!$Label.Quantidade_excedida_devido}.", false);
+                    console.log("Quantidade excedida");
+                }
+            }
+        }
+        </script>
+    </apex:outputPanel>
+</apex:component>

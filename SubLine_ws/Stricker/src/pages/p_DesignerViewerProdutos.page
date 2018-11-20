@@ -1,0 +1,274 @@
+<apex:page standardController="Opportunity" extensions="c_DesignerViewerProdutos">
+    <apex:includeScript value="/support/console/39.0/integration.js"/>
+    <apex:includeScript value="{!URLFOR($Resource.bs, '/jQuery_2_0_3.js')}"/>
+    <apex:slds />
+    <script>
+    window.onload =  function() {
+        var currentCookie = getCookie(cookieName);
+        if(currentCookie == null){
+            setTabs("1");
+        }else{
+            setTabs(currentCookie);
+        }
+    }
+    function showTab(ele){
+        var actives = document.getElementsByClassName("slds-is-active");
+        for(var i = 0; i < actives.length; i++){
+            if(!actives[i].id.includes("scoped")){
+                actives[i].classList.remove("slds-is-active");
+            }
+        }
+        
+        var activeHeader = document.getElementById(ele.parentElement.id).classList.add("slds-is-active");
+        
+        var actives2 = document.getElementsByClassName("slds-show");
+        for(var i = 0; i < actives2.length; i++){
+            var a = actives2[i];
+            a.classList.remove("slds-show");
+            a.classList.add('slds-hide');
+        }
+        
+        var toActivate = document.getElementById(ele.getAttribute("aria-controls"));
+        
+        toActivate.classList.add('slds-show');
+        toActivate.classList.remove('slds-hide');
+        setCookie();
+        var slice = toActivate.id.slice(-1);
+        var secTab = document.getElementById("tab-scoped-1__item" + slice);
+        if(secTab != null) showSecTab(secTab);
+        
+        //para esconder sempre as outras tabs principais
+        var mainTabsHide = document.getElementsByClassName("slds-tabs_default__content");
+        
+        for(var i = 0; i < mainTabsHide.length ; i++){
+            console.log(mainTabsHide[i]);
+            if(mainTabsHide[i].id != "tab-default-" + slice){
+                mainTabsHide[i].classList.remove('slds-show');
+                mainTabsHide[i].classList.add('slds-hide');
+            }
+        }
+    }
+    j$ = jQuery.noConflict();
+    var cookieName = "prodtab";
+    function setTabs(nTab){
+        var header = j$('.li'+nTab)[0];
+        showTab(header);
+    }
+    function setCookie(){
+        var text = j$('.slds-show')[0].id.slice(-1);
+        document.cookie= cookieName + "=" + text + ";";
+    }
+    function getCookie(name){
+        var value = "; " + document.cookie;
+        var parts = value.split("; " + name + "=");
+        if (parts.length == 2) return parts.pop().split(";").shift();
+    }
+    
+    //seccao de tabs secundarias
+    function showSecTab(ele){
+         var actives = document.getElementsByClassName("slds-is-active");
+        for(var i = 0; i < actives.length; i++){
+            if(actives[i].id.includes("scoped")){
+                actives[i].classList.remove("slds-is-active");
+            }
+        }
+        var activeHeader = document.getElementById(ele.parentElement.id).classList.add("slds-is-active");
+        var actives2 = document.getElementsByClassName("scoped" + ele.id.slice(-1));
+        for(var i = 0; i < actives2.length; i++){
+            var a = actives2[i];
+            a.classList.remove("slds-show");
+            a.classList.add('slds-hide');
+        }
+        
+        var toActivate = document.getElementById(ele.getAttribute("aria-controls"));
+        toActivate.classList.add('slds-show');
+        toActivate.classList.remove('slds-hide');
+        
+    }
+    </script>
+    <div class="slds-scope">
+        <div class="slds-page-header slds-p-around--x-small">
+            <div class="slds-media">
+                <div class="slds-media__figure">
+                    <span class="slds-icon_container slds-icon-standard-product" title="Description of icon when needed">
+                        <svg class="slds-icon" aria-hidden="true">
+                            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{!URLFOR($Asset.SLDS , '/assets/icons/standard-sprite/svg/symbols.svg#product')}"></use>
+                        </svg>
+                    </span>
+                </div>
+                <div class="slds-media__body">
+                    <h1 class="slds-page-header__title slds-truncate slds-align-middle">{!$ObjectType.Product2.labelPlural}</h1>
+                    <p class="slds-text-body_small slds-line-height_reset">Design</p>
+                </div>
+            </div>
+        </div>
+        <div class="slds-tabs_default" style="">
+            <ul class="slds-tabs_default__nav" role="tablist">
+                <apex:variable id="index" value="{!0}" var="c"/>
+                <apex:repeat value="{!prods}" var="prod">
+                    <apex:variable id="index" value="{!c + 1}" var="c"/>
+                    <li class="slds-tabs_default__item" title="Info" role="presentation" id="li{!c}">
+                        <a class="slds-tabs_default__link li{!c}" onclick="showTab(this);" role="tab" tabindex="{!c}" aria-selected="true" aria-controls="tab-default-{!c}" id="tab-default-{!c}__item">{!prods[prod].oli.Referencia_Sku__c}</a></li>
+                </apex:repeat>
+            </ul>
+            <apex:variable value="{!0}" var="c"/>
+            <apex:variable id="secIndex" value="{!0}" var="st"/>
+            <apex:repeat value="{!prods}" var="prod">
+                <apex:variable id="index" value="{!c + 1}" var="c"/>
+                <div id="tab-default-{!c}" class="slds-tabs_default__content tab-default-{!c} slds-hide" role="tabpanel" aria-labelledby="tab-default-{!c}__item">
+                    
+                    <fieldset class="slds-form--compound">
+                        <div class="slds-form-element__group ">
+                            <div class="slds-form-element__row">
+                                <div class="slds-form-element">
+                                    <label class="slds-form-element__label">{!$ObjectType.Product2.Fields.Name.Label}</label>
+                                    <div class="slds-form-element__control">
+                                        <apex:outputText >{!prods[prod].oli.Product2.Nome_Para_User__c}</apex:outputText>
+                                    </div>
+                                    <label class="slds-form-element__label slds-m-top--small">{!$ObjectType.OpportunityLineItem.Fields.Codigo_de_cor__c.Label}</label>
+                                    <div class="slds-form-element__control">
+                                        <apex:outputText >{!prods[prod].oli.Codigo_de_cor__c} -&nbsp;<apex:outputField value="{!prods[prod].oli.Codigo_de_cor__c}"/></apex:outputText>
+                                    </div>
+                                    <label class="slds-form-element__label slds-m-top--small">{!$ObjectType.Opportunity.Fields.Mudanca_de_cor__c.Label}</label>
+                                    <div class="slds-form-element__control">
+                                        <apex:outputPanel rendered="{!opp.Alerta_Mudanca_de_Cor__c}">
+                                            <span class="slds-checkbox">
+                                                <input type="checkbox" checked="true" id="checkbox" disabled="true"/>
+                                                <apex:outputLabel styleClass="slds-checkbox__label" for="checkbox">
+                                                    <span class="slds-checkbox--faux"></span>
+                                                </apex:outputLabel>
+                                            </span>
+                                        </apex:outputPanel>
+                                        <apex:outputPanel rendered="{!!opp.Alerta_Mudanca_de_Cor__c}">
+                                            <span class="slds-checkbox">
+                                                <input type="checkbox" id="checkbox" disabled="true"/>
+                                                <apex:outputLabel styleClass="slds-checkbox__label" for="checkbox">
+                                                    <span class="slds-checkbox--faux"></span>
+                                                </apex:outputLabel>
+                                            </span>
+                                        </apex:outputPanel>
+                                    </div>
+                                </div>
+                                <div class="slds-form-element">
+                                    <label class="slds-form-element__label">{!$Label.Quantidade_total_referencia}</label>
+                                    <div class="slds-form-element__control">
+                                        {!totalProdsCor[prods[prod].oli.ProductCode]}
+                                    </div>
+                                    
+                                    <label class="slds-form-element__label slds-m-top--small">{!$Label.Quantidade_total_referencia_cor}</label>
+                                    <div class="slds-form-element__control">
+                                        {!totalProdsCor[prods[prod].oli.ProductCode + prods[prod].oli.Codigo_de_cor__c]}
+                                    </div>
+                                </div>
+                                <div class="slds-form-element slds-align--absolute-center">
+                                    <apex:image url="{!prods[prod].oli.Product2.Url_Imagem__c}" style="width: 120px;"/>
+                                </div>
+                            </div>
+                        </div>
+                    </fieldset>
+                    <div class="slds-tabs_scoped">
+                        <ul class="slds-tabs_scoped__nav" role="tablist">
+                            <apex:repeat value="{!prods[prod].customs}" var="custom">
+                                <apex:variable id="index" value="{!st + 1}" var="st"/>
+                                <li class="slds-tabs_scoped__item {!if(st == 1 , 'slds-is-active','')}" title="Item One" role="presentation" id="scoped{!st}">
+                                    <a class="slds-tabs_scoped__link" role="tab" tabindex="{!st}" onclick="showSecTab(this);" aria-selected="true" aria-controls="tab-{!c}-scoped-{!st}" id="tab-scoped-{!st}__item{!c}">
+                                        {!custom.Product2.Tecnica__c}
+                                    </a>
+                                </li>
+                            </apex:repeat>
+                        </ul>
+                        <apex:variable id="secIndex" value="{!0}" var="st"/>
+                        <apex:repeat value="{!prods[prod].customs}" var="custom">
+                            <apex:variable id="index" value="{!st + 1}" var="st"/>
+                            <div id="tab-{!c}-scoped-{!st}" class="slds-tabs_scoped__content {!if(st = 1 ,'slds-show', 'slds-hide')} scoped{!c}" role="tabpanel" aria-labelledby="tab-scoped-{!st}__item">
+                                
+                                <fieldset class="slds-form--compound">
+                                    <div class="slds-form-element__group ">
+                                        <div class="slds-form-element__row slds-text-heading--label slds-p-bottom_medium">
+                                            <div class="slds-form-element">
+
+                                                Impressão
+                                            </div>
+                                            <div class="slds-form-element">
+
+                                               	Posicionamento de personalização
+                                            </div>
+                                            <div class="slds-form-element">
+
+                                                Informação adicional
+                                            </div>
+                                        </div>
+                                        <div class="slds-form-element__row">
+                                            <div class="slds-form-element">
+                                                
+                                                <label class="slds-form-element__label">{!$ObjectType.OpportunityLineItem.Fields.Cores_de_customizacao__c.Label}</label>
+                                                {!custom.Cores_de_customizacao__c}
+                                            </div>
+                                            <div class="slds-form-element">
+                                                <label class="slds-form-element__label">{!$ObjectType.OpportunityLineItem.Fields.Componente_da_impressao__c.Label}</label>
+                                                {!custom.Componente_da_impressao__c}
+                                            </div>
+                                            <div class="slds-form-element">
+                                                <label class="slds-form-element__label">{!$ObjectType.OpportunityLineItem.Fields.Texto_a_customizar__c.Label}</label>
+                                                {!custom.Texto_a_customizar__c}
+                                            </div>
+                                        </div>
+                                        <div class="slds-form-element__row">
+                                            <div class="slds-form-element">
+                                                <label class="slds-form-element__label">{!$ObjectType.OpportunityLineItem.Fields.Pantone_Cor__c.Label}</label>
+                                                {!custom.Pantone_Cor__c}
+                                            </div>
+                                            <div class="slds-form-element">
+                                                <label class="slds-form-element__label">{!$ObjectType.OpportunityLineItem.Fields.Alinhamento__c.Label}</label>
+                                                <apex:outputField value="{!custom.Alinhamento__c}"/>
+                                            </div>
+                                            <div class="slds-form-element">
+                                                <label class="slds-form-element__label">{!$ObjectType.OpportunityLineItem.Fields.Fonte__c.Label}</label>
+                                                {!custom.Fonte__c}
+                                            </div>
+                                        </div>
+                                        <div class="slds-form-element__row">
+                                            <div class="slds-form-element">
+                                                <label class="slds-form-element__label">{!$ObjectType.OpportunityLineItem.Fields.Numero_de_impressoes__c.Label}</label>
+                                                {!custom.Numero_de_impressoes__c}
+                                            </div>
+                                            <div class="slds-form-element">
+                                                <label class="slds-form-element__label">{!$ObjectType.OpportunityLineItem.Fields.Comprimento__c.Label}</label>
+                                                {!custom.Comprimento__c} (mm)
+                                            </div>
+                                            <div class="slds-form-element">
+                                                <label class="slds-form-element__label">{!$ObjectType.Opportunity.Fields.Dossier_de_repeticao__c.Label}</label>
+                                                {!custom.Opportunity.Dossier_de_repeticao__c}
+                                            </div>
+                                        </div>
+                                        <div class="slds-form-element__row">
+                                            <div class="slds-form-element">
+                                                <label class="slds-form-element__label">{!$ObjectType.OpportunityLineItem.Fields.Numero_de_repeticoes__c.Label}</label>
+                                                {!custom.Numero_de_repeticoes__c}
+                                            </div>
+                                            <div class="slds-form-element">
+                                                <label class="slds-form-element__label">{!$ObjectType.OpportunityLineItem.Fields.Altura__c.Label}</label>
+                                                {!custom.Altura__c} (mm)
+                                            </div>
+                                            <div class="slds-form-element">
+
+                                            </div>
+                                        </div>
+                                        <div class="slds-form-element__row slds-p-top_small slds-border--top">
+                                            <div class="slds-form-element">
+                                                <label class="slds-form-element__label">Comentário inicial</label>
+                                                {!custom.opportunity.Retificacoes_pedidas_pelo_comercial__c}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </fieldset>
+                            </div>
+                        </apex:repeat>
+                        
+                        <apex:variable id="secIndex2" value="{!0}" var="st"/>
+                    </div>
+                </div>
+            </apex:repeat>
+        </div>
+    </div>
+</apex:page>

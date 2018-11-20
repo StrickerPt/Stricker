@@ -1,0 +1,176 @@
+<apex:page standardController="Expedicao__c" extensions="c_PDFGuiaNeutra" language="{!lang}" cache="false" readOnly="true" applyBodyTag="false" applyHtmlTag="false" renderAs="PDF" showHeader="false">
+    <head>
+        <style type="text/css" media="print">
+            @page {
+            size: A4 portrait;
+            margin-left: 1.0cm;
+            margin-right: 1.0cm;
+            margin-top: 1.5cm;
+            margin-bottom: 3.5cm;
+            @top-center {
+            content: element(header);
+            }
+            @bottom-center {
+            content: element(footer);
+            }
+            }
+            div.header {
+            padding: 10px;
+            position: running(header);
+            }
+            div.footer {
+            display: block;
+            padding: 5px;
+            position: running(footer);
+            }
+            .pagenumber:before {
+            content: counter(page);
+            }
+            .pagecount:before {
+            content: counter(pages);
+            }
+            table {
+            -fs-table-paginate: paginate;
+            }
+            body {
+            font-family: Arial Unicode MS;
+            }
+        </style>
+    </head>
+    <div class="header" style="margin-left: 10px;margin-right: 10px;">
+        <table style="width: 100%">
+            <tr>
+                <td style="width: 50%;">{!$Label.Nota_de_encomenda}<span>{!expedicao.Dossier__r.Auto_Number__c}</span></td>
+                <td style="width: 50%;text-align: right;">
+                    {!$Label.Data}: <span style="text-decoration: underline;text-decoration-color: black;"><apex:outputText value="{0,date,dd/MM/yyyy}">&nbsp;<apex:param value="{!TODAY()}"/></apex:outputText>&nbsp;</span>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <div class="footer" style="margin-left: -10px;margin-right: -10px">
+        <table style="width: 100%;border-bottom:solid black;border-spacing: 10px 15px;">
+            <tr style="padding-bottom: 5px">
+                <td >
+                    {!$Label.Via}:
+                </td>
+                <td style="width: 15%;border-bottom: 1px solid black">
+                    {!expedicao.Transportadora__c}    
+                </td>
+                <td>
+                    {!$Label.Numero_de_expedicao}:
+                </td>
+                <td style="width: 20%;border-bottom: 1px solid black">
+                    {!expedicao.N_de_expedicao__c}    
+                </td>
+                <td>
+                    {!$Label.Volumes}:
+                </td>
+                <td style="width: 10%;border-bottom: 1px solid black">
+                    {!expedicao.Numero_de_volumes__c}    
+                </td>
+                <td >
+                    {!$Label.Peso_kgs}.
+                </td>
+                <td style="width: 7%;border-bottom: 1px solid black">
+                    {!expedicao.Peso_da_expedicao__c}    
+                </td>
+                <td style="text-align: right;width: 10%;">
+                    <div style="font-size: 10pt;float: right;font-weight: bold;"><span class="pagenumber"/> / <span class="pagecount"/></div>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <div class="content" style="margin-left: -10px;margin-right: -10px;padding: 2px;font-size: 10pt;">
+        <table style="width: 100%;">
+            <tr>
+                <td style="width: 50%;">
+                    <table style="width: 100%;border: 1px solid black;padding:5px;">
+                        <tr style="height:20px">
+                            <td>
+                                <span>{!$Label.Remetente}:</span>    
+                            </td>
+                        </tr> 
+                        <tr style="height:20px">
+                            <td>
+                                <span>{!expedicao.Dossier__r.Account.Name}</span>      
+                            </td>
+                        </tr > 
+                        <tr style="height:20px">
+                            <td>
+                                <span>{!expedicao.Dossier__r.Account.BillingStreet}</span>     
+                            </td>
+                        </tr> 
+                        <tr style="height:20px">    
+                            <td>
+                                <span>{!expedicao.Dossier__r.Account.BillingPostalCode}</span>     
+                            </td>
+                        </tr> 
+                        <tr style="height:20px">    
+                            <td>
+                                <span>{!expedicao.Dossier__r.Account.BillingCountry}</span>     
+                            </td>
+                        </tr> 
+                        <tr style="height:20px">    
+                            <td>
+                                <span>VAT: {!expedicao.Dossier__r.Account.Numero_de_contribuinte__c}</span>      
+                            </td>
+                        </tr>    
+                    </table>
+                </td>
+                <td style="width: 50%;">
+                    <table style="width: 100%;border: 1px solid black;padding:5px;">
+                        <tr style="height:20px">
+                            <td>
+                                <span>{!$Label.Morada_de_entrega}:</span>    
+                            </td>
+                        </tr> 
+                        <tr style="height:20px">
+                            <td>
+                                <span><b>{!expedicao.Dossier__r.Account.Numero_de_cliente__c}M{!expedicao.Morada_de_entrega__r.MSEQ__c}&nbsp;-&nbsp;{!expedicao.Dossier__r.Account.Name}&nbsp;-&nbsp;{!expedicao.Dossier__r.Pedido_por__r.Name}</b></span>      
+                            </td>
+                        </tr> 
+                        <tr style="height:20px">
+                            <td>
+                                <span><b>{!expedicao.Dossier__r.Account.BillingStreet}</b></span>     
+                            </td>
+                        </tr> 
+                        <tr style="height:20px">    
+                            <td>
+                                <span><b>{!expedicao.Dossier__r.Account.BillingPostalCode}</b></span>     
+                            </td>
+                        </tr>
+                        <tr style="height:20px">    
+                            <td>
+                                
+                            </td>
+                        </tr> 
+                        <tr style="height:20px">    
+                            <td>
+                                <span>Contact: {!expedicao.Morada_de_entrega__r.Telefone_logistico__c}</span>     
+                            </td>
+                        </tr>    
+                    </table>
+                </td>
+            </tr>
+        </table>
+        <p/>
+        <table style="width: 100%;border: 1px solid black;">
+            <thead>
+                <tr>
+                    <th>{!$Label.Quantidade}</th>
+                    <th>{!$Label.Designacao}</th>
+                    <th>{!$Label.Peso_kgs}</th>
+                </tr>
+            </thead>
+            <tbody>
+                <apex:repeat value="{!produtos}" var="id">
+                    <tr>
+                        <td><apex:outputField value="{!produtos[id].item.Quantity}" /></td>                       
+                        <td><apex:outputField value="{!produtos[id].item.Lingua_do_cliente__c}" /></td>
+                        <td><apex:outputField value="{!produtos[id].item.Peso__c}" /></td>
+                    </tr>
+                </apex:repeat>
+            </tbody>
+        </table>
+    </div>
+</apex:page>

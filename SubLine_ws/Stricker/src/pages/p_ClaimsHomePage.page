@@ -1,0 +1,77 @@
+<apex:page controller="c_ClaimsHomePage">
+    <apex:slds />
+    <apex:includeScript value="/support/console/43.0/integration.js"/>
+    <div class="slds-scope">
+        <article class="slds-card">
+            <div class="slds-card__header slds-grid">
+                <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                    <div class="slds-media__figure">
+                        <span class="slds-icon_container slds-icon-standard-case" title="case">
+                            <svg class="slds-icon slds-icon_small slds-icon-standard-case" aria-hidden="true">
+                                <use xmlns:xlink="http://www.w3.org/1999/xlink"
+                                     xlink:href="{!URLFOR($Asset.SLDS , '/assets/icons/standard-sprite/svg/symbols.svg#case')}"></use>
+                            </svg>
+                            <span class="slds-assistive-text">account</span>
+                        </span>
+                    </div>
+                    <div class="slds-media__body">
+                        <h2 class="slds-card__header-title">
+                            <span class="slds-text-heading_small">Lista de reclamações:</span>
+                        </h2>
+                    </div>
+                </header>
+            </div>
+            <div class="slds-card__body slds-card__body_inner" >
+                <div style="height:930px;overflow-y:auto;">
+                    <table class="slds-table slds-table_bordered slds-table_cell-buffer reduceFont">
+                        <thead>
+                            <tr>
+                                <th>
+                                    _Numero de processo
+                                </th>
+                                <th>
+                                    _Nome do cliente
+                                </th>
+                                <th>
+                                    _Data de criação
+                                </th>
+                                <th>
+                                    _Estado
+                                </th>
+                                <th>
+                                    _Sub-Estado
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <apex:repeat value="{!casos}" var="caso">
+                                <tr>
+                                    <td>
+                                        <a onclick="openCase('{!caso.Id}');">{!caso.CaseNumber}</a>
+                                    </td>
+                                    <td>
+                                        <apex:outputField value="{!caso.Account.Name}"/>
+                                    </td>
+                                    <td>
+                                        <apex:outputField value="{!caso.CreatedDate}"/>
+                                    </td>
+                                    <td>
+                                        <apex:outputField value="{!caso.Status}"/>
+                                    </td>
+                                    <td>
+                                        <apex:outputField value="{!caso.Sub_estado__c}"/>
+                                    </td>
+                                </tr>
+                            </apex:repeat>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </article>
+    </div>
+    <script>
+    function openCase(caseId){
+        sforce.console.openPrimaryTab(null, "/"+caseId, true, "");
+    }
+    </script>
+</apex:page>

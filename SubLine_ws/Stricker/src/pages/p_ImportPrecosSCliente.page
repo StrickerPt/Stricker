@@ -1,0 +1,2 @@
+<apex:page cache="true" contentType="text/csv#ImportacaoPrecosSemCliente.csv">Produto;Valor;Data de inicio;Data de fim
+</apex:page>

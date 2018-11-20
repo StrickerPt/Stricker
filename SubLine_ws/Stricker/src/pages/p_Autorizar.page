@@ -1,0 +1,152 @@
+<apex:page standardController="Opportunity" extensions="c_Autorizar">
+    <apex:includeScript value="/support/console/39.0/integration.js"/>
+    <apex:slds />
+    <style>
+        .centered {
+        position: fixed;
+        left: 50%;
+        transform: translate(-50%, 0);
+        z-index: 1000;
+        background-color: white;
+        width: 200px;
+        height: 35px;
+        border-radius: 0 0 4px 4px;
+        border-bottom: 1px solid #d8dde6;
+        border-left: 1px solid #d8dde6;
+        border-right: 1px solid #d8dde6;
+        text-align: center;
+        }
+    </style>
+    <script>
+    function openModal(modalToOpen){
+        document.getElementById("backdrop").classList.add('slds-backdrop--open');
+        document.getElementById(modalToOpen).classList.add('slds-fade-in-open');
+    }
+    function closeModal(modalToOpen){
+        document.getElementById(modalToOpen).classList.remove('slds-fade-in-open');
+        document.getElementById("backdrop").classList.remove('slds-backdrop--open');
+    }
+    </script>
+    <apex:form id="theForm" style="background-color: white;">
+        <apex:actionFunction action="{!updateRecord}" name="updateRecord" rerender="theForm" oncomplete="checkRedirect()"/>
+        <apex:actionFunction name="checkAgain" action="{!reCheckIntegration}" rerender="thePanel" oncomplete="checkStart();"/>
+        <apex:outputPanel id="thePanel">
+            <script>
+            
+            function checkStart(){
+                if({!opp.Espera_de_integracao__c}){
+                    openModal("modalWait");
+                    var nextCheck = function(){
+                        checkAgain();
+                    };
+                    setTimeout(nextCheck, 3000);
+                }else{
+                    closeModal("modalWait");
+                    updateRecord();
+                }
+            }
+            document.addEventListener("DOMContentLoaded", function(event) {
+                checkStart();
+                var setTabTitle= function setTabTitle(result) {
+                    console.log(result);
+                    sforce.console.setTabTitle('Autorizar dossier', null);
+                };
+                sforce.console.getFocusedSubtabId(setTabTitle);
+            });
+            function checkRedirect(){
+                if({!success}){
+                    if(sforce.console.isInConsole()){
+                        var getPageInfo = function getPageInfo(result){
+                            console.log(result);
+                            var showPageInfo = function showPageInfo(result2) {
+                                console.log(result2);
+                                var a = JSON.parse(result2.pageInfo);
+                                if(a.object == 'Opportunity' || a.objectId.includes("{!opp.Id}")){
+                                    openPrimaryTabConsole();
+                                }else{
+                                    openSubTabConsole();
+                                }
+                            };
+                            sforce.console.getPageInfo(result.id , showPageInfo);
+                            sforce.console.refreshPrimaryTabById(result.id, true);
+                        };
+                        sforce.console.getEnclosingPrimaryTabId(getPageInfo);
+                    }else{
+                        window.open("/{!opp.Id}","_self");  
+                    }
+                }
+            }
+            function openSubTabConsole(){
+                //close current tab because the opp is already open
+                var closeSubtab = function closeSubtab(result) {
+                    
+                    var tabId = result.id;
+                    sforce.console.closeTab(tabId);
+                };
+                sforce.console.getFocusedSubtabId(closeSubtab);
+                
+                //open opp again
+                var openSubtab = function openSubtab(result3) {
+                    
+                    var primaryTabId = result3.id;
+                    
+                    sforce.console.openSubtab(primaryTabId, "/{!opp.Id}", true, "", null);
+                };
+                sforce.console.getEnclosingPrimaryTabId(openSubtab);
+            }
+            function openPrimaryTabConsole(){
+                //close current tab because the opp is already open
+                var openPrimaryTab = function openPrimaryTab(result) {
+                    sforce.console.openPrimaryTab(result.id, "{!opp.Id}", true);
+                };
+                sforce.console.getFocusedPrimaryTabId(openPrimaryTab);
+                
+            }
+            </script>
+            
+        </apex:outputPanel>
+
+
+            <apex:outputPanel id="centered" rendered="{!!success}">
+                <apex:actionFunction name="goBack" action="{!goBack}" reRender="theForm" oncomplete="checkRedirect();"/>
+                <div class="slds-scope">
+                    <div class="slds-align--absolute-center">
+                        <a onclick="goBack();" class="slds-button slds-button--destructive" style="top: 5px;position: relative;">{!$Label.Sair}</a>
+                    </div>
+                </div>
+            </apex:outputPanel>
+        <br/><br/><br/><br/>
+        <apex:pageMessages escape="false"></apex:pageMessages>
+    </apex:form>
+    <div class="slds-scope">
+        <div class="slds-backdrop" id="backdrop"></div>
+        <div class="slds-modal" aria-hidden="false" role="dialog" id="modalWait">
+            <div class="slds-modal__container slds-size--3-of-4" style="max-width: -webkit-fill-available;">
+                <div class="slds-modal__header slds-p-around--none">
+                    <div class="slds-page-header">
+                        <div class="slds-media">
+                            <div class="slds-media__figure">
+                                <span class="slds-icon_container slds-icon-standard-opportunity">
+                                    <svg class="slds-icon" aria-hidden="true">
+                                        <use xmlns:xlink="http://www.w3.org/1999/xlink" 
+                                             xlink:href="{!URLFOR($Asset.SLDS , '/assets/icons/standard-sprite/svg/symbols.svg#opportunity')}"></use>
+                                    </svg>
+                                </span>
+                            </div>
+                            <div class="slds-media__body">
+                                <h1 class="slds-page-header__title slds-truncate slds-align-middle">{!opp.Name}</h1>
+                                <p class="slds-text-body_small slds-line-height_reset"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="slds-modal__content slds-p-around--medium slds-text-heading--small slds-text-color--error">
+                    <img id="processing_gif_photo" src="{!$Resource.processing_gif}" alt="A processar..." style="margin: auto auto;" class="slds-p-right--large"/> {!$Label.Validar_autorizacao}
+                </div>
+                <div class="slds-modal__footer">
+                    <a class="slds-button slds-button--destructive" onclick="goBack()">{!$Label.Cancelar}</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</apex:page>

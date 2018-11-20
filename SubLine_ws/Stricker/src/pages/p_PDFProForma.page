@@ -1,0 +1,355 @@
+<apex:page standardController="Opportunity" extensions="c_PDFProForma" language="{!lang}" cache="false" readOnly="true" standardStylesheets="false" applyBodyTag="false" applyHtmlTag="false" renderAs="PDF" showHeader="false">
+    <html>
+        <head>
+            <style type="text/css" media="print">
+                @page {
+                size: A4 portrait;
+                margin-left: 1.0cm;
+                margin-right: 0.8cm;
+                margin-top: 3.8cm;
+                margin-bottom: 2.5cm;
+                @top-center {
+                content: element(header);
+                }
+                @bottom-center {
+                content: element(footer);
+                padding-bottom: 0;
+                margin-bottom: 0;
+                }
+                }
+                div.header {
+                padding: 10px;
+                position: running(header);
+                }
+                div.footer {
+                background-image: url('{!CarimboUrl}');
+                background-repeat: no-repeat;
+                background-position: 100% 10px;
+                background-size: 20px 30px;
+                display: block;
+                padding: 5px;
+                padding-bottom: 0;
+                margin-bottom: 0;
+                position: running(footer);
+                }
+                .pagenumber:before {
+                content: counter(page);
+                }
+                .pagecount:before {
+                content: counter(pages);
+                }
+                .counterReset {
+                -fs-page-sequence: start;
+                }
+                body {
+                font-family: Arial Unicode MS;
+                }
+            </style>
+        </head>
+        <apex:repeat value="{!numDoc}" var="index">
+        <body style="padding: 0;margin: 0;font-family: Arial, Helvetica, sans-serif;">
+            <div class="header" style="margin-left: 0px;margin-right: 0px;">
+                <table style="width: 100%;padding: 0;margin: 0;">
+                    <tr>
+                        <td style="width: 30%;padding-right:20px;border-right:1px solid black;"><apex:image style="margin-left: -10px;" height="64px" value="{!logoUrl}"/></td>
+                        <td style="width: 50%;padding-left:20px;">
+                            <p></p>
+                            <p style="font-size: 7pt;margin:2px;line-height: 90%;">Núcleo Industrial de Murtede, Lote 5</p>
+                            <p style="font-size: 7pt;margin:2px;line-height: 90%;">3060-372 Murtede, Portugal</p>
+                            <p style="font-size: 7pt;margin:2px;line-height: 90%;"><b>t.</b> +351 231 209 980</p>
+                            <p style="font-size: 7pt;margin:2px;line-height: 90%;"><b>f.</b> +351 231 209 989</p>
+                            <p style="font-size: 7pt;margin:2px;line-height: 90%;"><b>e.</b> info@stricker.pt</p>
+                            <p style="font-size: 7pt;margin:2px;line-height: 90%;"><b>www.stricker.pt</b></p>
+                        </td>
+                        <td style="width: 25%;text-align: right;padding: 0;margin: 0;">
+                            <table style="text-align: center;border:1px solid black;width:100%">
+                                <tr>
+                                    <td>
+                                        <b>{!descDoc[index]}</b>
+                                    </td>
+                                </tr>
+                            </table>    
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <div class="footer" style="margin-left: 10px;margin-right: -6px;padding-bottom: 0;margin-bottom: 0;padding-top: 0;margin-top: 0;">                
+                <table style="width: 100%;">
+                    <tr>
+                        <td colspan="2" style="font-size: 8pt;text-align: center;border-top:1px solid black;border-bottom:1px solid black;">{!PMELiderUrl}Fica convencionado o domicílio da sociedade Paul Stricker, SA para a resolução de qualquer litígio emergente do presente contrato.</td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" style="font-size: 8pt;text-align: left;">Nº Produtor EEE: PT 002096 * Nº Produtor P &amp; A : PT 00406</td>
+                    </tr>
+                    <tr>
+                        <td style="width: 17%;text-align: right;">
+                            <apex:image height="36px" value="{!PMELiderUrl}" style="margin-right: 15px;"/>
+                            <apex:image height="36px" value="{!LogoISOUrl}"/>
+                        </td>
+                        <td style="width: 83%;text-align: left;">
+                            <p style="font-size: 8pt;margin:2px;text-align: left;">Sociedade Anónima - Capital Social 1.176.500 {!currencySymbol} - Cons. Reg. Comercial Cantanhede NIF - PT 501 888 640</p>                    
+                        </td>
+                    </tr>
+                </table>    
+            </div>
+                <div class="content" style="margin-left: 10px;margin-right: 0px;padding: 2px;font-size: 9pt;padding-bottom: 0;margin-bottom: 0;page-break-before:avoid;{!if(index != numDoc.size, 'page-break-after:always;','')}">
+                    <table style="width:100%;padding-bottom: 0;margin-bottom: 0;">
+                        <tr>
+                            <td style="width:40%">
+                                <table style="width:100%">
+                                    <tr>
+                                        <td style="border-top: 2px solid #000000;border-right: 2px solid #000000;padding-top: 4px;padding-right: 6px;">
+                                            <table style="width: 100%;border-collapse: collapse;">
+                                                <thead>
+                                                    <tr>
+                                                        <td style="border: 1px solid #000000;width: 50%;text-align: center;">{!$Label.Documento}</td>
+                                                        <td style="border: 1px solid #000000;text-align: center;">{!$Label.Numero}</td>
+                                                        <td style="border: 1px solid #000000;text-align: center;">{!$Label.Pagina}</td>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <th style="border: 1px solid #000000;width: 50%;text-align: center;">{!$Label.Factura_Proforma}</th>
+                                                        <td style="border: 1px solid #000000;text-align: center;">{!opp.Auto_Number__c}</td>
+                                                        <td style="border: 1px solid #000000;text-align: center;"><span class="pagenumber"/></td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                    <tr><td style="height: 5px;"></td></tr>
+                                    <tr>
+                                        <td style="border-top: 2px solid #000000;border-right: 2px solid #000000;padding-top: 4px;padding-right: 6px;">
+                                            <table style="border-collapse: collapse;width:100%;">
+                                                <thead>
+                                                    <tr>
+                                                        <td style="border: 1px solid #000000;width: 50%;text-align: center;">{!$Label.Data_de_emissao}</td>
+                                                        <td style="border: 1px solid #000000;text-align: center;">{!$Label.Prazo_de_Entrega}</td>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td style="border: 1px solid #000000;text-align: center;">
+                                                            <apex:outputText value="{0,date,dd-MM-yyyy}"><apex:param value="{!TODAY()}"/></apex:outputText>
+                                                        </td>
+                                                        <td style="border: 1px solid #000000;text-align: center;">
+                                                            {!prazoEntrega}
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                    <tr><td style="height: 5px;"></td></tr>
+                                    <tr>
+                                        <td style="border-top: 2px solid #000000;border-right: 2px solid #000000;padding-top: 4px;padding-right: 6px;">
+                                            <table style="border-collapse: collapse;width:100%;">
+                                                <thead >
+                                                    <tr>
+                                                        <td style="border: 1px solid #000000;width: 50%;text-align: center;">{!$Label.Numero_de_cliente}</td>
+                                                        <td style="border: 1px solid #000000;text-align: center;">{!$Label.Numero_de_contribuinte}</td>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td style="border: 1px solid #000000;text-align: center;">{!opp.Account.Numero_de_cliente__c}</td>
+                                                        <td style="border: 1px solid #000000;text-align: center;">{!opp.Account.Numero_de_contribuinte__c}</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                    <tr><td style="height: 5px;"></td></tr>
+                                    <tr>
+                                        <td style="border-top: 2px solid #ffffff;border-right: 2px solid #ffffff;padding-top: 4px;padding-right: 6px;">
+                                            <table style="border-collapse: collapse;width:100%;">
+                                                <tr>
+                                                    <td style="border: 1px solid #000000;padding-left: 8px;">{!$Label.Numero_da_encomenda} {!opp.Referencia_interna__c}</td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                            <td style="width:60%;vertical-align: center;">
+                                <table style="border-collapse: collapse;width: 100%;">
+                                    <tr>
+                                        <td style="width:15%;"></td>
+                                        <td style="width:85%;border-top: 2px solid #000000;border-right: 2px solid #000000;padding-top: 4px;padding-right: 6px;">
+                                            <div style="border: 1px solid #000000;">
+                                                <p style="margin:10px;"><b>{!opp.Account.Name}</b></p>
+                                                <p style="margin:10px;">{!opp.Account.BillingStreet}</p>
+                                                <p style="margin:10px;">{!opp.Account.BillingPostalCode} {!opp.Account.BillingCity}</p>
+                                                <p style="margin:10px;"><b>{!opp.Account.BillingCountry}</b></p>
+                                            </div>
+                                        </td>
+                                    </tr>    
+                                </table>
+                            </td>
+                        </tr>
+                    </table>
+                    <div style="margin-left: 6px;margin-right: 3px;border-top: 2px solid #000000;border-right: 2px solid #000000;padding-top: 4px;padding-right: 6px;padding-bottom: 0;margin-bottom: 0;">
+                        <table style="border-collapse: collapse;width:100%;padding-bottom: 0;margin-bottom: 0;">
+                            <thead>
+                                <tr>
+                                    <td style="text-align: center;border-left: 1px solid #000000;border-top: 1px solid #000000;width: 15%;padding-left: 8px;">{!$Label.Referencia}</td>
+                                    <td style="text-align: center;border-top: 1px solid #000000;width: 40%;">{!$Label.Descricao}</td>
+                                    <td style="text-align: center;border-top: 1px solid #000000;width: 10%;">{!$Label.Quantidade}</td>
+                                    <td style="text-align: center;border-top: 1px solid #000000;width: 10%;">{!$Label.Preco}</td>
+                                    <td style="text-align: center;border-top: 1px solid #000000;width: 10%;">{!$Label.Desconto}</td>
+                                    <td style="text-align: center;border-top: 1px solid #000000;width: 10%;">{!$Label.Valor_liquido}</td>
+                                    <td style="text-align: center;border-right: 1px solid #000000;border-top: 1px solid #000000;width: 5%;">{!$Label.IVA}</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td colspan="7" style="border: 1px solid #000000;min-height: 420px;" valign="top">
+                                        <!--;-->
+                                        <table style="width: 100%;border-collapse: collapse;">
+                                            <tbody>
+                                                <apex:repeat value="{!produtos}" var="key">
+                                                    <tr>
+                                                        <td style="padding-left: 4px;text-align: left;width: 15%;padding-bottom: 10px;">{!produtos[key].item.Referencia_SKU__c}</td> 
+                                                        <td style="padding-left: 4px;text-align: left;width: 40%;padding-bottom: 10px;">{!produtos[key].item.Lingua_do_cliente__c}</td> 
+                                                        <td style="text-align: right;width: 10%;padding-bottom: 10px;">
+                                                            <apex:outputText value="{0,number,#,############}">
+                                                                <apex:param value="{!produtos[key].item.Quantity}"/>
+                                                            </apex:outputText>
+                                                        </td> 
+                                                        <td style="text-align: right;width: 10%;padding-bottom: 10px;">
+                                                            <apex:outputText value="{0,number,#,###########0.00}">
+                                                                <apex:param value="{!produtos[key].item.Preco_unitario__c}"/>
+                                                            </apex:outputText>{!currencySymbol}</td> 
+                                                        <td style="text-align: right;width: 10%;padding-bottom: 10px;">{!produtos[key].item.Discount}</td> 
+                                                        <td style="text-align: right;width: 10%;padding-bottom: 10px;">
+                                                            <apex:outputText value="{0,number,#,###########0.00}">
+                                                                <apex:param value="{!produtos[key].item.Total_de_customizacao__c * (1 + opp.Account.Taxa_de_IVA__c/100)}"/>
+                                                            </apex:outputText>{!currencySymbol}</td> 
+                                                        <td style="text-align: right;width: 5%;padding-bottom: 10px;">{!TEXT(opp.Account.Taxa_de_IVA__c) + if(opp.Account.Taxa_de_IVA__c != null,'%','')}</td> 
+                                                    </tr>
+                                                    <apex:repeat value="{!produtos[key].customList}" var="c">
+                                                        <tr>
+                                                            <td style="padding-left: 8px;text-align: left;width: 12%;padding-bottom: 10px;">{!produtos[key].customList[c].item.Referencia_SKU__c}</td> 
+                                                            <td style="text-align: left;width: 40%;padding-bottom: 10px;">{!produtos[key].customList[c].description}</td> 
+                                                            <td style="text-align: right;width: 10%;padding-bottom: 10px;">{!produtos[key].customList[c].item.Quantity}</td> 
+                                                            <td style="text-align: right;width: 10%;padding-bottom: 10px;">{!produtos[key].customList[c].item.Preco_unitario__c}{!currencySymbol}</td> 
+                                                            <td style="text-align: right;width: 10%;padding-bottom: 10px;">{!produtos[key].item.Discount}</td> 
+                                                            <td style="text-align: right;width: 10%;padding-bottom: 10px;">{!produtos[key].customList[c].item.Total_de_customizacao__c * (1 + opp.Account.Taxa_de_IVA__c/100)}{!currencySymbol}</td> 
+                                                            <td style="text-align: right;width: 8%;padding-bottom: 10px;">{!opp.Account.Taxa_de_IVA__c}</td> 
+                                                        </tr>
+                                                    </apex:repeat>
+                                                </apex:repeat>
+                                                <tr>
+                                                	<td colspan="7">
+                                                        No commercial value
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                	<td colspan="7">
+                                                        Only for customs propose
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table> 
+                    </div>
+                    <table style="width:100%;margin-top: 10px;margin-left: 2px;padding-bottom: 0;margin-bottom: 0;page-break-inside:avoid;">
+                        <thead>
+                            <tr>
+                            	<th colspan="2" style="page-break-inside:avoid;">
+                                    Este documento não serve de fatura
+                                </th>
+                            </tr>
+                            <tr>
+                                <th colspan="2" style="page-break-inside:avoid;">{!$Label.Banco}: {!banco}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="width: 50%;page-break-inside:avoid;">
+                                    <table style="width: 100%;border-spacing: 5px 0;margin-left: -5px;float: left;">
+                                        <tbody>
+                                            <tr>
+                                                <td style="width: 40%;">{!$Label.Carregamento}:</td>
+                                                <td style="width: 60%;">N/ Instalações</td>
+                                            </tr>
+                                            <tr>
+                                                <td>{!$Label.Data_de_transporte}:</td>
+                                                <td><apex:outputText value="{0,date,dd-MM-yyyy}"><apex:param value="{!TODAY()}"/></apex:outputText> - <span>{!exp.Transportadora__c}</span></td>
+                                            </tr>
+                                            <tr>
+                                                <td>{!$Label.Hora}:</td>
+                                                <td><apex:outputText value="{0,date,hh:mma z}"><apex:param value="{!NOW()}"/></apex:outputText></td>
+                                            </tr>
+                                            <tr>
+                                                <td>{!$Label.Peso_bruto}:</td>
+                                                <td>{!if(exp.Peso_da_expedicao__c != null, exp.Peso_da_expedicao__c, '0')} Kgs</td>
+                                            </tr>
+                                            <tr>
+                                                <td>{!$Label.Pacote_n}</td>
+                                                <td>{!exp.Volume_da_expedicao__c}</td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="2" style="{!IF(opp.Motivo_de_isencao_de_impostos__c != null, 'border: 1px solid #000000;','')}">{!opp.Motivo_de_isencao_de_impostos__c}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </td>
+                                <td style="width:50%;page-break-inside:avoid;">
+                                    <table style="width: 100%;border-spacing: 5px 0;margin-right: -5px;float: right;text-align: right;">
+                                        <tbody>
+                                            <tr><td style="width: 30%;">{!$Label.Total_bruto}</td><td style="width: 70%;">{!opp.Amount}{!currencySymbol}{!if(currencySymbol != '€','('+ text(oppConvertedAmount) +'€)','')}</td></tr>
+                                            <tr>
+                                                <td>{!$Label.Desconto_total}</td>
+                                                <td></td>
+                                            </tr>
+                                            <tr>
+                                                <td>{!$Label.Total_liquido}</td>
+                                                <td style="border-top: 1px solid #000000;">{!opp.Amount}{!currencySymbol}{!if(currencySymbol != '€','('+ text(oppConvertedAmount) +'€)','')}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>{!$Label.Total_IVA}</td>
+                                                <td>{!totalIVA}{!currencySymbol}{!if(currencySymbol != '€','('+ text(totalIVAConverted) +'€)','')}</td>
+                                            </tr>
+                                            <tr>
+                                                <td><b>{!$Label.Total}</b></td>
+                                                <td style="border-top: 1px solid #000000;"><b>{!totalEuro}{!currencySymbol}{!if(currencySymbol != '€','('+ text(totalEuroConverted) +'€)','')}</b></td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="2" style="border: 1px solid #000000;text-align: left;padding-left: 10px;">Incoterm: <b style="{!if(opp.Incoterm__c == null, 'color:red;','')}">{!if(opp.Incoterm__c != null, opp.Incoterm__c, "EM FALTA")}</b></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="2" style="text-align: center;border-top: 1px solid #000000;margin-bottom: 0;page-break-inside:avoid;">
+                                    <p style="margin-top: .1em;margin-bottom: .1em;">
+                                        <span style="float: left;">{!$Label.Destino} </span><span> 
+                                        {!if(exp.Ao_cuidado_de__c != null ,exp.Ao_cuidado_de__c + ' -' ,'')}
+                                        {!if(exp.Morada_de_entrega__r.Nome_da_empresa__c != null ,exp.Morada_de_entrega__r.Nome_da_empresa__c + ' -' ,'')}
+                                        {!if(exp.Morada_de_entrega__r.Morada_de_entrega__c != null ,exp.Morada_de_entrega__r.Morada_de_entrega__c + ' -' ,'')}
+                                        {!if(exp.Morada_de_entrega__r.Codigo_postal__c != null,exp.Morada_de_entrega__r.Codigo_postal__c + ' -' ,'')}
+                                        {!if(exp.Morada_de_entrega__r.Localidade__c != null ,exp.Morada_de_entrega__r.Localidade__c + ' -' ,'')}
+                                        {!exp.Morada_de_entrega__r.Pais__c}</span>
+                                    </p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="2" style="text-align: center;border-top: 1px solid #000000;page-break-inside:avoid;">
+                                    <p style="margin-top: .1em;margin-bottom: .1em;">
+                                        <span style="float: left;">{!$Label.Observacoes} </span><span>{!exp.Observacoes_documento__c}</span>
+                                    </p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="counterReset"/>
+                </div>
+            </body>
+        </apex:repeat>
+    </html>
+</apex:page>

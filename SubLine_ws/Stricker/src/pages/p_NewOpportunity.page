@@ -1,0 +1,388 @@
+<apex:page standardController="Opportunity" extensions="c_NewOpportunity" docType="html-5.0" tabStyle="Opportunity">
+    <head>
+        <apex:includeScript value="{!URLFOR($Resource.bs, '/jQuery_2_0_3.js')}"/>
+        <apex:includeScript value="{!URLFOR($Resource.bs, '/js/bootstrap.js')}"/>
+        <apex:includeScript value="{!URLFOR($Resource.bs, '/js/bootstrap-typeahead.js')}"/>
+        <apex:stylesheet value="{!URLFOR($Resource.bs, '/css/bootstrap.css')}"/>
+        <apex:stylesheet value="{!URLFOR($Resource.bs, '/css/bootstrap-theme.css')}"/>
+        <apex:includeScript value="/support/console/39.0/integration.js"/>
+        <style>
+            .input-xs{
+            height: 25px !important;
+            
+            }
+            .input-xxs{
+            height: 20px !important;
+            padding: 2px !important;
+            }
+            .input-ch{
+            height: 20px !important;
+            box-shadow: inset 0 0 0 rgba(0, 0, 0, 0.075) !important;
+            bottom: 2.5px !important;
+            position: relative !important;
+            }
+            .collapsing{color: #0070d2;}
+            .sidebar{width: 0px;border: 1px solid transparent;}
+            .sidebar:hover{border: 1px solid #e6e6e6;color: #428bca;}
+            .arrow:hover{color: #428bca;}
+            .centered {
+            position: fixed;
+            left: 50%;
+            transform: translate(-50%, 0);
+            z-index: 1000;
+            background-color: white;
+            width: 300px;
+            height: 35px;
+            border-radius: 0 0 4px 4px;
+            border-bottom: 1px solid #d8dde6;
+            border-left: 1px solid #d8dde6;
+            border-right: 1px solid #d8dde6;
+            text-align: center;
+            }
+            .message .messageText h4 {
+            font-weight: bold;
+            display: initial;
+            font-size: 8pt;
+            }
+            .messageTable > tbody > tr > td{
+            border: 0 !important;
+            width: 0.1rem;
+            }
+            .bs .table-striped > tbody > tr:nth-child(odd) > td{
+            background-color: #f3f3f3 !important;
+            }
+            .vb{
+            cursor: pointer;
+            font-size: 16px;
+            }
+            .vb:hover{
+            color: #673AB7;
+            }
+            .bs input[type="radio"]:focus{
+            border-color: transparent !important;
+            -webkit-box-shadow: inset 0 1px 1px transparent, 0 0 8px transparent !important;
+            box-shadow: inset 0 1px 1px transparent, 0 0 8px transparent !important;
+            }
+            .dateFormat{
+            display:none;
+            }
+            body{
+            font: 13.3333px Arial !important;
+            }
+            .bs .input-sm {
+            padding: 5px 6px;
+            }
+            .autoCompleteSectionRow{
+            display:none;
+            }
+            .autoCompleteRow{
+            display:none;
+            }
+            .tabIcon{
+            background-color: #fcb95b !important;
+            }
+            .slds-input{
+            width:98% !important;
+            padding: 0 0.75rem 0 0.5rem;
+            }
+            .slds-section-title--divider{
+            margin-top: 1.5rem;
+            }
+            .slds-scope .slds-form-element__row {
+            padding-top:1rem;
+            }
+        </style>
+        <script>
+        window.onload = function() {
+            var setTabTitle= function setTabTitle(result) {
+                sforce.console.setTabTitle('Novo dossier', result.id);
+                sforce.console.setTabIcon('/img/icon/hands24.png', result.id);
+            };
+            sforce.console.getFocusedSubtabId(setTabTitle);
+        }
+        function closeTab() {
+            if(sforce.console.isInConsole()){
+                var closeSubtab = function closeSubtab(result) {
+                    //Now that we have the primary tab ID, we can close it
+                    var tabId = result.id;
+                    sforce.console.closeTab(tabId);
+                };
+                sforce.console.getEnclosingTabId(closeSubtab);
+                
+            }else{
+                window.open("/{!accId}","_self");
+            }
+        }
+        function teste2(){}
+        function setFocusOnLoad(){}
+        function buttonsEnabled(enabled) {
+            // retrieve all of the buttons or links on the page
+            // with the css class of btn
+            var $buttons = jQuery('.btn');
+            if (enabled === false) {
+                // add the btnDisabled class to give it the look of being disabled
+                // add the disabled attribute to actually disable interactability
+                $buttons.toggleClass('btnDisabled', true).attr('disabled', 'disabled');
+            } else {
+                // remove the css class and the disabled attribute
+                $buttons.toggleClass('btnDisabled', false).attr('disabled', null);
+            } 
+        }
+        function spinnerOn(activated){
+            if(activated){
+                document.getElementById("spinner").style.display = "block";   
+            }else{
+                document.getElementById("spinner").style.display = "none";
+            }
+        }
+        </script>
+    </head>
+    <apex:form id="frm">
+        <apex:slds />
+        <div class="bs centered">
+            <apex:outputPanel id="centered">
+                <apex:commandButton styleClass="btn btn-default btn-xs" value="{!$Label.Sair}" onclick="closeTab();" style="top: 5px;position: relative;"
+                                    rerender="hiddenPanel"/>
+                &nbsp;
+                &nbsp;
+                &nbsp;
+                <apex:commandButton styleClass="btn btn-primary btn-xs" value="{!$Label.Confirmar}" action="{!insertOpp}" disabled="{!(opp = null || opp.Id != null)}" onclick="buttonsEnabled(false);spinnerOn(true);"
+                                    rerender="frm" style="top: 5px;position: relative;" oncomplete="closeTabConfirm(false);buttonsEnabled(true);spinnerOn(false);"/>
+                &nbsp;
+                &nbsp;
+                &nbsp;
+                <apex:commandButton styleClass="btn btn-primary btn-xs" value="{!$ObjectType.Product2.labelPlural}" action="{!insertOpp}" disabled="{!(opp = null || opp.Id != null)}" onclick="buttonsEnabled(false);"
+                                    rerender="frm" style="top: 5px;position: relative;" oncomplete="closeTabConfirm(true);buttonsEnabled(true);"/>
+                <script>
+                function closeTabConfirm(openProds){
+                    if(sforce.console.isInConsole()){
+                        if({!opp.Id != null}){
+                            var tabId;
+                            var newTab = false;
+                            var currentTab;
+                            
+                            var openSubtab = function openSubtab(result4) {
+                                if(newTab){//se tiver preenchido = nova conta
+                                    tabId = result4.id;
+                                }else{
+                                    sforce.console.closeTab(result4.id);
+                                }
+                                sforce.console.openSubtab(tabId, "/{!opp.Id}", true, "{!opp.Name}", null);
+                                if(openProds){
+                                    sforce.console.openSubtab(tabId, "/apex/p_AddProduct?id={!opp.Id}", true, "", null);
+                                }
+                                if(currentTab != null) sforce.console.closeTab(currentTab);
+                            };
+                            
+                            var closeTab = function closeTab(result3){
+                                currentTab = result3.id;
+                                sforce.console.openPrimaryTab(null, "/{!opp.AccountId}", true, "",openSubtab);
+                            };
+                            var openPrimaryTab = function openPrimaryTab(result2){
+                                if("{!opp.AccountId}".includes(result2.id)){//se a conta for a mesma
+                                    sforce.console.getFocusedSubtabId(openSubtab);//abre opp na mesma tab
+                                }else{
+                                    newTab = true;
+                                    sforce.console.getFocusedPrimaryTabId(closeTab);//abre nova P tab com a nova conta
+                                }
+                            };
+                            
+                            var getSubtabId = function getSubtabId(result) {
+                                tabId = result.id;
+                                sforce.console.getFocusedPrimaryTabObjectId(openPrimaryTab);//vai buscar id do objecto para ver se a tab aberta corresponde a conta da nova opp
+                                sforce.console.refreshPrimaryTabById(result.id, true);//faz refresh para a nova opp aparecer na tab atual
+                            };
+                            sforce.console.getEnclosingPrimaryTabId(getSubtabId);
+                        }else{
+                            buttonsEnabled(true);
+                        }
+                    }else{
+                        window.open("/{!opp.Id}","_self");
+                    }
+                }
+                </script>
+            </apex:outputPanel>
+            
+            
+        </div>
+        <apex:sectionHeader title="Novo Dossier"/>
+        <apex:pageBlock mode="maindetail" id="newOpp">
+            <div class="slds-scope">
+                <div class="container-fluid slds-m-around--small">
+                    <apex:pageMessages escape="false"></apex:pageMessages>
+                    <fieldset class="slds-form--compound" >
+                        <div class="slds-form-element__group"> 
+                            <div class="slds-form-element__row">
+                                <div class="slds-form-element">
+                                    <apex:outputLabel for="rtChoice">{!$Label.Tipo_de_dossier}</apex:outputLabel>
+                                    <apex:actionFunction name="rerenderPanel" action="{!createDummyOpp}" reRender="secondPanel, centered, infoPanelWrapper, docPanel"/>
+                                    <apex:selectList rendered="true" id="rtChoice" value="{!selectedRT}" onchange="rerenderPanel()" size="1"
+                                                     styleClass="slds-input">
+                                        <apex:selectOptions value="{!rtOptions}"/>
+                                    </apex:selectList>
+                                </div>
+                            </div>
+                        </div>
+                    </fieldset>
+                    <apex:outputPanel id="infoPanelWrapper">
+                        <apex:outputPanel id="infoPanel" rendered="{!selectedRT = null}">
+                            <table class="slds-table slds-size--1-of-4 slds-table_bordered slds-table_cell-buffer slds-m-top--large">
+                                <apex:repeat value="{!recordTypes}" var="rt">
+                                    <tr onclick="chooseRT('{!rt.Id}');">
+                                        <td>
+                                            {!$Label[rt.DeveloperName]}
+                                        </td>
+                                        <td>
+                                            {!$Label[rt.DeveloperName + 'Desc']}
+                                        </td>
+                                    </tr>
+                                </apex:repeat>
+                                <script>
+                                function chooseRT(id){
+                                    var ele = document.getElementById('{!$Component.rtChoice}');
+                                    ele.value = id;
+                                    ele.onchange();
+                                }
+                                </script>
+                            </table>
+                        </apex:outputPanel>
+                    </apex:outputPanel>
+                    <apex:outputPanel id="secondPanel">
+                        <apex:outputPanel rendered="{!selectedRT != null}" id="hiddenPanel">
+                            <div class="slds-section-title--divider">
+                                {!$Label.Informacoes_da_Oportunidade}
+                            </div>
+                            <fieldset class="slds-form--compound" >
+                                <div class="slds-form-element__group"> 
+                                    <div class="slds-form-element__row">
+                                        <div class="slds-form-element">
+                                            <apex:outputLabel for="name">{!$Label.Nome_do_dossier}</apex:outputLabel>
+                                            <p>
+                                                <apex:outputText value="{!opp.Name}" id="name"/>
+                                            </p>
+                                        </div>
+                                        <div class="slds-form-element">
+                                            <apex:outputLabel >{!$Label.Comercial}</apex:outputLabel><p>
+                                            </p>
+                                            <apex:outputField value="{!opp.OwnerId}" styleClass="form-control input-sm input-xs"/>
+                                        </div>
+                                    </div>
+                                    <div class="slds-form-element__row">
+                                        <div class="slds-form-element">
+                                            <apex:outputLabel >
+                                                <abbr class="slds-required">*</abbr> {!$Label.Cliente}</apex:outputLabel><p>
+                                            </p>
+                                            <apex:actionFunction name="changeAccountFields" action="{!docDest}" reRender="docPanel, clientTipoFat"/>
+                                            <apex:inputField value="{!opp.AccountId}" style="width: 95% !important;display: inline;" id="accountLookup" onchange="changeAccountFields();"
+                                                             styleClass="slds-input"/>
+                                            <script>
+                                            var a = document.getElementsByClassName("lookupInput");
+                                            a[0].children[2].classList.remove("slds-input");
+                                            </script>
+                                        </div>
+                                        <div class="slds-form-element">
+                                            <apex:outputLabel for="askedByLookup">{!$Label.Pedido_por}</apex:outputLabel>
+                                            <apex:inputField value="{!opp.Pedido_por__c}" style="width: 98% !important;display: inline;" required="false" id="askedByLookup"
+                                                             styleClass="slds-input"/>
+                                            <script>
+                                            var a = document.getElementsByClassName("lookupInput");
+                                            a[1].children[2].classList.remove("slds-input");
+                                            </script>
+                                        </div>
+                                    </div>
+                                    <div class="slds-form-element__row">
+                                        <div class="slds-form-element">
+                                            <apex:outputPanel id="clientTipoFat">
+                                                <apex:outputLabel >
+                                                    {!$ObjectType.Account.fields.Tipologia_de_facturacao__c.Label}
+                                                </apex:outputLabel>
+                                                <p>
+                                                    <apex:outputText value="{!accTipoFat}"/>
+                                                </p>
+                                            </apex:outputPanel>
+                                        </div>
+                                        <div class="slds-form-element">
+                                            <apex:outputPanel id="clientArma">
+                                                <apex:outputLabel >
+                                                    <abbr class="slds-required">*</abbr>
+                                                    {!$ObjectType.Opportunity.fields.Armazem__c.Label}
+                                                </apex:outputLabel>
+                                                <p>
+                                                    <apex:inputField value="{!opp.Armazem__c}" styleClass="slds-input"/>
+                                                </p>
+                                            </apex:outputPanel>
+                                        </div>
+                                    </div>
+                                    <div class="slds-form-element__row">
+                                        <div class="slds-form-element" style="display:{!if(OR(auxRtMap['Orcamento'] == selectedRT, auxRtMap['Orcamento_de_Importacao'] == selectedRT),'block','none')};">
+                                            <apex:outputLabel value="{!if(OR(opp.Name == 'Orçamento',opp.Name == 'Orçamento de Importação'),'Validade','')}" ></apex:outputLabel>
+                                            <apex:inputField value="{!opp.Validade__c}" styleClass="slds-input" required="false"/>
+                                        </div>
+                                    </div>
+                                    <div class="slds-form-element__row">
+                                        <div class="slds-form-element">
+                                            <apex:outputLabel >{!$Label.Origem}</apex:outputLabel>
+                                            <apex:inputField value="{!opp.Origem__c}" styleClass="slds-input" required="false"/>
+                                        </div>
+                                        <div class="slds-form-element">
+                                            <apex:outputLabel >{!$Label.Referencia_interna}</apex:outputLabel>
+                                            <apex:inputField value="{!opp.Referencia_interna__c}" styleClass="slds-input" required="false"/>
+                                            
+                                        </div>
+                                    </div>
+                                    <div class="slds-form-element__row">
+                                        <div class="slds-form-element">
+                                            <apex:outputPanel id="docPanel">
+                                                <apex:outputLabel >
+                                                    <abbr class="slds-required" style="display:{!if(Or(auxRtMap['Orcamento'] == selectedRT, auxRtMap['Orcamento_de_Importacao'] == selectedRT),'none','inline')};">*</abbr>
+                                                    {!$ObjectType.Opportunity.fields.Documento_de_destino__c.Label}</apex:outputLabel>
+                                                <apex:inputField value="{!opp.Documento_de_destino__c}" styleClass="slds-input"/>
+                                            </apex:outputPanel>
+                                        </div>
+                                        <div class="slds-form-element">
+                                            <apex:outputLabel >
+                                                <abbr class="slds-required" style="display:{!if(Or(auxRtMap['Orcamento'] == selectedRT, auxRtMap['Orcamento_de_Importacao'] == selectedRT),'none','inline')};">*</abbr>
+                                                {!$ObjectType.Opportunity.fields.Destino_de_impressao__c.Label}</apex:outputLabel>
+                                            <apex:inputField value="{!opp.Destino_de_impressao__c}" styleClass="slds-input"/>
+                                            
+                                        </div>
+                                    </div>
+                                    <div class="slds-form-element__row" style="display:{!if(Or(foRecordId == selectedRT, foiRecordId == selectedRT),'flex','none')};">
+                                        <div class="slds-form-element">
+                                            <apex:outputLabel >
+                                                <abbr class="slds-required">*</abbr>
+                                                {!$ObjectType.Opportunity.fields.Email_para_envio_de_maquete__c.Label}</apex:outputLabel>
+                                            <apex:inputField value="{!opp.Email_para_envio_de_maquete__c}" styleClass="slds-input"/>
+                                            
+                                        </div>
+                                        <div class="slds-form-element">
+                                            <apex:outputLabel >
+                                                {!$ObjectType.Opportunity.fields.Outro_email_para_envio_de_maquete__c.Label}</apex:outputLabel>
+                                            <apex:inputField value="{!opp.Outro_email_para_envio_de_maquete__c}" styleClass="slds-input"/>
+                                            
+                                        </div>
+                                    </div>
+                                </div>
+                            </fieldset>
+                            
+                            <script>
+                            var ele = document.getElementById('{!$Component.stages}');
+                            ele.value = ele.options[1].value;
+                            </script>
+                        </apex:outputPanel>
+                    </apex:outputPanel>
+                    
+                </div>
+                
+                <div class="slds-spinner_container" style="display: none; position: fixed;" id="spinner">
+                    <div role="status" class="slds-spinner slds-spinner--medium">
+                        <span class="slds-assistive-text">Loading</span>
+                        <div class="slds-spinner__dot-a"></div>
+                        <div class="slds-spinner__dot-b"></div>
+                    </div>
+                </div>
+            </div>
+            
+        </apex:pageBlock>
+    </apex:form>
+</apex:page>

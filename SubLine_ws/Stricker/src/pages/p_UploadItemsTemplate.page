@@ -1,0 +1,2 @@
+<apex:page cache="true" contentType="text/csv#p_UploadItemsTemplate.csv">{!$Label.Referencia}.{!$Label.Cor}.{!$Label.Tamanho};{!$Label.Quantidade};
+</apex:page>

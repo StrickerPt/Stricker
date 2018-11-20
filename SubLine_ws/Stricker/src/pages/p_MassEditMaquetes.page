@@ -1,0 +1,79 @@
+<apex:page standardController="Opportunity" recordSetVar="opp" extensions="c_MassEditMaquetes">
+    <head>
+        <apex:includeScript value="{!URLFOR($Resource.bs, '/jQuery_2_0_3.js')}"/>
+        <apex:includeScript value="/support/console/42.0/integration.js"/>
+        <apex:slds />
+        <script type="text/javascript">
+        function setFocusOnLoad(){}
+        
+        function refreshTab() {
+            //Focus Navigation Tab
+            sforce.console.focusNavigationTab();
+        }
+        function checkConsole(){
+            if(sforce.console.isInConsole()){
+                sforce.console.refreshNavigationTab();
+            }else{
+                window.open('{!retURL}', '_self');
+            }
+        }
+        
+        //Modal Close
+        function closeModal(){
+            j$('#modal').removeClass('slds-fade-in-open');
+            j$("#spinner").css("display", "block");
+        }
+        </script>
+    </head>
+    <div class="slds-scope">
+        <apex:form id="theForm">
+            <script>
+            j$ = jQuery.noConflict();
+            
+            //Modal Open
+            j$(document).ready(function() {
+                j$('#backdrop').addClass('slds-backdrop--open');
+                j$('#modal').addClass('slds-fade-in-open');
+            });
+            </script>
+            <div class="slds-modal slds-p-around--medium" aria-hidden="false" role="dialog" id="modal">
+                <div class="slds-modal__container slds-p-around--medium">
+                    <div class="slds-modal__header">
+                        <h2 class="slds-text-heading--medium">{!$Label.Atribuir_Maquete}</h2>
+                        <div class="slds-form-element">
+                            <div class="slds-text-title slds-float--right slds-text-body--regular slds-m-right--small">
+                                <apex:pageMessages escape="false"></apex:pageMessages>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="slds-modal__content slds-p-around--medium">
+                        <fieldset class="slds-form--compound" style="{!IF(isBlocked, 'display:none;', '')}">
+                            <div class="slds-form-element__group">
+                                <div class="slds-form-element__row">
+                                    <div class="slds-form-element slds-size--1-of-1">
+                                        <div class="slds-form-element__control">
+                                            <label class="slds-form-element__label" for="designer">{!$ObjectType.Opportunity.fields.Designer__c.Label}</label>
+                                            <apex:inputField value="{!myopp.Designer__c}" styleClass="slds-input"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </fieldset>
+                    </div>
+                    <div class="slds-modal__footer">
+                        <apex:commandButton value="Cancel" onclick="closeModal();checkConsole()" styleClass="slds-button slds-button--neutral" rerender="modal"/>
+                        <apex:commandButton value="Actualizar" styleClass="slds-button slds-button--brand" onclick="closeModal()" action="{!updateOpps}" oncomplete="checkConsole()" disabled="{!isBlocked}"/>
+                    </div>
+                </div>
+            </div>
+            <div class="slds-backdrop" id="backdrop"></div>
+            <div class="slds-spinner_container" style="display:none;" id="spinner">
+                <div role="status" class="slds-spinner slds-spinner--medium">
+                    <span class="slds-assistive-text">Loading</span>
+                    <div class="slds-spinner__dot-a"></div>
+                    <div class="slds-spinner__dot-b"></div>
+                </div>
+            </div>
+        </apex:form>
+    </div>
+</apex:page>

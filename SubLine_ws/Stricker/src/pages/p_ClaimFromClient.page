@@ -1,0 +1,260 @@
+<apex:page extensions="c_ClaimFromClient" standardController="Case">
+    <apex:slds />
+    <apex:includeScript value="{!URLFOR($Resource.swal2, '/sweetalert2.min.js')}"/>
+    <apex:includeScript value="/support/console/43.0/integration.js"/>
+    <apex:includeScript value="{!URLFOR($Resource.bs, '/jQuery_2_0_3.js')}"/>
+    <style>
+        .reduceFont{
+        font-size: .65rem !important;
+        }
+        .swal-icon{
+        box-sizing: content-box !important;
+        }
+        .swal-styled{
+        background-image: inherit;
+        }
+        .swal-container {
+        z-index: 9001;
+        }
+        .swal-button {
+        background-image: inherit;
+        font-size: 14px !important;
+        }
+        .modal {
+        background-color: transparent;
+        display: block;
+        height: 100%;
+        left: 0;
+        position: fixed;
+        width: 100%;
+        top: 90px;
+        }
+        .modal__content,
+        .modal__footer {
+        position: absolute;
+        width: 100%;
+        }
+        .modal__content {
+        background-color: transparent;
+        bottom: 160px;
+        top: 20px;
+        overflow-y: auto;
+        }
+        .modal__footer {
+        background-color: white;
+        bottom: 70px;
+        min-height: 80px;
+        }
+    </style>
+    <div class="slds-scope">
+        <!--a onclick="redirectFinal('5009E000007wQZgQAM');">teste redirect{!numCli}</a-->
+        <apex:form id="theForm">
+            <!--avançar fases dentro da página para mostrar novos componentes-->
+            <div class="{!if(numCli == null, 'slds-show','slds-hide')}" id="numCliDiv">
+                <article class="slds-card">
+                    <div class="slds-card__header slds-grid">
+                        <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                            <div class="slds-media__figure">
+                                <span class="slds-icon_container slds-icon-standard-account" title="account">
+                                    <svg class="slds-icon slds-icon_small slds-icon-standard-account" aria-hidden="true">
+                                        <use xmlns:xlink="http://www.w3.org/1999/xlink"
+                                             xlink:href="{!URLFOR($Asset.SLDS , '/assets/icons/standard-sprite/svg/symbols.svg#account')}"></use>
+                                    </svg>
+                                    <span class="slds-assistive-text">account</span>
+                                </span>
+                            </div>
+                            <div class="slds-media__body">
+                                <h2 class="slds-card__header-title">
+
+                                        <span class="slds-text-heading_small">Seleccionar cliente:</span>
+
+                                </h2>
+                            </div>
+                        </header>
+                    </div>
+                    <div class="slds-card__body slds-card__body_inner">
+
+                        <div class="slds-form-element">
+                            <label class="slds-form-element__label" for="{!$Component.accountFilter}">{!$ObjectType.Account.Fields.Numero_de_cliente__c.Label}:</label>
+                            <div class="slds-form-element__control">
+                                <div class="slds-combobox_container">
+                                    <script>
+                                    function showList(){
+                                        var ele = document.getElementById("combobox");
+                                        ele.classList.add("slds-is-open");
+                                    }
+                                    
+                                    function hideList(){
+                                        var ele = document.getElementById("combobox");
+                                        ele.classList.remove("slds-is-open");
+                                    }
+                                    
+                                    
+                                    var j$ = jQuery.noConflict();
+                                    function renderAccount(){
+                                        var imageURL = "{!URLFOR($Asset.SLDS , '/assets/icons/standard-sprite/svg/symbols.svg#account')}";
+                                        var SVG = j$('<svg/>', {
+                                            class: 'slds-icon slds-icon_small',
+                                        });
+                                        var SVGUse = j$('<use/>');
+                                        SVGUse.attr('xlink:href',imageURL);
+                                        
+                                        var eles = document.getElementsByClassName("accountIcon");
+                                        for(var i = 0; i < eles.length; i++){
+                                            var aux ="#"+eles[i].id;
+                                            j$(aux).html("");
+                                            //eles[i].style = "width: auto;padding-right:  0.5rem;;padding-left: 0.5rem;height: 32px;vertical-align: bottom;cursor:pointer;";
+                                            j$(aux).prepend(SVG.append(SVGUse));
+                                            j$(aux).html(j$(aux).html());
+                                        }
+                                    }
+                                    </script>
+                                    <apex:actionFunction name="callFilter" action="{!applyFilter}" reRender="listPanel" oncomplete="renderAccount();"/>
+                                    <div class="slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click" aria-expanded="false" aria-haspopup="listbox" role="combobox" id="combobox">
+                                        <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right" role="none">
+                                            <apex:inputText html-autocomplete="off" value="{!filter}" onfocus="showList();" onkeyup="callFilter();" styleClass="slds-input slds-combobox__input" 
+                                                            id="accountFilter" html-placeholder="Search..." />
+                                            <apex:inputHidden value="{!numCLi}" id="hiddenNumCli"/>
+                                            <span class="slds-icon_container slds-icon-utility-search slds-input__icon slds-input__icon_right">
+                                                <svg class="slds-icon slds-icon slds-icon_x-small slds-icon-text-default" aria-hidden="true">
+                                                    <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{!URLFOR($Asset.SLDS , '/assets/icons/utility-sprite/svg/symbols.svg#search')}" />
+                                                </svg>
+                                            </span>
+                                        </div>
+                                        <apex:outputPanel id="listPanel">
+                                            <apex:outputPanel rendered="{!filteredList.size > 0}">
+                                                <div id="listbox-id-1" class="slds-dropdown slds-dropdown_length-with-icon-7 slds-dropdown_fluid" role="listbox">
+                                                    <ul class="slds-listbox slds-listbox_vertical" role="presentation">
+                                                        <!-- REPEAT -->
+                                                        <apex:repeat value="{!filteredList}" var="account">
+                                                            <li role="presentation" class="slds-listbox__item" 
+                                                                onclick="document.getElementById('{!$Component.accountFilter}').value = '{!account.Name}'; 
+                                                                         document.getElementById('{!$Component.hiddenNumCli}').value = '{!account.Numero_de_cliente__c}'; 
+                                                                         hideList();
+                                                                         callFilter();">
+                                                                <div id="option1" class="slds-media slds-listbox__option slds-listbox__option_entity slds-listbox__option_has-meta" role="option">
+                                                                    <span class="slds-media__figure">
+                                                                        <span class="slds-icon_container slds-icon-standard-account accountIcon" id="account{!account.Id}">
+                                                                            <!-- AQUI É CRIADO O BOTÃO COM O ICON -->
+                                                                        </span>
+                                                                    </span>
+                                                                    <span class="slds-media__body">
+                                                                        <span class="slds-listbox__option-text slds-listbox__option-text_entity">{!account.Name}</span>
+                                                                        <span class="slds-listbox__option-meta slds-listbox__option-meta_entity">{!account.Numero_de_cliente__c}</span>
+                                                                    </span>
+                                                                </div>
+                                                            </li>
+                                                        </apex:repeat>      
+                                                    </ul>
+                                                </div>   
+                                            </apex:outputPanel>                                       
+                                        </apex:outputPanel>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                        </div>
+                    </div>
+                    <footer class="slds-card__footer">
+                        <apex:actionFunction name="refreshHeader" action="{!setAccount}" reRender="clientHeader, scriptsAccount" />
+                        <a id="nextBtt" class="slds-button slds-button--success" style="color: white;" onclick="handleNext();refreshHeader();">{!$Label.Confirmar}</a>
+                        <script>
+                        function handleNext(){
+                            var cliDiv = document.getElementById('numCliDiv');
+                            cliDiv.classList.remove('slds-show');
+                            cliDiv.classList.add('slds-hide');
+                            
+                            var docDiv = document.getElementById('chooseDocDiv');
+                            docDiv.classList.remove('slds-hide');
+
+                        }
+                        </script>
+                    </footer>
+                </article>
+                
+            </div>
+            <div class="{!if(numCli != null, '','slds-hide')}" id="chooseDocDiv">
+                <apex:actionFunction name="nextStage" action="{!nextStage}" rerender="stage2, clientHeader" oncomplete="spinnerOn(false);">
+                    <apex:param assignTo="{!selectedLine}" name="p1" value=""/>
+                </apex:actionFunction>
+                <apex:actionFunction name="backStage" action="{!backStage}" rerender="stage2, clientHeader" oncomplete="spinnerOn(false);"/>
+                <c:cmp_ClaimsHeader title="{!acc.Name}" subTitle="{!If(ficheiroEscolhido != null , ficheiroEscolhido, '_Nova Reclamação')}" library="standard" symbol="case"/>
+                <div id="stage1" class="slds-show">
+                    <c:cmp_ChooseOrigin no="{!numCli}" showBackPage="true"/>
+                </div>
+                <apex:outputPanel id="stage2">
+                    <apex:outputPanel rendered="{!stage >= 2}">
+                        <c:cmp_ChooseLines list="{!linhas}" selectedDocument="{!selectedLine}" no="{!numCli}"/>
+                    </apex:outputPanel>
+                </apex:outputPanel>
+            </div>
+        </apex:form>
+        <div class="slds-spinner_container" style="display: none; position: fixed;" id="spinner">
+            <div role="status" class="slds-spinner slds-spinner--medium">
+                <span class="slds-assistive-text">Loading</span>
+                <div class="slds-spinner__dot-a"></div>
+                <div class="slds-spinner__dot-b"></div>
+            </div>
+        </div>
+        <script>
+        /* Método evocado pelos componentes e página para ligar/desligar o spinner
+     * @activated : boolean para ligar ou desligar o spinner
+     * */
+        function spinnerOn(activated){
+            if(activated){
+                document.getElementById("spinner").style.display = "block";   
+            }else{
+                document.getElementById("spinner").style.display = "none";
+            }
+        }
+        /* Método evocado pelos componentes para avançar na página principal
+     * @ftstamp : Stamp selecionado dentro do componente
+     * @bostamp : Stamp do dossier selecionado, caso exista
+     * */
+        function nextComponent(selectedLine){
+            var panel = document.getElementById("stage1");
+            panel.classList.add('slds-hide');
+            panel.classList.remove('slds-show');
+            nextStage(JSON.stringify(selectedLine));
+        }
+        function backStep(){
+            var panel = document.getElementById("stage1");
+            panel.classList.add('slds-show');
+            panel.classList.remove('slds-hide');
+            
+            backStage();
+        }
+        function setFocusOnLoad(){}
+        function handleBack(){
+            var cliDiv = document.getElementById('numCliDiv');
+            cliDiv.classList.add('slds-show');
+            cliDiv.classList.remove('slds-hide');
+            
+            var docDiv = document.getElementById('chooseDocDiv');
+            docDiv.classList.add('slds-hide');
+
+        }
+        </script>
+        <apex:outputPanel id="scriptsAccount">
+            <script>
+            
+            function redirectFinal(caseId){
+                var currentTab;
+                var openSubtab = function openSubtab(result2){
+                    sforce.console.openSubtab(result2.id,caseId, true, '', null);
+                    //abre nova opp
+                    if(currentTab != null) sforce.console.closeTab(currentTab);
+                    sforce.console.refreshPrimaryTabById(result2.id, true);
+                };
+                var openPrimTab = function openPrimTab(result) {
+                    currentTab = result.id;
+                    sforce.console.openPrimaryTab(null, "{!acc.Id}", false, "",openSubtab);
+                    
+                };
+                sforce.console.getFocusedPrimaryTabId(openPrimTab);
+                
+            }
+            </script>
+        </apex:outputPanel>
+    </div>
+</apex:page>

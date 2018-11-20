@@ -1,0 +1,166 @@
+<apex:page controller="c_ClaimsList" showHeader="false" action="{!checkPermaValidate}">
+    <apex:slds />
+    <style>
+        .slds-scope .slds-button_brand, .slds-scope .slds-button--brand {
+        background-color: rgba(0,130,190,0.8);
+        border-color: transparent;
+        }
+    </style>
+    <script>
+    function changeSection(ele, parEle){
+        var classList = parEle.classList.value;
+        if(classList.includes("slds-is-open")){
+            parEle.classList.remove("slds-is-open");
+        }else{
+            parEle.classList.add("slds-is-open");
+        }
+        
+    }
+    
+    function openNewClaim(){
+        window.open("/apex/p_NewClaim?no={!no}&token={!token}","_self");
+    }
+    </script>
+    <apex:form >
+        <div class="slds-scope">
+            <c:cmp_StrickerHeader />
+            <apex:outputPanel rendered="{!validClient}">
+                <fieldset class="slds-form--compound">
+                    <div class="slds-form-element__group ">
+                        <c:cmp_ClaimsHeader title="{!acc.Name}" subTitle="{!$Label.Lista_de_reclamacoes}" library="standard" symbol="case"/>
+                        <div class="slds-form-element__row slds-float--right">
+                            <div class="slds-form-element slds-p-around--medium">
+                                <a class="slds-button slds-button_brand" onclick="openNewClaim();">_Nova Reclamação</a>
+                            </div>
+                        </div>
+                        <div class="slds-form-element__row">
+                            <div class="slds-form-element slds-size_1-of-1">
+                                <div class="slds-section slds-is-open">
+                                    <h3 class="slds-section__title">
+                                        <a aria-controls="expando-unique-id" aria-expanded="true" class="slds-button slds-section__title-action glyphicon glyphicon-chevron-right" onclick="changeSection(this, this.parentElement.parentElement);">
+                                            <span class="slds-truncate" style="width: 100%; text-align: left;">
+                                                <div class="slds-icon_container slds-m-right--medium">
+                                                    <svg class="slds-section__title-action-icon slds-button__icon" aria-hidden="false">
+                                                        <use xmlns:xlink="http://www.w3.org/1999/xlink"
+                                                             xlink:href="{!URLFOR($Asset.SLDS , '/assets/icons/utility-sprite/svg/symbols.svg#switch')}"></use>
+                                                    </svg>
+                                                </div>
+                                                _Reclamações a Decorrer
+                                            </span>
+                                        </a>
+                                    </h3>
+                                    <div aria-hidden="true" class="slds-section__content" id="expando-unique-id">
+                                        <apex:outputPanel rendered="{!openCases.size > 0}">
+                                            <table class="slds-table slds-table_bordered slds-table_cell-buffer">
+                                                <tr>
+                                                    <th>
+                                                        _Nº Reclamação
+                                                    </th>
+                                                    <th>
+                                                        _Data de abertura
+                                                    </th>
+                                                    <th>
+                                                        _Estado da Reclamação
+                                                    </th>
+                                                </tr>
+                                                <apex:repeat value="{!openCases}" var="case">
+                                                    
+                                                    <tr>
+                                                        <td>
+                                                            {!case.CaseNumber}
+                                                        </td>
+                                                        <td>
+                                                            <apex:outputText value="{0,date,dd-MM-yyyy HH:mm}">
+                                                                <apex:param value="{!case.CreatedDate+offset}"/>
+                                                            </apex:outputText>
+                                                        </td>
+                                                        <td>
+                                                            {!case.Status}
+                                                        </td>
+                                                    </tr>
+                                                </apex:repeat>
+                                            </table>
+                                        </apex:outputPanel>
+                                        <apex:outputPanel rendered="{!openCases.size == 0}">
+                                            <div class="slds-text-heading_small slds-text-align_center">_Não existem reclamações a mostrar.</div>
+                                        </apex:outputPanel>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="slds-form-element__row">
+                            <div class="slds-form-element slds-size_1-of-1">
+                                <div class="slds-section slds-is-open">
+                                    <h3 class="slds-section__title">
+                                        <a aria-controls="expando-unique-id" aria-expanded="true" class="slds-button slds-section__title-action glyphicon glyphicon-chevron-right" onclick="changeSection(this, this.parentElement.parentElement);">
+                                            <span class="slds-truncate" style="width: 100%; text-align: left;">
+                                                <div class="slds-icon_container slds-icon-utility-chevronup slds-m-right--medium">
+                                                    <svg class="slds-section__title-action-icon slds-button__icon" aria-hidden="false">
+                                                        <use xmlns:xlink="http://www.w3.org/1999/xlink"
+                                                             xlink:href="{!URLFOR($Asset.SLDS , '/assets/icons/utility-sprite/svg/symbols.svg#switch')}"></use>
+                                                    </svg>
+                                                </div>
+                                                _Reclamações Concluídas
+                                            </span>
+                                        </a>
+                                    </h3>
+                                    <div aria-hidden="true" class="slds-section__content" id="expando-unique-id">
+                                        <apex:outputPanel rendered="{!closedCases.size > 0}">
+                                            
+                                            <table class="slds-table slds-table_bordered slds-table_cell-buffer">
+                                                <tr>
+                                                    <th>
+                                                        _Nº Reclamação
+                                                    </th>
+                                                    <th>
+                                                        _Data de abertura
+                                                    </th>
+                                                    <th>
+                                                        _Estado da Reclamação
+                                                    </th>
+                                                </tr>
+                                                
+                                                <apex:repeat value="{!closedCases}" var="case">
+                                                    
+                                                    <tr>
+                                                        <td>
+                                                            {!case.CaseNumber}
+                                                        </td>
+                                                        <td>
+                                                            <apex:outputText value="{0,date,dd-MM-yyyy HH:mm}">
+                                                                <apex:param value="{!case.CreatedDate}"/>
+                                                            </apex:outputText>
+                                                        </td>
+                                                        <td>
+                                                            {!case.Status}
+                                                        </td>
+                                                    </tr>
+                                                </apex:repeat>
+                                            </table>
+                                        </apex:outputPanel>
+                                        <apex:outputPanel rendered="{!closedCases.size == 0}">
+                                            <div class="slds-text-heading_small slds-text-align_center">_Não existem reclamações a mostrar.</div>
+                                        </apex:outputPanel>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+            </apex:outputPanel>
+            <apex:outputPanel rendered="{!!validClient}">
+                <div class="slds-notify slds-notify_alert slds-theme_alert-texture slds-theme_error" role="alert">
+                    <span class="slds-assistive-text">error</span>
+                    <span class="slds-icon_container slds-icon-utility-error slds-m-right_x-small" title="Description of icon when needed">
+                        <svg class="slds-icon slds-icon_x-small" aria-hidden="true">
+                            <use  xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{!URLFOR($Asset.SLDS , '/assets/icons/utility-sprite/svg/symbols.svg#error')}"></use>
+                        </svg>
+                    </span>
+                    <h2>
+                        Something is wrong with your session. Please return to Paul Stricker's Site and try again.
+                    </h2>
+                </div>
+            </apex:outputPanel>
+        </div>
+    </apex:form>
+</apex:page>

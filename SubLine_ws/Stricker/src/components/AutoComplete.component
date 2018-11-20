@@ -1,0 +1,134 @@
+<apex:component controller="AC_JSONCtrl">
+    <!-- attributes -->
+    <apex:attribute name="ComponentLabel" description="Label of Component" type="String" required="true"/>
+    <apex:attribute name="for" description="Id of input field" type="String" required="true"/>
+    <apex:attribute name="for2" description="Id of input field" type="String" required="true"/>
+    <apex:attribute name="SObject" description="SObject to query" type="String" required="true"/>
+    <apex:attribute name="Label" description="Label for autocomplete" type="String" required="true"/>
+    <apex:attribute name="Value" description="Value for autocomplete" type="String" required="true"/>
+    <apex:attribute name="ReturnValue" description="Return value for autocomplete" type="Object" required="true"/>
+    <apex:attribute name="ReturnValue2" description="Return value for autocomplete" type="Object" required="true"/>
+    
+    <apex:attribute name="LabelStyleClass" description="Label CSS class" type="String" required="false"/>
+    <apex:attribute name="Details" description="Details for autocomplete" type="String" required="false"/>
+    <apex:attribute name="whereClause" description="Additional where clause for query" type="String" required="false"/>
+    <!-- limit defaults to 10 -->
+    <apex:attribute name="limitClause" description="Limits the return number of records" type="String" required="false"/>
+    
+    <!-- CSS -->
+    <!--<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"/>-->
+    <apex:stylesheet value="{!URLFOR($Resource.AutoCompletecss, '/JQueryUI/css/ui-lightness/jquery-ui-1.8.17.custom.css')}"/>
+    <apex:stylesheet value="{!URLFOR($Resource.AutoCompletecss, '/JQueryModal/css/basic.css')}"/>
+    
+    <!-- jQuery -->
+    <apex:includescript value="https://code.jquery.com/jquery-1.10.2.js"/>
+    <apex:includescript value="https://code.jquery.com/ui/1.11.4/jquery-ui.js"/>
+    <!-- loading css -->
+    <style type="text/css">
+        .ui-autocomplete-loading { background: white url('{!URLFOR($Resource.AutoCompletecss, 'AjaxLoad.gif')}') right center no-repeat; }
+    </style>
+    
+    <!-- START COMPONENT BODY -->
+    
+    <div id="{!for}_hiddenDiv">
+        <!--<label class="{!LabelStyleClass}">{!ComponentLabel}</label>-->
+        <apex:inputHidden value="{!ReturnValue}" id="r1"/>
+        <apex:inputHidden value="{!ReturnValue2}" id="r2"/>
+    </div>
+    
+    <!-- END COMPONENT BODY -->
+    <!-- autcomplete function -->
+    <script type="text/javascript">
+    $ac = jQuery.noConflict();
+    
+    function getLoadingImage()
+    {
+        var loadImagURL = "{!URLFOR($Resource.AutoComplete, 'BigLoad.gif')}";
+        var retStr = ['<img src="', loadImagURL ,'" title="loading..." alt="loading..." class="middleAlign" />'];
+        return retStr.join("");
+    }
+    
+    //the Visualforce page where the data is returned
+    var sourcePage = '/apex/AC_JSON?core.apexpages.devmode.url=0';
+    
+    $ac(function() {
+        var txtVal = $ac('[id$="{!for}"]');
+        //This method returns the last character of String
+        function extractLast(term) {
+            return term.substr(term.length - 1);
+        }
+        
+        $ac('[id$="{!for}"]').autocomplete({
+            source: function( request, response ) {
+                
+                //Abort Ajax
+                var $this = $ac(this);
+                var $element = $ac(this.element);
+                var jqXHR = $element.data('jqXHR');
+                if(jqXHR)
+                    jqXHR.abort();
+                
+                $ac('[id$="{!for}"]').addClass('ui-autocomplete-loading');
+                $element.data('jqXHR',$ac.ajax({
+                    url: sourcePage+'&q='+txtVal.val()+'&obj={!sObject}&label={!label}&value={!value}&detail={!details}&wc={!URLENCODE(whereClause)}&lm={!limitClause}',
+                    dataType: "json",
+                    data: {},
+                    success: function( data ) {
+                        response( $ac.map( data , function( item ) {
+                            return {
+                                label: '<a>'+
+                                item.label+"<br />"+
+                                '<span style="font-size:0.8em;font-style:italic">'
+                                +item.detail+
+                                "</span></a>",
+                                value: item.label,
+                                name: item.name,
+                                id: item.value
+                            }
+                        }));
+                    },
+                    complete: function() {
+                        //This method is called either request completed or not
+                        $this.removeData('jqXHR');
+                        //remove the class responsible for loading image
+                        $ac('[id$="{!for}"]').removeClass('ui-autocomplete-loading');
+                        
+                    }
+                })
+                             );
+            },
+            
+            search: function() {
+                //If String contains at least 2 characters
+                if (this.value.length >= 2)
+                {
+                    $ac('[id$="{!for}"]').autocomplete('option', 'delay', 100);
+                    return true;
+                }
+                return false;
+            },
+            focus: function() {
+                // prevent value inserted on focus
+                return false;
+            },
+            select: function(event, ui) {
+                var selectedObj = ui.item.label;
+                $ac('[id$="{!for2}"]').val(ui.item.name);
+                $ac('[id$="{!for}_hiddenDiv"] input[type=hidden][id$="r1"]').val(ui.item.id);
+                $ac('[id$="{!for}_hiddenDiv"] input[type=hidden][id$="r2"]').val(ui.item.value);
+                callAfterClick();
+                return true;
+            }
+        }).data("ui-autocomplete")._renderItem = autoCompleteRender;
+    });
+    
+    function autoCompleteRender(ul, item) {
+        return $ac("<li></li>").data("item.autocomplete", item).append(item.label).appendTo(ul);
+    }
+    
+    function callAfterClick(){
+        callPageAfterClick();
+    }
+    </script>
+    
+</apex:component>

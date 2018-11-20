@@ -1,0 +1,18 @@
+<apex:component controller="c_AprovacaoMaquete" access="global">
+    <apex:attribute name="oppid" type="Id" description="Id da Oportunidade" assignTo="{!idOpp}"/>
+    <div style="font-size: 12pt; color: black;">
+        <p>{!$Label.Caro_cliente}</p>
+        <p>{!$Label.Enviamos} {!comercial.Versao_de_maquete_enviada__c} {!$Label.Para_encomenda} {!comercial.Referencia_interna__c}({!$Label.Referencia_Stricker}: {!comercial.Auto_Number__c} / {!comercial.Referencia_PHC__c}).</p>
+        <p>{!$Label.Clique_no} <a href="{!siteURL}apex/maquete?id={!idOpp}&doc={!maquete.Id}" target="_blank">link</a> {!$Label.Poder_aprovar_maquete}.</p>
+        <br/>
+        <p>{!$Label.Obrigado}</p>
+        <br/>
+        <p>{!$Label.Nao_responda}</p>
+        <p>
+            <apex:outputField value="{!comercial.Owner.Assinatura_email__c}"/>
+        </p>
+        <p>
+            <apex:image style="height: 50px;margin-left: -10px;" value="{!LogoUrl}"/>
+        </p>
+    </div>
+</apex:component>

@@ -1,0 +1,64 @@
+<apex:page standardController="Opportunity" extensions="c_SincronizarDossier">
+    <apex:includeScript value="/support/console/39.0/integration.js"/>
+    <apex:form id="theForm" style="background-color: white;">
+        <apex:actionFunction action="{!callSync}" name="callSync" rerender="theForm" oncomplete="checkRedirect()"/>
+        <script>
+        document.addEventListener("DOMContentLoaded", function(event) {
+            callSync();
+            var setTabTitle= function setTabTitle(result) {
+                console.log(result);
+                sforce.console.setTabTitle('Sincronizar dossier', null);
+            };
+            sforce.console.getFocusedSubtabId(setTabTitle);
+        });
+        function checkRedirect(){
+            if({!success}){
+                if(sforce.console.isInConsole()){
+                    var getPageInfo = function getPageInfo(result){
+                        console.log(result);
+                        var showPageInfo = function showPageInfo(result2) {
+                            console.log(result2);
+                            var a = JSON.parse(result2.pageInfo);
+                            if(a.object == 'Opportunity' || a.objectId.includes("{!opp.Id}")){
+                                openPrimaryTabConsole();
+                            }else{
+                                openSubTabConsole();
+                            }
+                        };
+                        sforce.console.getPageInfo(result.id , showPageInfo);
+                    };
+                    sforce.console.getEnclosingPrimaryTabId(getPageInfo);
+                }else{
+                    window.open("/{!opp.Id}","_self");  
+                }
+            }
+        }
+        function openSubTabConsole(){
+            //close current tab because the opp is already open
+            var closeSubtab = function closeSubtab(result) {
+                
+                var tabId = result.id;
+                sforce.console.closeTab(tabId);
+            };
+            sforce.console.getFocusedSubtabId(closeSubtab);
+            
+            //open opp again
+            var openSubtab = function openSubtab(result3) {
+                
+                var primaryTabId = result3.id;
+                
+                sforce.console.openSubtab(primaryTabId, "/{!opp.Id}", true, "", null);
+            };
+            sforce.console.getEnclosingPrimaryTabId(openSubtab);
+        }
+        function openPrimaryTabConsole(){
+            //close current tab because the opp is already open
+            var openPrimaryTab = function openPrimaryTab(result) {
+                sforce.console.openPrimaryTab(result.id, "{!opp.Id}", true);
+            };
+            sforce.console.getFocusedPrimaryTabId(openPrimaryTab);
+            
+        }
+        </script>
+    </apex:form>
+</apex:page>

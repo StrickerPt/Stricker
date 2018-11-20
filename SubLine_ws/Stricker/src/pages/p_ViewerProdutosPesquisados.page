@@ -1,0 +1,169 @@
+<apex:page standardController="Account" extensions="c_ViewerProdutosPesquisados">
+    <apex:includeScript value="{!URLFOR($Resource.bs, '/jQuery_2_0_3.js')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.swal2, '/sweetalert2.min.js')}"/>
+    
+    <apex:includeScript value="{!URLFOR($Resource.DataTables_1100, 'DataTables-1.10.12/media/js/jquery.dataTables.js')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.jQueryDataTables_TableToolsZip, 'TableTools-2.2.4/js/dataTables.tableTools.js')}"/>
+    
+    <apex:stylesheet value="{!URLFOR($Resource.DataTables_1100, 'DataTables-1.10.12/media/css/jquery.dataTables.css')}"/>
+    <apex:stylesheet value="{!URLFOR($Resource.jQueryDataTables_TableToolsZip, 'TableTools-2.2.4/css/dataTables.tableTools.css')}"/>
+    <style>
+        .swal-icon{
+        box-sizing: content-box !important;
+        }
+        .swal-styled{
+        background-image: inherit;
+        }
+        .swal-container {
+        z-index: 9001;
+        }
+        .swal-button {
+        background-image: inherit;
+        font-size: 14px !important;
+        }
+        .dataTables_wrapper .dataTables_paginate .paginate_button.current{
+        border-radius: 2px;
+        color: #005fb2 !important;
+        transition: color 0.05s linear, background-color 0.05s linear !important;
+        background: linear-gradient(to bottom, white 0%, #f4f6f9 100%);
+        background-color: #f4f6f9;
+        border: 1px solid #d8dde6;
+        }
+        .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover{
+        background: linear-gradient(to bottom, white 0%, #f4f6f9 100%);
+        }
+        .dataTables_wrapper .dataTables_paginate .paginate_button:hover{
+        background: linear-gradient(to bottom, #005fb2 0%, #0070d2 100%);
+        border: 1px solid transparent;
+        }
+        table.dataTable.no-footer {
+        border-bottom: none;
+        }
+        table.dataTable thead th, table.dataTable thead td {
+        border-bottom: none;
+        }
+        
+        .dataTables_filter{
+        margin: 1rem;
+        }
+        
+        .dataTables_filter input{
+        background-color: white;
+        color: #16325c;
+        border: 1px solid #d8dde6;
+        border-radius: 0.25rem;
+        width: 100%;
+        transition: border 0.1s linear, background-color 0.1s linear;
+        display: inline-block;
+        padding: 0 1rem 0 0.75rem;
+        line-height: 1.875rem;
+        min-height: calc(1.875rem + (1px * 2));
+        }
+        .dataTables_filter input:focus, input:active{
+        outline: 0;
+        border-color: #1589ee;
+        background-color: white;
+        box-shadow: 0 0 3px #0070D2;
+        }
+        .dataTables_length select{
+        background-color: white;
+        color: #16325c;
+        border: 1px solid #d8dde6;
+        border-radius: 0.25rem;
+        width: 5rem;
+        transition: border 0.1s linear, background-color 0.1s linear;
+        display: inline-block;
+        padding: 0 1rem 0 0.75rem;
+        line-height: 1.875rem;
+        min-height: calc(1.875rem + (1px * 2));
+        }
+        .dataTables_length select:focus, select:active{
+        outline: 0;
+        border-color: #1589ee;
+        background-color: white;
+        box-shadow: 0 0 3px #0070D2;
+        }
+        .dataTables_length{
+        margin-top: 1.5rem;
+        width: 12rem;
+        }   
+    </style>
+    
+    <script>
+    j$ = jQuery.noConflict();
+    
+    function tablesort(){
+        console.log("sorting");
+        j$("[id$='dataTable1']").dataTable({
+            scrollY: 250,
+            "bDestroy": true,
+            "sPaginationType": "full_numbers",
+            "iDisplayLength": 5,
+            "aLengthMenu": [[5, 10, 25, 50, 100, 150, -1], [5, 10, 25, 50, 100, 150, "All"]],
+            "aoColumnDefs" : [],
+            "oLanguage": {
+                "sProcessing":   "Processing...",
+                "sLengthMenu":   "Show _MENU_ records",
+                "sZeroRecords":  "No results found",
+                "sInfo":         "_START_ to _END_ of _TOTAL_ total records",
+                "sInfoEmpty":    "0 of 0 records",
+                "sInfoFiltered": "(filtered of _MAX_ total records)",
+                "sInfoPostFix":  "",
+                "sSearch":       "Search:",
+                "sUrl":          "",
+                "oPaginate": {
+                    "sFirst":    "<<",
+                    "sPrevious": "<",
+                    "sNext":     ">",
+                    "sLast":     ">>"
+                }
+            }
+        });
+    }
+    </script>
+    
+    <apex:slds />
+    <apex:form >     
+        <div class="slds-scope">
+            <div class="slds-page-header">
+                <div class="slds-media">
+                    <div class="slds-media__figure">
+                        <span class="slds-icon_container slds-icon-standard-product">
+                            <svg class="slds-icon" aria-hidden="true">
+                                <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{!URLFOR($Asset.SLDS , '/assets/icons/standard-sprite/svg/symbols.svg#product')}"></use>
+                            </svg>
+                        </span>
+                    </div>
+                    <div class="slds-media__body">  
+                        <h1 class="slds-page-header__title slds-truncate slds-align-middle">{!$Label.Produtos_pesquisados}</h1>
+                        <p class="slds-text-body_small slds-line-height_reset">{!Account.Name}</p>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <apex:actionFunction name="init" action="{!init}" rerender="tablePanel" oncomplete="tablesort();"/>
+                <script>
+                window.onload = function(){
+                    init();
+                }
+                </script>
+                <apex:outputPanel id="tablePanel">
+                    <apex:variable id="index" value="{!0}" var="c"/>
+                    <apex:dataTable value="{!datas}" var="prod" id="dataTable1" styleClass="slds-table slds-table_bordered slds-table_cell-buffer" headerClass="slds-text-body_small">
+                        <apex:column >
+                            <apex:variable id="index" value="{!c + 1}" var="c"/>
+                            {!c}
+                        </apex:column>
+                        <apex:column value="{!datas[prod].ref}" headerValue="{!$ObjectType.Product2.Fields.ProductCode.Label}"/>
+                        <apex:column value="{!datas[prod].counter}" headerValue="Nº"/>
+                        <apex:column >
+                        	<apex:repeat value="{!datas[prod].datas}" var="dat">
+                                    {!dat}
+                            </apex:repeat>
+                        </apex:column>
+                    </apex:dataTable>
+                </apex:outputPanel>
+            </div>
+        </div>
+    </apex:form>
+</apex:page>

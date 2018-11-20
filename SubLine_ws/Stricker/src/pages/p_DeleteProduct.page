@@ -1,0 +1,26 @@
+<apex:page standardController="OpportunityLineItem">
+    <apex:includeScript value="/support/console/39.0/integration.js"/>
+    
+    <script>
+    document.addEventListener("DOMContentLoaded", function(event) {
+        //openTab('{!OpportunityLineItem.OpportunityId}');
+        openTab('/apex/p_AddProduct?id={!OpportunityLineItem.OpportunityId}');
+    });
+    function openTab(objId){
+        if(sforce.console.isInConsole()){
+            var openSubTab = function openSubTab(result) {
+                sforce.console.openSubtab(result.id, objId, true);
+                
+                sforce.console.getEnclosingTabId(
+                    function(result2) {
+                        sforce.console.openSubtab(result.id, '/{!OpportunityLineItem.OpportunityId}', false, '', result2.id);
+                    }
+                );
+            };
+            sforce.console.getFocusedPrimaryTabId(openSubTab);
+        }else{
+            window.open(objId ,"_blank");
+        }
+    }
+    </script>
+</apex:page>

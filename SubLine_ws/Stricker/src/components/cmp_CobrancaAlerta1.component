@@ -1,0 +1,50 @@
+<apex:component controller="c_CobrancaAlerta" access="global">
+    <apex:attribute name="accid" type="Id" description="Id da Conta" assignTo="{!idAcc}"/>
+    <apex:attribute name="tipo" type="Integer" description="Tipo de alerta" assignTo="{!alertType}"/>
+    <html>
+        <body style="font-family: 'Trebuchet MS'">
+            <div align="center">
+                <apex:image style="height: 50px;" value="{!LogoUrl}"/>
+            </div>
+            <h1 style="text-align: -webkit-center;font-size: 1.5rem;">
+                {!$Label.Titulo_alerta} {!if(account.Numero_de_alertas_1__c != null, account.Numero_de_alertas_1__c, '1')}
+            </h1>
+            <p>
+                {!$Label.Caro_cliente}
+            </p>
+            <p>
+                {!$Label.Verifique_faturas}
+            </p>
+            <apex:repeat value="{!docs}" var="doc">
+                <p style="padding-left: 4rem;">
+                    {!$ObjectType.Documentos_Financeiros__c.fields.Numero_de_documento__c.Label} {!doc.Numero_de_documento__c}&nbsp;{!doc.Valor_regularizado__c}{!currencySymbol}
+                </p>
+            </apex:repeat>
+            <p>
+                {!$Label.No_total_de} {!total}{!currencySymbol} {!$Label.Irao_vencer}
+            </p>
+            <p>
+                {!$Label.Ignore_este_aviso}
+            </p>
+            <p>
+                {!$Label.Outras_informacoes}:<br/>
+                {!$Label.Total_credito}:{!TotalCred}{!currencySymbol}<br/>
+                {!$Label.Total_em_divida}: {!if(account.Divida_vencida__c != null , account.Divida_vencida__c, '0.00')}{!currencySymbol}
+            </p>
+            <p>
+                {!$Label.Cumprimentos}
+            </p>
+            <p>
+                {!$Label.Departamento_contabilidade}
+            </p>
+            <div style="font-size: xx-small;">
+                <p>
+                    {!$Label.Enviada_automaticamente}
+                </p>
+                <p>
+                    {!$Label.Ficheiros_e_anexos_confidencial}
+                </p>
+            </div>
+        </body>
+    </html>
+</apex:component>

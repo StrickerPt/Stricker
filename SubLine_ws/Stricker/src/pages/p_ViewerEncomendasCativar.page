@@ -1,0 +1,218 @@
+<apex:page controller="c_ViewerEncomendasCativar">
+    <head>
+        
+        <style>
+            .hasMotif {
+            margin:0;
+            }
+            .dataTables_wrapper .dataTables_paginate .paginate_button.current{
+            border-radius: 2px;
+            color: #005fb2 !important;
+            transition: color 0.05s linear, background-color 0.05s linear !important;
+            background: linear-gradient(to bottom, white 0%, #f4f6f9 100%);
+            background-color: #f4f6f9;
+            border: 1px solid #d8dde6;
+            }
+            .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover{
+            background: linear-gradient(to bottom, white 0%, #f4f6f9 100%);
+            }
+            .dataTables_wrapper .dataTables_paginate .paginate_button:hover{
+            background: linear-gradient(to bottom, #005fb2 0%, #0070d2 100%);
+            border: 1px solid transparent;
+            }
+            table.dataTable.no-footer {
+            border-bottom: none;
+            }
+            table.dataTable thead th, table.dataTable thead td {
+            border-bottom: none;
+            }
+            
+            .dataTables_filter{
+            margin: 1rem;
+            }
+            
+            .dataTables_filter input{
+            background-color: white;
+            color: #16325c;
+            border: 1px solid #d8dde6;
+            border-radius: 0.25rem;
+            width: 100%;
+            transition: border 0.1s linear, background-color 0.1s linear;
+            display: inline-block;
+            padding: 0 1rem 0 0.75rem;
+            line-height: 1.875rem;
+            min-height: calc(1.875rem + (1px * 2));
+            }
+            .dataTables_filter input:focus, input:active{
+            outline: 0;
+            border-color: #1589ee;
+            background-color: white;
+            box-shadow: 0 0 3px #0070D2;
+            }
+            .dataTables_length select{
+            background-color: white;
+            color: #16325c;
+            border: 1px solid #d8dde6;
+            border-radius: 0.25rem;
+            width: 5rem;
+            transition: border 0.1s linear, background-color 0.1s linear;
+            display: inline-block;
+            padding: 0 1rem 0 0.75rem;
+            line-height: 1.875rem;
+            min-height: calc(1.875rem + (1px * 2));
+            }
+            .dataTables_length select:focus, select:active{
+            outline: 0;
+            border-color: #1589ee;
+            background-color: white;
+            box-shadow: 0 0 3px #0070D2;
+            }
+            .dataTables_length{
+            margin-top: 1.5rem;
+            width: 12rem;
+            }
+            
+            .dataTables_filter > label{
+            display: inline-flex;
+            }
+            table.dataTable thead .sorting::after{
+            display:none;
+            }
+            table.dataTable thead .sorting_asc::after {
+            display:none;
+            }
+            table.dataTable thead .sorting_desc::after {
+            display:none;
+            }
+        </style>
+        <script>
+        j$ = jQuery.noConflict();
+        j$(document).ready(function() {
+            tablesort();
+        });
+        function tablesort(){
+            j$("[id$='dataTable1']").dataTable({
+                scrollY: "auto",
+                "bDestroy": true,
+                "sPaginationType": "full_numbers",
+                "iDisplayLength": 5,
+                "aLengthMenu": [[], []],
+                "aoColumnDefs" : [],
+                "oLanguage": {
+                    "sProcessing":   "Processing...",
+                    "sLengthMenu":   "",
+                    "sZeroRecords":  "No results found",
+                    "sInfo":         "_START_ to _END_ of _TOTAL_ total records",
+                    "sInfoEmpty":    "0 of 0 records",
+                    "sInfoFiltered": "(filtered of _MAX_ total records)",
+                    "sInfoPostFix":  "",
+                    "sSearch":       "Search:",
+                    "sUrl":          "",
+                    "oPaginate": {
+                        "sFirst":    "<<",
+                        "sPrevious": "<",
+                        "sNext":     ">",
+                        "sLast":     ">>"
+                    }
+                }
+            });
+        }
+        
+        function showSpinner(show){
+            if(show){
+                j$("#spinner").css("display", "block");
+            }else{
+                j$("#spinner").css("display", "none");  
+            }
+        }
+        </script>
+    </head>
+    <apex:slds />
+    <apex:includeScript value="/support/console/39.0/integration.js"/>
+    <apex:includeScript value="{!URLFOR($Resource.bs, '/jQuery_2_0_3.js')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.DataTables_1100, 'DataTables-1.10.12/media/js/jquery.dataTables.js')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.jQueryDataTables_TableToolsZip, 'TableTools-2.2.4/js/dataTables.tableTools.js')}"/>
+    
+    <apex:stylesheet value="{!URLFOR($Resource.DataTables_1100, 'DataTables-1.10.12/media/css/jquery.dataTables.css')}"/>
+    <apex:stylesheet value="{!URLFOR($Resource.jQueryDataTables_TableToolsZip, 'TableTools-2.2.4/css/dataTables.tableTools.css')}"/>
+    <apex:form >
+        <apex:outputPanel id="openTabPanel">
+            <script>
+            function openOppTab(){
+            	if({!resultId != null}){
+                    sforce.console.openPrimaryTab(null, '/{!resultId}', true);
+                }
+            }
+            </script>
+        </apex:outputPanel>
+        <apex:actionFunction name="openOpp" action="{!getOppId}" oncomplete="openOppTab();" rerender="openTabPanel, messages">
+        	<apex:param assignTo="{!oppToSearch}" value="" name="p1"/>
+        </apex:actionFunction>
+        <div class="slds-scope">
+            <div class="slds-page-header">
+                <div class="slds-media">
+                    <div class="slds-media__figure">
+                        <span class="slds-icon_container slds-icon-standard-opportunity">
+                            <svg class="slds-icon" aria-hidden="true">
+                                <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{!URLFOR($Asset.SLDS , '/assets/icons/standard-sprite/svg/symbols.svg#opportunity')}"></use>
+                            </svg>
+                        </span>
+                    </div>
+                    <div class="slds-media__body">  
+                        <h1 class="slds-page-header__title slds-truncate slds-align-middle">Encomendas por cativar</h1>
+                        <p class="slds-text-body_small slds-line-height_reset">{!$Label.Encomendas}</p>
+                    </div>
+                    <div class="slds-form-element" onclick="clearMessages();">
+                        <apex:actionFunction name="clearMessages" rerender="messages"/>
+                        <apex:pageMessages escape="false" id="messages"></apex:pageMessages>
+                    </div>
+                </div>
+            </div>
+            <div class="slds-m-horizontal_small">
+                <!--apex:variable id="index" value="{!0}" var="c"/-->
+                <apex:dataTable value="{!encomendas}" var="encomenda" styleClass="slds-table slds-table_bordered slds-table_cell-buffer" id="dataTable1">
+                    <!--apex:column >
+                        <apex:variable id="index" value="{!c + 1}" var="c"/>
+                        {!c}
+                    </apex:column-->
+                    <apex:column >
+                        <apex:outputText value="Cativar Stock" styleClass="slds-button slds-button_neutral"/>
+                        <apex:actionSupport event="onclick" reRender="" onsubmit="showSpinner(true);" action="{!cativarStock}" oncomplete="showSpinner(false);">
+                            <apex:param assignTo="{!oppToSearch}" value="{!encomenda.NumFolhaObra}" name="p1"/>
+                        </apex:actionSupport>
+
+                    </apex:column>
+                    <apex:column value="{!encomenda.Comercial}" headerValue="{!$Label.Comercial}"/>
+                    <apex:column value="{!encomenda.Referencia}" headerValue="{!$ObjectType.OpportunityLineItem.Fields.Referencia_SKU__c.Label}"/>
+                    <apex:column value="{!encomenda.Quantidade}" headerValue="{!$ObjectType.OpportunityLineItem.Fields.Quantity.Label}"/>
+                    <apex:column headerValue="{!$ObjectType.OpportunityLineItem.Fields.Stock_cativo__c.Label}">
+                        <div class="slds-form-element__control">
+                            <span class="slds-checkbox">
+                                <apex:inputCheckbox disabled="true" value="{!encomenda.Cativo}" id="checkbox"/>
+                                <apex:outputLabel styleClass="slds-checkbox__label" for="checkbox">
+                                    <span class="slds-checkbox--faux"></span>
+                                </apex:outputLabel>
+                            </span>
+                        </div>
+                    </apex:column>
+                    <apex:column value="{!encomenda.NumDossier}" headerValue="{!$ObjectType.Opportunity.Fields.Name.Label}"/>
+                    <apex:column headerValue="{!$ObjectType.Opportunity.Fields.Numero_de_dossier__c.Label}">
+                        <a onclick="openOpp('{!encomenda.NumFolhaObra}');">{!encomenda.NumFolhaObra}</a>
+                    </apex:column>
+                    <apex:column headerValue="{!$ObjectType.OpportunityLineItem.Fields.Stock_atual__c.Label}">
+                        <apex:outputText value="{0, number, 0}">
+                            <apex:param value="{!encomenda.StockExistente}" />
+                        </apex:outputText>
+                    </apex:column>
+                </apex:dataTable>
+            </div>
+            <div class="slds-spinner_container" style="display:none;" id="spinner">
+                <div role="status" class="slds-spinner slds-spinner--medium">
+                    <span class="slds-assistive-text">Loading</span>
+                    <div class="slds-spinner__dot-a"></div>
+                    <div class="slds-spinner__dot-b"></div>
+                </div>
+            </div>
+        </div>
+    </apex:form>
+</apex:page>

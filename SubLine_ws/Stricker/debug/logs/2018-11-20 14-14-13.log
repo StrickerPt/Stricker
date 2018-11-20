@@ -1,0 +1,43 @@
+40.0 APEX_CODE,DEBUG;APEX_PROFILING,INFO;CALLOUT,INFO;DB,INFO;NBA,INFO;SYSTEM,DEBUG;VALIDATION,INFO;VISUALFORCE,INFO;WAVE,INFO;WORKFLOW,INFO
+14:14:11.0 (166779)|USER_INFO|[EXTERNAL]|0050Y000000OsfQ|marcoramos@stricker.pt|Western European Time|GMTZ
+14:14:11.0 (511354)|EXECUTION_STARTED
+14:14:11.0 (524725)|CODE_UNIT_STARTED|[EXTERNAL]|0660Y000005Vxqj|VF: /apex/p_ViewerContaCorrente
+14:14:11.0 (1395917)|VF_DESERIALIZE_VIEWSTATE_BEGIN|0660Y000005Vxqj
+14:14:11.0 (44293311)|VF_DESERIALIZE_VIEWSTATE_END
+14:14:11.45 (45500854)|SYSTEM_MODE_ENTER|true
+14:14:11.47 (47090209)|SYSTEM_MODE_ENTER|true
+14:14:11.0 (47849409)|SYSTEM_MODE_ENTER|true
+14:14:11.48 (48638004)|SYSTEM_MODE_ENTER|true
+14:14:11.0 (70411476)|CALLOUT_REQUEST|[381]|consultaSaldoCliente_PHC_element:[apex_schema_type_info=(https://www.stricker-europe.com/pt/, true, false), field_order_type_info=(numCliente), numCliente=12369, numCliente_type_info=(numCliente, https://www.stricker-europe.com/pt/, null, 1, 1, false)]::SOAPAction="https://www.stricker-europe.com/pt/consultaSaldoCliente_PHC" Accept=text/xml User-Agent=SFDC-Callout/44.0 SFDC_STACK_DEPTH=1 Content-Type=text/xml; charset=UTF-8 
+14:14:11.0 (205078047)|CALLOUT_RESPONSE|[381]|
+14:14:11.0 (214009429)|CALLOUT_REQUEST|[1875]|lstContaCorrenteCliente_element:[apex_schema_type_info=(https://www.stricker-europe.com/pt/, true, false), field_order_type_info=(numCliente), numCliente=12369, numCliente_type_info=(numCliente, https://www.stricker-europe.com/pt/, null, 1, 1, false)]::SOAPAction="https://www.stricker-europe.com/pt/lstContaCorrenteCliente" Accept=text/xml User-Agent=SFDC-Callout/44.0 SFDC_STACK_DEPTH=1 Content-Type=text/xml; charset=UTF-8 
+14:14:11.0 (700924962)|CALLOUT_RESPONSE|[1875]|
+14:14:11.0 (701333722)|USER_DEBUG|[19]|DEBUG|368
+14:14:11.726 (726238812)|SYSTEM_MODE_ENTER|true
+14:14:11.726 (726479700)|SYSTEM_MODE_ENTER|true
+14:14:11.0 (727143734)|SYSTEM_MODE_ENTER|true
+14:14:11.0 (728692409)|SYSTEM_MODE_ENTER|true
+14:14:11.818 (818661227)|SYSTEM_MODE_ENTER|true
+14:14:11.818 (818949091)|SYSTEM_MODE_ENTER|true
+14:14:11.0 (824279796)|SYSTEM_MODE_ENTER|true
+14:14:12.284 (1284180041)|VF_SERIALIZE_VIEWSTATE_BEGIN|0660Y000005Vxqj
+14:14:12.284 (1355894303)|VF_SERIALIZE_VIEWSTATE_END
+14:14:12.392 (1392121615)|CUMULATIVE_LIMIT_USAGE
+14:14:12.392 (1392121615)|LIMIT_USAGE_FOR_NS|(default)|
+  Number of SOQL queries: 0 out of 100
+  Number of query rows: 0 out of 1000000
+  Number of SOSL queries: 0 out of 20
+  Number of DML statements: 0 out of 0
+  Number of DML rows: 0 out of 0
+  Maximum CPU time: 50 out of 10000
+  Maximum heap size: 0 out of 6000000
+  Number of callouts: 2 out of 100
+  Number of Email Invocations: 0 out of 0
+  Number of future calls: 0 out of 50
+  Number of queueable jobs added to the queue: 0 out of 50
+  Number of Mobile Apex push calls: 0 out of 10
+
+14:14:12.392 (1392121615)|CUMULATIVE_LIMIT_USAGE_END
+
+14:14:12.284 (1392180869)|CODE_UNIT_FINISHED|VF: /apex/p_ViewerContaCorrente
+14:14:12.284 (1393106848)|EXECUTION_FINISHED

@@ -1,0 +1,1499 @@
+<apex:page standardController="Opportunity" extensions="c_AddProduct">
+    
+    <apex:remoteObjects >
+        <apex:remoteObjectModel name="Product2" jsShorthand="Produto2" 
+                                fields="Name,Id,Nome_para_user__c">
+        </apex:remoteObjectModel>
+    </apex:remoteObjects>
+    <html>
+        <head>
+            <apex:includeScript value="{!URLFOR($Resource.bs, '/jQuery_2_0_3.js')}"/>
+            <apex:includeScript value="{!URLFOR($Resource.bs, '/js/bootstrap.js')}"/>
+            <apex:includeScript value="{!URLFOR($Resource.bs, '/js/bootstrap-typeahead.js')}"/>
+            <apex:stylesheet value="{!URLFOR($Resource.bs, '/css/bootstrap.css')}"/>
+            <apex:stylesheet value="{!URLFOR($Resource.bs, '/css/bootstrap-theme.css')}"/>
+            <apex:includeScript value="/support/console/39.0/integration.js"/>
+            <apex:includeScript value="{!URLFOR($Resource.swal2, '/sweetalert2.min.js')}"/>
+            <apex:slds />
+            <style>
+                .arrow:hover {
+                color: inherit !important;
+                }
+                .slds-scope{
+                font-family: Arial,Helvetica,sans-serif !important;
+                }
+                .slds-badge{
+                font-size: inherit !important;
+                line-height: inherit !important;
+                }
+                .slds-truncate{
+                font-family: Arial,Helvetica,sans-serif;
+                }
+                .slds-scope h1, .slds-scope h2, .slds-scope h3, .slds-scope h4, .slds-scope h5, .slds-scope h6, .slds-scope td, .slds-scope th {
+                font-family: Arial,Helvetica,sans-serif;
+                }
+                .bs .glyphicon-chevron-down:before {
+                display:none;
+                }
+                .bs .glyphicon-chevron-down:after {
+                content: "\e114";
+                text-align: right;
+                float: right;
+                }
+                .bs .glyphicon-chevron-right:before {
+                display:none;
+                }
+                .bs .glyphicon-chevron-right:after {
+                content: "\e080";
+                text-align: right;
+                float: right;
+                }
+                .swal-icon{
+                box-sizing: content-box !important;
+                }
+                .swal-styled{
+                background-image: inherit;
+                }
+                .swal-container {
+                z-index: 9001;
+                }
+                .swal-button {
+                background-image: inherit;
+                font-size: 14px !important;
+                }
+                .input-xs{
+                height: 25px !important;
+                }
+                .input-xxs{
+                height: 20px !important;
+                padding: 2px !important;
+                }
+                .input-ch{
+                height: 20px !important;
+                box-shadow: inset 0 0 0 rgba(0, 0, 0, 0.075) !important;
+                bottom: 2.5px !important;
+                position: relative !important;
+                }
+                .collapsing{color: #0070d2;}
+                .sidebar{width: 0px;border: 1px solid transparent;}
+                .sidebar:hover{border: 1px solid #e6e6e6;color: #428bca;}
+                .arrow:hover{color: #428bca;}
+                .centered {
+                position: fixed;
+                left: 50%;
+                transform: translate(-50%, 0);
+                z-index: 1000;
+                background-color: white;
+                width: 300px;
+                height: 35px;
+                border-radius: 0 0 4px 4px;
+                border-bottom: 1px solid #d8dde6;
+                border-left: 1px solid #d8dde6;
+                border-right: 1px solid #d8dde6;
+                text-align: center;
+                }
+                .bPageBlock .message {
+                margin: 0;
+                padding: 0;
+                height: 40px;
+                }
+                .message .messageText h4 {
+                font-weight: bold;
+                display: initial;
+                font-size: 8pt;
+                }
+                .messageTable > tbody > tr > td{
+                border: 0 !important;
+                }
+                .bs .table-striped > tbody > tr:nth-child(odd) > td{
+                background-color: #f3f3f3 !important;
+                }
+                .vb{
+                cursor: pointer;
+                font-size: 16px;
+                }
+                .vb:hover{
+                color: #673AB7;
+                }
+                .bs input[type="radio"]:focus{
+                border-color: transparent !important;
+                -webkit-box-shadow: inset 0 1px 1px transparent, 0 0 8px transparent !important;
+                box-shadow: inset 0 1px 1px transparent, 0 0 8px transparent !important;
+                }
+                
+                .groupedRow{
+                background-color: #eeeeee;
+                cursor: not-allowed;
+                }
+                .bs .table-striped > tbody > tr > td {
+                vertical-align: inherit;
+                }
+                
+                .lookupInput > a.form-control{
+                display:none;
+                }
+                
+                #divImage{
+                
+                display: none; 
+                position: absolute;
+                width: 0px;
+                height: 0px;
+                border:2px solid #a1a1a1;
+                border-radius:5px;
+                }
+            </style>
+            <apex:outputPanel id="scripts">
+                
+                <script>
+                window.onload = function() {
+                    var setTabTitle= function setTabTitle(result) {
+                        
+                        sforce.console.setTabTitle('{!$Label.Adicionar_produtos}', null);
+                        sforce.console.setTabIcon('/img/icon/products16.png', null, null);
+                    };
+                    
+                    sforce.console.getFocusedSubtabId(setTabTitle);
+                }
+                
+                function setFocusOnLoad(){}
+                
+                var callRefreshTab = function callRefreshTab(result) {
+                    for(i=0;i<result.ids.length;i++){
+                        if(i < result.ids.length-1){
+                            sforce.console.refreshSubtabById(result.ids[i], true);
+                        }
+                    }
+                }
+                
+                var callRefreshPrimaryTab = function callRefreshPrimaryTab(result) {
+                    sforce.console.refreshPrimaryTabById(result.id, true);
+                    sforce.console.getSubtabIds(result.id, callRefreshTab);
+                }
+                
+                function closeTab() {
+                    if({!isSucess}){
+                        sforce.console.getEnclosingPrimaryTabId(callRefreshPrimaryTab);
+                        
+                        var closeSubTab = function closeSubTab(result){
+                            sforce.console.closeTab(result.id);
+                        };
+                        sforce.console.getFocusedSubtabId(closeSubTab);
+                    }
+                }
+                
+                function openNewExpedition(){
+                    if({!isSucess}){
+                        sforce.console.getEnclosingPrimaryTabId(callRefreshPrimaryTab);
+                        
+                        var openSubTab = function openSubTab(result){
+                            sforce.console.openSubtab(result.id, "/apex/p_NewExpedition?id={!opp.Id}",true, '',null);
+
+                        };
+                        sforce.console.getEnclosingPrimaryTabId(openSubTab);
+                        closeTab();
+                    }
+                }
+                
+                function clearFind(){
+                    jQuery('[id$="pref"]').val(null);
+                }
+                function callPageAfterClick(){
+                    refreshCustoms();
+                }
+                
+                window.onkeyup = function(e) {
+                    //console.log(e);
+                    var key = e.keyCode ? e.keyCode : e.which;
+                    if (key == 45 && e.ctrlKey == true) { // keyCode 45 is Insert
+                        jQuery('[id$=btnAdd]').click(); // submit the form by hitting ctrl + enter
+                        return false; // preventing default action
+                    }
+                }
+                
+                function buttonsEnabled(enabled) {
+                    // retrieve all of the buttons or links on the page
+                    // with the css class of btn
+                    var $buttons = jQuery('.btn');
+                    if (enabled === false) {
+                        // add the btnDisabled class to give it the look of being disabled
+                        // add the disabled attribute to actually disable interactability
+                        $buttons.toggleClass('btnDisabled', true).attr('disabled', 'disabled');
+                    } else {
+                        // remove the css class and the disabled attribute
+                        $buttons.toggleClass('btnDisabled', false).attr('disabled', null);
+                    } 
+                }
+                
+                function tableButtonEnabled(enabled){
+                    
+                    var $buttons = jQuery('.tableButton');
+                    if (enabled === false) {
+                        // add the btnDisabled class to give it the look of being disabled
+                        // add the disabled attribute to actually disable interactability
+                        $buttons.toggleClass('btnDisabled', true).attr('disabled', 'disabled');
+                    } else {
+                        // remove the css class and the disabled attribute
+                        $buttons.toggleClass('btnDisabled', false).attr('disabled', null);
+                    } 
+                }
+                </script>
+                
+            </apex:outputPanel>
+        </head>
+        <body>
+            <apex:form id="frm">
+                <!--****************************************************************************************************
+                *********************************************** Funções ********************************************
+                ****************************************************************************************************-->
+                <apex:actionFunction name="getCustoms" action="{!getCustoms}" reRender="customizing,customs,thePanel,pnlStock">
+                    <apex:param name="p1" value="" assignTo="{!idProduct}"/>
+                </apex:actionFunction>
+                <apex:actionFunction name="removeProduct" reRender="rProduct">
+                    <apex:param name="p2" value="" assignTo="{!idProduct}"/>
+                </apex:actionFunction>
+                <apex:actionFunction name="cloneProduct" reRender="rProduct">
+                    <apex:param name="p2" value="" assignTo="{!idProduct}"/>
+                </apex:actionFunction>
+                <apex:actionFunction name="removeCustom" reRender="rCustom">
+                    <apex:param name="p2" value="" assignTo="{!typeCustom}"/>
+                    <apex:param name="p3" value="" assignTo="{!idCustom}"/>
+                </apex:actionFunction>
+                <apex:actionFunction name="extraFieldCustom" reRender="painelCustCust">
+                    <apex:param name="p2" value="" assignTo="{!typeCustom}"/>
+                    <apex:param name="p3" value="" assignTo="{!idCustom}"/>
+                </apex:actionFunction>
+                <apex:actionFunction name="removeGroup" reRender="dummy">
+                    <apex:param name="p2" value="" assignTo="{!idGroup}"/>
+                </apex:actionFunction>
+                <apex:actionFunction name="setShow" action="{!setShow}" reRender="thePanel">
+                    <apex:param name="p3" value="" assignTo="{!idProduct}"/>
+                </apex:actionFunction>
+                <apex:actionFunction name="setCustom" action="{!setCustom}" reRender="thePanel,pnlStock"/>
+                <apex:actionFunction name="refreshCustoms" action="{!refreshCustomsHeader}" reRender="pcor,pqtd,pvalor,pvaltab,iref,customs"/>
+                <apex:actionFunction name="refreshTable" action="{!refreshTable}" reRender="pnlTable"/>
+                <apex:actionFunction name="insertPrice" action="{!insertPrice}" reRender="pvalor,ptotal,pvaltab">
+                    <apex:param name="p3" value="" assignTo="{!header.Preco_Unitario__c}"/>
+                </apex:actionFunction>
+                <apex:actionFunction name="insertPriceTable" reRender="pvalor,ptotal,pvaltab,priceTableButtons" oncomplete="tableButtonEnabled(true);">
+                    <apex:param name="p3" value="" assignTo="{!tablePrice}"/>
+                </apex:actionFunction>
+                <apex:actionFunction name="closeInsertTable" action="{!insertPriceByTable}" reRender="pvalor,ptotal,pvaltab"/>
+                <apex:actionFunction name="insertDiscount" action="{!insertDiscount}" reRender="pvalor,ptotal,pvaltab"/>
+                <apex:actionFunction name="saveProdId" action="{!cloneOLI}" rerender="prodPanelTitle,thePanel">
+                    <apex:param assignTo="{!idProduct}" name="p1" value=""/>
+                </apex:actionFunction>
+                <apex:actionFunction action="{!getColorsModal}" name="genColors" rerender="cores">
+                    <apex:param assignTo="{!idProduct}" name="p1" value=""/>
+                </apex:actionFunction>
+                <apex:actionFunction name="rerenderHeader" rerender="cabecalho"/>
+                <apex:actionFunction name="rerenderPqtd" rerender="pqtd"/>
+                
+                <!--****************************************************************************
+****************************************************************************************************-->
+                <div class="bs centered slds-scope">
+                    <apex:commandButton styleClass="btn btn-default btn-xs" action="{!apagarAgrupadores}" value="{!$Label.Sair}" oncomplete="closeTab();return false;" rerender="scripts" style="top: 5px;position: relative;"/>
+                    &nbsp;
+                    &nbsp;
+                    &nbsp;
+                    <apex:commandButton styleClass="btn btn-primary btn-xs" value="{!$Label.Confirmar}" action="{!save}" onclick="buttonsEnabled(false)" oncomplete="buttonsEnabled(true);closeTab();return false;" 
+                                        rerender="frm, scripts" style="top: 5px;position: relative;" rendered="{!!isAuthorized}"/>
+                    &nbsp;
+                    &nbsp;
+                    &nbsp;
+                    <apex:commandButton styleClass="btn btn-primary btn-xs" value="{!$Label.Confirmar_e_Expedicao}" action="{!save}" onclick="buttonsEnabled(false)" rendered="{!!isAuthorized}"
+                                        oncomplete="buttonsEnabled(true);openNewExpedition();return false;" rerender="frm, scripts" style="top: 5px;position: relative;"/>
+                </div>
+                <div class="slds-scope">
+                    
+                    <div class="slds-page-header" style="border-bottom:none; background: none;padding-left:inherit">
+                        <div class="slds-media slds-m-left_small">
+                            <div class="slds-media__body">
+                                <h1 class="slds-page-header__title slds-truncate slds-align-middle">{!$Label.Adicionar_produtos}</h1>
+                                <p class="slds-text-body_small slds-line-height_reset">{!opp.Name} {!opp.CurrencyIsoCode}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <apex:pageBlock mode="maindetail" id="produtos" rendered="{!!isAuthorized}">
+                    <div class="bs">
+                        <div id="divImage"></div>
+                        <div class="container-fluid">
+                            <div>
+                                <table class="col-md-12">
+                                    <tr>
+                                        <td style="vertical-align: top;">
+                                            <apex:outputPanel id="cabecalho">
+                                                
+                                                <!--****************************************************************************************************
+*********************************************** Cabeçalho ******************************************
+****************************************************************************************************-->
+                                                <table class="table table-condensed table-hover table-striped" style="border-collapse:collapse;margin-bottom: 0; width:100%">
+                                                    
+                                                    <thead>
+                                                        <tr style="background: #f3f3f3;border: 1px solid #c3c5c7;">
+                                                            <th class="slds-scope" style="vertical-align: inherit;">
+                                                                <apex:inputHidden value="{!header.Product2Id}" id="prodId"/>
+                                                                <apex:outputPanel rendered="{!opp.RecordType.Name = 'Orçamento de Importação'}">
+                                                                    <div class="slds-form-element__row">
+                                                                        <div class="slds-form-element">
+                                                                            <div class="slds-form-element__control" style="text-align: center;">
+                                                                                <span class="slds-checkbox">
+                                                                                    <apex:inputCheckbox id="prodGen" value="{!produtoGenerico}" onchange="rerenderHeader();"/>
+                                                                                    <apex:outputLabel styleClass="slds-checkbox__label" for="prodGen" style="color: #000;font-family: Arial,Helvetica,sans-serif;font-size: 71%;">
+                                                                                        Produto<br/>
+                                                                                        Generico<br/>
+                                                                                        <span class="slds-checkbox--faux"></span>
+                                                                                    </apex:outputLabel>
+                                                                                </span>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <script>
+                                                                    function writeProdId(){
+                                                                        if({!produtoGenerico}){
+                                                                            document.getElementById("{!$Component.prodId}").value = '{!genPbe.Product2Id}';
+                                                                        }
+                                                                    }
+                                                                    </script>
+                                                                    <span class="badge" style="cursor:default;border-radius: 0;background-color: #f3f3f3;line-height: 1.428571429;color: #a5a5a5;padding: 1px 1px;font-size: 8px;margin-top: 3px;">Novo</span>
+                                                                </apex:outputPanel>
+                                                            </th>    
+                                                            <th colspan="{!IF(produtoGenerico,5,1)}" width="{!IF(produtoGenerico,'60%','')}">
+                                                                <apex:outputPanel rendered="{!!produtoGenerico}">
+                                                                    <div class="form-group">
+                                                                        <label for="pref">{!$ObjectType.Product2.Fields.ProductCode.Label}</label>
+                                                                        <c:AutoComplete returnValue="{!header.Product2Id}" returnValue2="{!header.Referencia_SKU__c}"
+                                                                                        for="pref" for2="pprod" componentLabel=""
+                                                                                        labelStyleClass="" sObject="PricebookEntry" label="ProductCode,Product2.Tamanho__c"
+                                                                                        value="Product2Id" details="Product2.Nome_para_user__c,CurrencyIsoCode" 
+                                                                                        whereClause="{!pricebook}" limitClause="15" id="autoComplete">
+                                                                        </c:AutoComplete>
+                                                                        <apex:inputText id="pref" styleClass="form-control input-sm input-xs"/>
+                                                                        <script>
+                                                                        
+                                                                        function clearRef(){
+
+                                                                            if({!If(header.Product2Id == null, true, false)}){
+                                                                                document.getElementById("{!$Component.pref}").value = "";
+                                                                            }
+                                                                        }
+                                                                        </script>
+                                                                    </div>
+                                                                </apex:outputPanel>
+                                                                <apex:outputPanel rendered="{!produtoGenerico}">
+                                                                    <div class="form-group">
+                                                                        <label for="desc">{!$ObjectType.Product2.Fields.Description.Label}</label>
+                                                                        <apex:inputTextarea id="desc" styleClass="form-control input-sm input-xs" rows="10" value="{!header.Description}"
+                                                                                            style="height: 80px !important;resize: none;"/>
+                                                                    </div>
+                                                                </apex:outputPanel>
+                                                            </th>
+                                                            <th width="{!IF(produtoGenerico,'20%','')}" style="{!IF(produtoGenerico,'vertical-align: inherit;','')}">
+                                                                <apex:outputPanel rendered="{!!produtoGenerico}">
+                                                                    <div class="form-group" onclick="rerenderScript();" >
+                                                                        <label for="pprod">{!$ObjectType.Product2.Label}</label>
+                                                                        <apex:inputText id="pprod" disabled="true" styleClass="form-control input-sm input-xs" style="cursor: pointer;"/>
+                                                                        <apex:actionFunction name="rerenderScript" rerender="openProdPanel" oncomplete="checkProduto();"/>
+                                                                        <apex:outputPanel id="openProdPanel">
+                                                                            
+                                                                            <script>
+                                                                            function checkProduto(){
+                                                                                if("{!header.Product2Id}" != ""){
+                                                                                    if(sforce.console.isInConsole()){
+                                                                                        var openSubtab = function openSubtab(result) {
+                                                                                            var primaryTabId = result.id;
+                                                                                            sforce.console.openSubtab(primaryTabId ,"/{!header.Product2Id}", true, 
+                                                                                                                      '', null);
+                                                                                        };
+                                                                                        sforce.console.getEnclosingPrimaryTabId(openSubtab);
+                                                                                    }else{
+                                                                                        window.open("/{!header.Product2Id}","_self");
+                                                                                    }
+                                                                                }
+                                                                            }
+                                                                            </script>
+                                                                        </apex:outputPanel>
+                                                                    </div>
+                                                                </apex:outputPanel>
+                                                                <apex:outputPanel rendered="{!produtoGenerico}">
+                                                                    <div class="form-group">
+                                                                        <label for="prefsem">{!$Label.Referencia_Semelhante}</label>
+                                                                        <apex:inputField id="prefsem" value="{!header.Referencia_semelhante__c}" styleClass="form-control input-sm input-xs"/>
+                                                                    </div>
+                                                                </apex:outputPanel>
+                                                            </th>
+                                                            <th style="{!IF(produtoGenerico,'display:none','')}" colspan="{!IF(opp.Tipo_de_amostra__c == 'Terceiros', 3, 1)}">
+                                                                <div class="form-group">
+                                                                    <label for="pcor">{!$ObjectType.Product2.Fields.Cor__c.Label}</label>
+                                                                    <apex:selectList onchange="rerenderPqtd();" id="pcor" value="{!header.Codigo_de_cor__c}" rendered="{!header.Product2.Name != 'Genérico'}" multiselect="false" size="1" styleClass="form-control input-sm input-xs">
+                                                                        <apex:selectOptions value="{!colors}"/>
+                                                                    </apex:selectList>
+                                                                </div>
+                                                            </th>
+                                                            <th width="{!IF(produtoGenerico,'40%','')}" style="{!IF(produtoGenerico,'vertical-align: inherit;','')}">
+                                                                <div class="form-group">
+                                                                    <apex:outputPanel id="pqtd">
+                                                                        <table style="width: -webkit-fill-available;">
+                                                                            <tr>
+                                                                                <td style="padding:0px;">
+                                                                                    <label for="pqtd">{!$ObjectType.OpportunityLineItem.Fields.Quantity.Label}</label>
+                                                                                </td>
+                                                                                <td style="padding:0px;text-align:center;">
+                                                                                    Stock: {!stockHeader}
+                                                                                </td>
+                                                                            </tr>
+                                                                        </table>
+                                                                        <div>
+                                                                            
+                                                                        </div>
+                                                                        <apex:inputField styleClass="form-control input-sm input-xs" value="{!header.Quantity}" required="false">
+                                                                            <apex:actionSupport event="onchange" oncomplete="document.getElementById('btnAdd').removeAttribute('disabled');" action="{!priceByQuantity}" 
+                                                                                                reRender="pvalor,pvaltab,ptotal"/>
+                                                                        </apex:inputField>
+                                                                    </apex:outputPanel>
+                                                                </div>
+                                                            </th>
+                                                            <th style="{!IF(OR( produtoGenerico , opp.Tipo_de_amostra__c == 'Terceiros'),'display:none','')}">
+                                                                <table style="width: 100%;">
+                                                                    <tr>
+                                                                        <td style="padding: 0;">
+                                                                            <div class="form-group">
+                                                                                <label for="pvalor">{!$Label.Valor}</label>
+                                                                                <apex:inputField styleClass="form-control input-sm input-xs" value="{!header.Preco_unitario__c}" id="pvalor">
+                                                                                    <apex:actionSupport event="onchange" action="{!priceByValue}" reRender="pvaltab,ptotal"/>
+                                                                                </apex:inputField>
+                                                                            </div>
+                                                                        </td>
+                                                                        <td style="padding: 0 0 0 4px;vertical-align: middle;">
+                                                                            <i class="glyphicon glyphicon-list vb" data-toggle="modal" data-target="#myModalTable" onclick="refreshTable();" title="Tabela de preços"/>
+                                                                        </td>
+                                                                    </tr>
+                                                                </table>
+                                                            </th>
+                                                            <th style="{!IF(OR( produtoGenerico , opp.Tipo_de_amostra__c == 'Terceiros'),'display:none','')}">
+                                                                <div class="form-group">
+                                                                    <label for="ptotal">{!$Label.Total}</label>
+                                                                    <apex:inputField styleClass="form-control input-sm input-xs" value="{!header.Total_de_customizacao__c}" id="ptotal" html-disabled="true"/>
+                                                                </div>
+                                                            </th>
+                                                            <th style="{!IF(Or(CONTAINS(opp.RecordType.Name, 'Orçamento'),CONTAINS(opp.RecordType.Name, 'Reserva')),'display:none;','')}">
+                                                                <div class="form-group">
+                                                                    <label for="pvaltab">{!$Label.Cativar_Stock}</label>
+                                                                    <apex:inputField id="pcativo" styleClass="form-control input-sm input-ch" html-title="{!$ObjectType.OpportunityLineItem.Fields.Stock_cativo__c.Label}" value="{!header.Stock_cativo__c}"/>
+                                                                </div>
+                                                            </th>
+                                                            <th style="{!IF(produtoGenerico,'display:none','')}">
+                                                                <div class="form-group">
+                                                                    <label for="pvaltab">{!$ObjectType.OpportunityLineItem.Fields.Valor_de_tabela_de_precos__c.Label}</label>
+                                                                    <apex:inputField styleClass="form-control input-sm input-ch" value="{!header.Valor_de_tabela_de_precos__c}" id="pvaltab" html-disabled="true">
+                                                                        <apex:actionSupport event="onchange" action="{!valueTabChange}" reRender="pvalor,ptotal"/>
+                                                                    </apex:inputField>
+                                                                </div>
+                                                            </th>
+                                                            <th style="vertical-align: middle;text-align: right;">
+                                                                <a id="btnAdd" onclick="buttonsEnabled(false);adicionarProduto();" class="btn btn-default btn-xs" style="margin-top: 5px;" disabled="true">{!$Label.Adicionar}</a>
+                                                                <apex:actionFunction name="adicionarProduto" action="{!addProduct}" reRender="thePanel,prodPanelTitle, autoComplete, cabecalho, prodPanelTitle"
+                                                                                     oncomplete="clearRef(); buttonsEnabled(true);document.getElementById('{!$Component.pref}').focus();
+                                                                                                 document.getElementById('btnAdd').setAttribute('disabled' ,'true');return false;" />
+                                                            </th>
+                                                        </tr>
+                                                        <tr>
+                                                            <th colspan="10"><apex:pageMessages /></th>
+                                                        </tr>
+                                                    </thead>
+                                                </table>
+                                                
+                                            </apex:outputPanel>
+                                            <div id="dummy">
+                                                <apex:commandButton value="{!$Label.Agrupar_produtos}" rendered="{!AND(Contains(opp.RecordType.Name, 'Orçamento'), size> 0)}"
+                                                                    html-data-toggle="modal" html-data-target="#myModalGroup" onclick="refreshTable();"
+                                                                    styleClass="btn btn btn-default btn-xs" rerender="dummy"
+                                                                    style="position: relative;float: right;width: 20%;margin: 1%;"/>
+                                            </div>
+                                            
+                                            <!--****************************************************************************************************
+                                                *********************************************** Produtos *******************************************
+                                                ****************************************************************************************************-->
+                                            <div class="slds-scope">
+                                                <div class="slds-page-header" style="border-bottom:none; background: none;padding-left:inherit">
+                                                    <div class="slds-media">
+                                                        <div class="slds-media__figure">
+                                                            <span class="slds-icon_container slds-icon-standard-product">
+                                                                <svg class="slds-icon" aria-hidden="true">
+                                                                    <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{!URLFOR($Asset.SLDS , '/assets/icons/standard-sprite/svg/symbols.svg#product')}"></use>
+                                                                </svg>
+                                                            </span>
+                                                        </div>
+                                                        <div class="slds-media__body">
+                                                            <apex:outputPanel id="prodPanelTitle">
+                                                                <h1 class="slds-page-header__title slds-truncate"
+                                                                    style="font-family: Arial,Helvetica,sans-serif;color: black;">
+                                                                    {!IF(size>0, $Label.Produtos_adicionados + ' - ' + opp.CurrencyIsoCode + ' ' + Text(valorTotal),'- ' + $Label.Nao_existem_produtos + ' -')}
+                                                                </h1>
+                                                            </apex:outputPanel>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                
+                                            </div>
+                                            <apex:outputPanel id="thePanel">
+                                                <table class="table table-condensed table-hover table-striped" style="border-collapse:collapse;margin-bottom: 0;">
+                                                    <tbody>
+                                                        <tr style="height: 40px;background-color: white;">
+                                                            <th colspan="{!if(CONTAINS(opp.RecordType.Name, 'Orçamento'),'12',if(CONTAINS(opp.RecordType.Name, 'Nota de encomenda'),'10','12'))}"
+                                                                class="form-group" style="background-color: white;vertical-align: middle;padding: 0;font-size: 10pt;{!IF(size>0, 'text-align:left;','color:#a5a5a5;text-align:center;')}">
+                                                            </th>
+                                                        </tr>
+                                                        <script>
+                                                        function openProduct(prodId) {
+                                                            if(sforce.console.isInConsole()){
+                                                                var openSubtab = function openSubtab(result) {
+                                                                    var primaryTabId = result.id;
+                                                                    sforce.console.openSubtab(primaryTabId ,"/"+prodId, true, 
+                                                                                              '', null);
+                                                                };
+                                                                sforce.console.getEnclosingPrimaryTabId(openSubtab);
+                                                            }else{
+                                                                window.open("/"+prodId,"_self");
+                                                            }
+                                                        }
+                                                        var timerID;
+                                                        timerID = setTimeout(function(){}, 1000);
+                                                        function showPhoto(e, imagem){
+                                                            
+                                                            jQuery("#divImage").html('<img id="processing_gif_photo" src="{!$Resource.processing_gif}" alt="A processar..." style="margin: auto auto;"/>');
+                                                            jQuery("#divImage").css('top', (e.pageY + 10) + 'px').css('left', (e.pageX + 10) + 'px').css('z-index',100).show();
+                                                            
+                                                            timerID = setTimeout(function(){
+                                                                var oImg = document.createElement("img");
+                                                                oImg.setAttribute('width', '100%');
+                                                                oImg.setAttribute('height', '100%');
+                                                                oImg.setAttribute('src', imagem);
+                                                                jQuery("#divImage").html(oImg);
+                                                                jQuery("#divImage").animate({height:'100',width:'100'});
+                                                            }, 1000);
+                                                        }
+                                                        function hidePhoto(){
+                                                            
+                                                            clearTimeout(timerID);
+                                                            jQuery("#divImage").hide();
+                                                            jQuery("#divImage").html('');
+                                                            jQuery("#divImage").animate({height:'0',width:'0'});
+                                                        }
+                                                        </script>
+                                                        <apex:repeat value="{!sortedKeys}" var="id">
+                                                            <tr style="border-left: 1px solid #dddddd;border-right: 1px solid #dddddd;border-bottom: 1px solid #dddddd;">
+                                                                <td colspan="{!if(CONTAINS(opp.RecordType.Name, 'Nota de encomenda'),'1','2')}" style="width:1%;display: table-cell;cursor: pointer;{!if(CONTAINS(opp.RecordType.Name, 'Nota de encomenda'),'display:none;','')}" data-toggle="collapse" data-target="#row{!id}" class="accordion-toggle arrow {!IF(produtos[id].show, 'glyphicon glyphicon-chevron-up','glyphicon glyphicon-chevron-down')}" onclick="setShow('{!id}');"></td>
+                                                                <td colspan="{!if(CONTAINS(opp.RecordType.Name, 'Orçamento'),'1','2')}" style="font-weight: bold; vertical-align: middle;{!if(CONTAINS(opp.RecordType.Name, 'Orçamento'),'','display:none;')}" width="1%">
+                                                                    <apex:outputText id="pGroupIndex" value="{!IF(produtos[id].item.Agrupador_Oli__c != null, agrupadores[produtos[id].item.Agrupador_Oli__c].index,'-')}"/>
+                                                                </td>
+                                                                <td style="font-weight: bold;" onclick="openProduct('{!produtos[id].item.Product2Id}');" width="8rem">
+                                                                    <apex:inputField id="psku" styleClass="form-control input-sm input-xs" style="cursor: pointer; width: 8rem;"
+                                                                                     value="{!produtos[id].item.Referencia_SKU__c}" html-disabled="true"/>
+                                                                </td>
+                                                                <td style="font-weight: bold;" id="Prod{!id}" onclick="openProduct('{!produtos[id].item.Product2Id}');" onmouseover="showPhoto(event, '{!produtos[id].item.Product2.Url_Imagem__c}');" onmouseout="hidePhoto();" colspan="{!IF(opp.Tipo_de_amostra__c == 'Terceiros', 3, 1)}">
+                                                                    <input type="text" class="form-control input-sm input-xs" style="cursor: pointer;"
+                                                                           disabled="true" id="nomeProd{!id}"/>
+                                                                    <script>
+                                                                    var id = document.getElementById("nomeProd{!id}");
+                                                                    fetchWarehouses(id.id);
+                                                                    function fetchWarehouses(id){
+                                                                        // Create a new Remote Object
+                                                                        var wh = new SObjectModel.Product2();
+                                                                        wh.retrieve({where: {Id: {eq: '{!produtos[id].item.Product2Id}' }}}, function(err, records, event){
+                                                                            if(err) {
+                                                                                alert(err.message);
+                                                                            }
+                                                                            else {
+
+                                                                                if(records.length > 0){
+                                                                                    var ele = document.getElementById(id);
+                                                                                    ele.value = htmlDecode(records[0]._props.Nome_para_user__c);
+                                                                                }
+                                                                            }
+                                                                        });
+                                                                    };
+                                                                    function htmlDecode(input){
+                                                                        var e = document.createElement('div');
+                                                                        e.innerHTML = input;
+                                                                        return e.childNodes.length === 0 ? "" : e.childNodes[0].nodeValue;
+                                                                    }
+                                                                    </script>
+                                                                </td>
+                                                                <td style="font-weight: bold;" colspan="{!IF(produtos[id].item.Referencia_SKU__c == genPbe.ProductCode,'3','2')}">
+                                                                    <apex:outputPanel rendered="{!produtos[id].item.Referencia_SKU__c == genPbe.ProductCode}">
+                                                                        <apex:inputTextarea id="desc" styleClass="form-control input-sm input-xs" rows="10" value="{!produtos[id].item.Description}"
+                                                                                            style="height: 80px !important;resize: none;"/>
+                                                                    </apex:outputPanel>
+                                                                    <apex:outputPanel rendered="{!produtos[id].item.Referencia_SKU__c != genPbe.ProductCode}">
+                                                                        <table style="width: 100%; border-top: none;">
+                                                                            <tbody>
+                                                                                <tr>
+                                                                                    <td width="99%" style="border-top: none;padding-right: 0;">
+                                                                                        <apex:selectList value="{!produtos[id].item.Codigo_de_cor__c}" multiselect="false" size="1" styleClass="form-control input-sm input-xs" style="width:100%;">
+                                                                                            <apex:selectOptions value="{!produtos[id].options}"/>
+                                                                                            <apex:actionSupport event="onchange" action="{!changeSKU}" reRender="psku">
+                                                                                                <apex:param name="p10" value="{!id}" assignTo="{!idProduct}"/>
+                                                                                            </apex:actionSupport>
+                                                                                        </apex:selectList>
+                                                                                    </td>
+                                                                                    <td width="1%" style="border-top: none;">
+                                                                                        <apex:image url="{!URLFOR($Resource.rbg_wheel_icon)}" width="25rem" height="25rem" style="padding: 2px;" html-data-toggle="modal" html-data-target="#myModalColors" onclick="genColors('{!id}');"/>
+                                                                                    </td>
+                                                                                </tr>
+                                                                            </tbody>
+                                                                            
+                                                                        </table>
+                                                                    </apex:outputPanel>
+                                                                </td>
+                                                                <td style="font-weight: bold;" colspan="{!IF(produtos[id].item.Referencia_SKU__c == genPbe.ProductCode,'2','1')}">
+                                                                    <apex:inputField styleClass="form-control input-sm input-xs" value="{!produtos[id].item.Quantity}" required="false">
+                                                                        <apex:actionSupport event="onchange" action="{!priceByQuantityLine}" reRender="thePanel,prodPanelTitle, groupModal, pvalorp,pvaltabp,ptotalp,pquantc,pvalorc,pvaltabc,ptotalc">
+                                                                            <apex:param name="p9" value="{!id}" assignTo="{!idProduct}"/>
+                                                                        </apex:actionSupport>
+                                                                    </apex:inputField>
+                                                                </td>
+                                                                <td style="font-weight: bold;{!IF(OR(produtos[id].item.Referencia_SKU__c == genPbe.ProductCode,opp.Tipo_de_amostra__c == 'Terceiros'),'display:none;','')}" id="myCell">
+                                                                    <apex:inputField id="pvalorp" styleClass="form-control input-sm input-xs" value="{!produtos[id].item.Preco_Unitario__c}">
+                                                                        <apex:actionSupport event="onchange" action="{!priceByValueLine}" reRender="pvaltabp,ptotalp,prodPanelTitle, groupModal, thePanel">
+                                                                            <apex:param name="p10" value="{!id}" assignTo="{!idProduct}"/>
+                                                                        </apex:actionSupport>
+                                                                    </apex:inputField>
+                                                                </td>
+                                                                <td style="font-weight: bold;{!IF(OR(produtos[id].item.Referencia_SKU__c == genPbe.ProductCode,opp.Tipo_de_amostra__c == 'Terceiros'),'display:none;','')}">
+                                                                    <apex:inputField id="ptotalp" styleClass="form-control input-sm input-xs" value="{!produtos[id].item.Total_de_customizacao__c}" html-disabled="true"/>
+                                                                </td>
+                                                                <td style="font-weight: bold;{!IF(Or(CONTAINS(opp.RecordType.Name, 'Orçamento'),CONTAINS(opp.RecordType.Name, 'Reserva')),'display:none;','')}" width="5%">
+                                                                    <apex:inputField id="pcativo" styleClass="form-control input-sm input-ch" html-title="{!$ObjectType.OpportunityLineItem.Fields.Stock_cativo__c.Label}" value="{!produtos[id].item.Stock_Cativo__c}"/>
+                                                                </td>
+                                                                <td style="font-weight: bold;{!IF(produtos[id].item.Referencia_SKU__c == genPbe.ProductCode,'display:none;','')}" width="5%">
+                                                                    <apex:inputField id="pvaltabp" styleClass="form-control input-sm input-ch" value="{!produtos[id].item.Valor_de_tabela_de_precos__c}" html-disabled="true">
+                                                                        <apex:actionSupport event="onchange" action="{!valueTabChangeLine}" reRender="thePanel,prodPanelTitle,pvalorp,ptotalp">
+                                                                            <apex:param name="p10" value="{!id}" assignTo="{!idProduct}"/>
+                                                                        </apex:actionSupport>
+                                                                    </apex:inputField>
+                                                                </td>
+                                                                <td style="width: 140px;text-align: center;">
+                                                                    <span title="{!opp.CurrencyIsoCode} {!produtos[id].taxa.UnitPrice}">
+                                                                        <i class="glyphicon glyphicon-euro" style="cursor: pointer;font-size: 16px;{!IF(produtos[id].taxa == null, 'display:none;', '')}"/>
+                                                                    </span>
+                                                                    
+                                                                    &nbsp;&nbsp;&nbsp;&nbsp;
+                                                                    <span title="Customizar">
+                                                                        <i class="glyphicon glyphicon-plus-sign"  onclick="getCustoms('{!id}');"
+                                                                           style="cursor: pointer;font-size: 16px;
+                                                                                  {!if(id == idProduct && produtos[id].show,'color: #e54c00;','')}
+                                                                                  {!IF(produtos[id].item.Product2Id == genPbe.Product2Id,'display:none;','')}"> 
+                                                                          
+                                                                        </i>
+                                                                    </span>
+                                                                    &nbsp;&nbsp;&nbsp;&nbsp;
+                                                                    <span title="Apagar">
+                                                                        <i class="{!IF(Customizing, 'glyphicon glyphicon-trash','glyphicon glyphicon-trash')}" 
+                                                                           style="cursor: pointer;font-size: 16px;" data-toggle="modal"
+                                                                           data-target="#myModalP" onclick="removeProduct('{!id}');"/>
+                                                                    </span>
+                                                                    &nbsp;&nbsp;&nbsp;&nbsp;
+                                                                    <span title="Clonar">
+                                                                        <i class="{!IF(Customizing, 'glyphicon glyphicon-copy','glyphicon glyphicon-copy')}" 
+                                                                           style="cursor: pointer;font-size: 16px;"
+                                                                           data-target="#myModalClone" onclick="saveProdId('{!id}')"/>
+                                                                    </span>
+                                                                    
+                                                                </td>
+                                                            </tr>
+                                                            <tr style="border-left: 1px solid #dddddd;border-right: 1px solid #dddddd;border-bottom: 1px solid #dddddd;">
+                                                                <td colspan="{!if(CONTAINS(opp.RecordType.Name, 'Orçamento'),'12',if(CONTAINS(opp.RecordType.Name, 'Nota de encomenda'),'10','12'))}" style="/*border: 1px solid #e6e6e6;background: #f3f3f3;*/padding:0;border-top: 0;">
+                                                                    <div id="row{!id}" class="accordian-body collapse {!IF(produtos[id].show,'in','')}" style="background: transparent;">
+                                                                        <table class="table table-striped" style="background-color: transparent;{!if(CONTAINS(opp.RecordType.Name, 'Nota de encomenda'),'display:none;','')}">
+                                                                            <thead>
+                                                                                <tr>
+                                                                                    <th>{!$Label.Componente}</th>
+                                                                                    <th>{!$ObjectType.Product2.Fields.Tecnica__c.Label}</th>
+                                                                                    <th>{!$Label.Area}</th>
+                                                                                    <th>{!$Label.Cores}</th>
+                                                                                    <th>{!$ObjectType.OpportunityLineItem.Fields.Numero_de_impressoes__c.Label}</th>
+                                                                                    <th>{!$ObjectType.OpportunityLineItem.Fields.Quantity.Label}</th>
+                                                                                    <th>{!$Label.Valor}</th>
+                                                                                    <th>{!$Label.Total}</th>
+                                                                                    <th style="width: 50px;"></th>
+                                                                                    
+                                                                                </tr>
+                                                                            </thead>
+                                                                            <tbody>
+                                                                                <apex:repeat value="{!produtos[id].customList}" var="idProd">
+                                                                                    <tr>
+                                                                                        <td><apex:inputField styleClass="form-control input-sm input-xxs" value="{!produtos[id].customList[idProd].item.Componente_da_impressao__c}" html-disabled="true"/></td>
+                                                                                        <td><apex:inputField styleClass="form-control input-sm input-xxs" value="{!produtos[id].customList[idProd].item.Tecnica__c}" html-disabled="true"/></td>
+                                                                                        <td><apex:inputField styleClass="form-control input-sm input-xxs" value="{!produtos[id].customList[idProd].item.Dimensoes_maximas_de_impressao__c}" html-disabled="true"/></td>
+                                                                                        <td>
+                                                                                            <apex:inputField styleClass="form-control input-sm input-xxs" value="{!produtos[id].customList[idProd].item.Cores_de_customizacao__c}" html-disabled="true"/>
+                                                                                        </td>
+                                                                                        <td>
+                                                                                            <apex:inputField styleClass="form-control input-sm input-xxs" value="{!produtos[id].customList[idProd].item.Numero_de_impressoes__c}" html-disabled="true"/>
+                                                                                        </td>
+                                                                                        <td>
+                                                                                            <apex:inputField id="pquantc" styleClass="form-control input-sm input-xxs" value="{!produtos[id].customList[idProd].item.Quantity}" html-disabled="true" required="false"/>
+                                                                                        </td>
+                                                                                        <td>
+                                                                                            <apex:inputField id="pvalorc" styleClass="form-control input-sm input-xxs" value="{!produtos[id].customList[idProd].item.Preco_Unitario__c}">
+                                                                                                <apex:actionSupport action="{!changePriceInCustom}" event="onchange" reRender="thePanel,prodPanelTitle, groupModal, pvalorp,pvaltabp,ptotalp,pquantc,pvalorc,pvaltabc,ptotalc">
+                                                                                                    <apex:param assignTo="{!idProduct}" name="p1" value="{!id}"/>
+                                                                                                    <apex:param assignTo="{!idCustom}" name="p2" value="{!idProd}"/>
+                                                                                                </apex:actionSupport>
+                                                                                            </apex:inputField>
+                                                                                        </td>
+                                                                                        <td><apex:inputField id="ptotalc" styleClass="form-control input-sm input-xxs" value="{!produtos[id].customList[idProd].item.Total_de_customizacao__c}" html-disabled="true"/></td>
+                                                                                        
+                                                                                        <td style="vertical-align: middle;">
+                                                                                            <span title="">
+                                                                                                <i class="glyphicon glyphicon-plus-sign" data-target="#modalExtraFields" data-toggle="modal"  style="cursor: pointer;font-size: 12px;" onclick="extraFieldCustom('{!id}','{!idProd}');"> 
+                                                                                                </i>
+                                                                                            </span>
+                                                                                            <span title="{!$Label.Apagar}"><i class="{!IF(Customizing, 'glyphicon glyphicon-trash','glyphicon glyphicon-trash')}" style="cursor: pointer;font-size: 12px;" data-toggle="modal" data-target="#myModalC" onclick="removeCustom('{!id}','{!idProd}');"/></span>
+                                                                                        </td>
+                                                                                    </tr>
+                                                                                </apex:repeat>
+                                                                            </tbody>
+                                                                        </table>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                        </apex:repeat>
+                                                    </tbody>
+                                                    
+                                                </table>
+                                            </apex:outputPanel>
+                                        </td>
+                                        <td style="padding: 4px;" data-toggle="collapse" data-target="#collapse1" onclick="setCustom();" class="accordion-toggle sidebar">
+                                            <apex:outputPanel id="customizing">
+                                                <span><i class="{!IF(Customizing, 'glyphicon glyphicon-chevron-right','glyphicon glyphicon-chevron-left')}" style="cursor: pointer;font-size: 16px;"/></span>
+                                            </apex:outputPanel>
+                                        </td>
+                                        <!--****************************************************************************************************
+*********************************************** Customizações **************************************
+****************************************************************************************************-->
+                                        <td style="width: 0px;">
+                                            <apex:outputPanel id="pnlStock">
+                                                <div id="collapse1" class="accordian-body collapse {!IF(Customizing,'in','')}" style="width: 100%;border: 1px solid #d8dde6;padding: 4px;position: relative;">
+                                                    
+                                                    <table style="width: 100%;">
+                                                        <tr>
+                                                            <td>
+                                                                <ol class="breadcrumb" style="text-align: center;margin-bottom: 8px;">
+                                                                    <li class="breadcrumb-item active" style="color: #e00000;font-weight: bold;">Stock</li>
+                                                                </ol>
+                                                                <div class="form-group">
+                                                                    <label for="iref">{!$ObjectType.Product2.Fields.ProductCode.Label}</label>
+                                                                    <apex:outputText styleClass="form-control input-sm input-xs" id="iref" value="{!sidebar.item.Referencia_SKU__c}"/>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>
+                                                                <div class="form-group">
+                                                                    <label for="itot" >{!$Label.Total_Armazem}</label>
+                                                                    <apex:outputText styleClass="form-control input-sm input-xs" id="itot" value="{!sidebar.stockAtual}"/>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>
+                                                                <div class="form-group">
+                                                                    <label for="itca" >{!$Label.Total_Cativo}</label>
+                                                                    <apex:outputText styleClass="form-control input-sm input-xs" id="itca" value="{!sidebar.stockCativo}"/>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>
+                                                                <div class="form-group">
+                                                                    <label for="itdi" >{!$Label.Total_Disponivel}</label>
+                                                                    <apex:outputText styleClass="form-control input-sm input-xs" id="itdi" value="{!sidebar.stockAtual - sidebar.stockCativo}"/>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>
+                                                                <div class="form-group">
+                                                                    <label for="idata" >{!$Label.Data_proxima_chegada}</label>
+                                                                    <!--apex:outputText styleClass="form-control input-sm input-xs" id="idata" value="{!sidebar.stockData}"/-->
+                                                                    <apex:outputText styleClass="form-control input-sm input-xs" id="idata" value="{0,date,yyyy-MM-dd}">
+                                                                        <apex:param value="{!sidebar.stockData}" />
+                                                                    </apex:outputText>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>
+                                                                <div class="form-group">
+                                                                    <label for="iqpc" >{!$Label.Quantidade_proxima_chegada}</label>
+                                                                    <apex:outputText styleClass="form-control input-sm input-xs" id="iqpc" value="{!sidebar.stockPrevisto}"/>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                        <tr style="{!if(CONTAINS(opp.RecordType.Name, 'Nota de encomenda'),'display:none;','')}">
+                                                            <td>
+                                                                <ol class="breadcrumb" style="text-align: center;margin-bottom: 8px;">
+                                                                    <li class="breadcrumb-item active" style="color: #e00000;font-weight: bold;margin-left: 0;">{!$Label.Customizar}</li>
+                                                                </ol>
+                                                                <apex:outputPanel id="customs">
+                                                                    <div class="slds-scope">
+                                                                        <script>
+                                                                        function changeSection(ele, parEle){
+                                                                            var classList = parEle.classList.value;
+                                                                            if(classList == undefined) {
+                                                                                classList = '';
+                                                                                for(var i = 0; i < parEle.classList.length; i++){
+                                                                                    classList += parEle.classList[i];
+                                                                                }
+                                                                            }
+                                                                            if(classList.includes("slds-is-open")){
+                                                                                parEle.classList.remove("slds-is-open");
+                                                                                ele.classList.remove("glyphicon-chevron-down");
+                                                                                ele.classList.add("glyphicon-chevron-right");
+                                                                                 
+                                                                            }else{
+                                                                                parEle.classList.add("slds-is-open");
+                                                                                ele.classList.add("glyphicon-chevron-down");
+                                                                                ele.classList.remove("glyphicon-chevron-right");
+                                                                            }
+                                                                            
+                                                                        }
+                                                                        </script>
+                                                                        <apex:repeat value="{!customs}" var="key">
+                                                                            <div class="form-group" style="margin: 0 2px 5px 2px;">
+                                                                                <span class="slds-badge">{!componentMap[key]}</span>
+                                                                                
+                                                                                <apex:repeat value="{!customs[key]}" var="key2">
+                                                                                    <div class="slds-section">
+                                                                                        <h3 class="slds-section__title">
+                                                                                            <a aria-controls="expando-unique-id{!key2}" aria-expanded="true" class="slds-button slds-section__title-action glyphicon glyphicon-chevron-right" onclick="changeSection(this, this.parentElement.parentElement);">
+                                                                                                
+                                                                                                <span class="slds-truncate" style="width: 100%; text-align: left;">{!tecnicaMap[key2]}</span>
+                                                                                            </a>
+                                                                                        </h3>
+                                                                                        <div aria-hidden="true" class="slds-section__content" id="expando-unique-id{!key2}">
+                                                                                            <table class="slds-table slds-table_bordered slds-table_cell-buffer">
+                                                                                                <tr>
+                                                                                                    <th>
+                                                                                                        {!$Label.Local}
+                                                                                                    </th>
+                                                                                                    <th>
+                                                                                                        {!$Label.Tabela}
+                                                                                                    </th>
+                                                                                                    <th>
+                                                                                                        {!$Label.Coluna}
+                                                                                                    </th>
+                                                                                                    <th>
+                                                                                                        {!$Label.Descricao}
+                                                                                                    </th>
+                                                                                                </tr>
+                                                                                                <apex:repeat value="{!customs[key][key2]}" var="key3">
+                                                                                                    <tr data-toggle="collapse" data-target="#custom{!customs[key][key2][key3].Id}" >
+                                                                                                        <td>
+                                                                                                            <p style="font-weight: bold;cursor: pointer;margin-top: 5px; width: 100px !important;" class="accordion-toggle arrow">
+                                                                                                                <apex:outputField value="{!customs[key][key2][key3].Product2.Localizacao_da_impressao__c}"></apex:outputField>
+                                                                                                            </p>
+                                                                                                        </td>
+                                                                                                        <td>
+                                                                                                            <p style="font-weight: bold;cursor: pointer;margin-top: 5px; width: 50px !important;" class="accordion-toggle arrow">
+                                                                                                                
+                                                                                                                {!customs[key][key2][key3].Product2.Tabela_de_customizacoes__c}
+                                                                                                            </p>
+                                                                                                        </td>
+                                                                                                        <td>
+                                                                                                            <p style="font-weight: bold;cursor: pointer;margin-top: 5px; width: 50px !important;" class="accordion-toggle arrow">
+                                                                                                                {!customs[key][key2][key3].Product2.Cores_de_customizacao__c}
+                                                                                                            </p>
+                                                                                                        </td>
+                                                                                                        <td>
+                                                                                                            <p style="font-weight: bold;cursor: pointer;margin-top: 5px; width: 100px !important;" class="accordion-toggle arrow">
+                                                                                                                <!-- remove referencia base-->
+                                                                                                                <apex:variable var="prodName" value="{!RIGHT(customs[key][key2][key3].Product2.Name, 
+                                                                                                                                                     LEN(customs[key][key2][key3].Product2.Name) - 
+                                                                                                                                                     (FIND(' - ', customs[key][key2][key3].Product2.Name) + 2)
+                                                                                                                                                     )}"/>
+                                                                                                                <!-- remove local da impressão-->
+                                                                                                                <apex:variable var="prodName2" value="{!RIGHT(prodName, LEN(prodName) - (FIND(' - ', prodName) + 2))}"/>
+                                                                                                                <!-- remove tecnica da customização-->
+                                                                                                                <apex:variable var="prodName3" value="{!RIGHT(prodName2, LEN(prodName2) - (FIND(' - ', prodName2) + 2))}"/>
+                                                                                                                <!-- remove dimensoes caso existam-->
+                                                                                                                <apex:variable var="prodName4" value="{!IF(contains(prodName3, '-'), 
+                                                                                                                                                      RIGHT(prodName3, LEN(prodName3) - (FIND(' - ', prodName3) + 2)),
+                                                                                                                                                      prodName3)}" />
+                                                                                                                <!-- valor final-->
+                                                                                                                {!prodName4}
+                                                                                                            </p>
+                                                                                                        </td>
+                                                                                                    </tr>
+                                                                                                    <tr>
+                                                                                                        <td colspan="3" style="padding: 0px;" class="alignCenter ">
+                                                                                                            <div id="custom{!customs[key][key2][key3].Id}" class="accordian-body collapse slds-m-around--x-small" style="padding: 0 1px 6px 1px;">
+                                                                                                                <apex:commandLink reRender="thePanel, prodPanelTitle" styleClass="slds-button" action="{!addCustom}" style="margin:0;line-height:0.5;font-size:10pt;height:18px;">
+                                                                                                                    <apex:image url="{!URLFOR($Resource.check)}" width="20px" height="20px"></apex:image>
+                                                                                                                    <apex:param name="p4" value="{!key}" assignTo="{!typeCustom}"/>
+                                                                                                                    <apex:param name="p5" value="{!key2}" assignTo="{!idCustom}"/>
+                                                                                                                    <apex:param name="p6" value="{!key3}" assignTo="{!nameCustom}"/>
+                                                                                                                </apex:commandLink>
+                                                                                                            </div>
+                                                                                                        </td>
+                                                                                                    </tr>
+                                                                                                </apex:repeat>
+                                                                                            </table>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </apex:repeat>
+                                                                            </div>
+                                                                        </apex:repeat>
+                                                                        
+                                                                        
+                                                                    </div>
+                                                                </apex:outputPanel>
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                </div>
+                                            </apex:outputPanel>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            
+                                            <apex:outputPanel rendered="{!transportadoras.size>0}" id="transps">
+                                                <div class="slds-scope">
+                                                    <div class="slds-page-header slds-m-top_large" style="border-bottom:none; background: none;padding-left:inherit">
+                                                        <div class="slds-media">
+                                                            <div class="slds-media__figure">
+                                                                <span class="slds-icon_container slds-icon-custom-custom98">
+                                                                    <svg class="slds-icon" aria-hidden="true">
+                                                                        <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{!URLFOR($Asset.SLDS , '/assets/icons/custom-sprite/svg/symbols.svg#custom98')}"></use>
+                                                                    </svg>
+                                                                </span>
+                                                            </div>
+                                                            <div class="slds-media__body">
+                                                                <h1 class="slds-page-header__title slds-truncate"
+                                                        style="font-family: Arial,Helvetica,sans-serif;color: black;">{!$Label.Custo_transporte}</h1>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    
+                                                </div>
+                                                <table class="table table-condensed" style="border-collapse:collapse;width:auto;margin-top: 1%;">
+                                                    <tr>
+                                                        <th style="background-color: white;vertical-align: middle;padding: 0; font-size: 10pt; border-top: none;
+                                                                   {!IF(transportadoras.size>0, 'text-align:left;','color:#a5a5a5;text-align:center;')}">
+                                                            <label for="tMorada">{!$ObjectType.OpportunityLineItem.fields.ProductCode.Label}</label>
+                                                        </th>
+                                                        <th style="background-color: white;vertical-align: middle;padding: 0; font-size: 10pt; border-top: none;
+                                                                   {!IF(transportadoras.size>0, 'text-align:left;','color:#a5a5a5;text-align:center;')}">
+                                                            <label for="tMorada">{!$ObjectType.Expedicao__c.fields.Morada_de_entrega__c.Label}</label>
+                                                        </th>
+                                                        <th style="background-color: white;vertical-align: middle;padding: 0; font-size: 10pt; border-top: none;
+                                                                   {!IF(transportadoras.size>0, 'text-align:left;','color:#a5a5a5;text-align:center;')}">
+                                                            <label for="tTranps">{!$ObjectType.Expedicao__c.fields.Transportadora__c.Label}</label>
+                                                        </th>
+                                                        <th style="background-color: white;vertical-align: middle;padding: 0; font-size: 10pt; border-top: none;
+                                                                   {!IF(transportadoras.size>0, 'text-align:left;','color:#a5a5a5;text-align:center;')}">
+                                                            <label for="pUnit">{!$ObjectType.OpportunityLineItem.fields.Preco_Unitario__c.Label}</label>
+                                                        </th>
+                                                    </tr>
+                                                    <apex:repeat value="{!transportadoras}" var="transp">
+                                                        <tr style="border-left: 1px solid #dddddd;border-right: 1px solid #dddddd;border-bottom: 1px solid #dddddd;background-color: #f3f3f3 !important;">
+                                                            <td style="font-weight: bold;">
+                                                                <apex:inputField styleClass="form-control input-sm input-xs" value="{!transp.Referencia_SKU__c}" 
+                                                                                 html-disabled="true" id="tSku"/>
+                                                            </td>
+                                                            <td style="font-weight: bold;">
+                                                                <div onclick="openProduct('{!transp.Expedicao__c}');">
+                                                                    <apex:inputField styleClass="form-control input-sm input-xs" value="{!transp.Expedicao__r.Morada_aux__c}" 
+                                                                                     html-disabled="true" id="tMorada" />
+                                                                </div>
+                                                            </td>
+                                                            <td style="font-weight: bold;">
+                                                                <div >
+                                                                    <apex:inputField styleClass="form-control input-sm input-xs" value="{!transp.Expedicao__r.Transportadora__c}" 
+                                                                                     html-disabled="true" id="tTranps"/>
+                                                                </div>
+                                                            </td>
+                                                            <td style="font-weight: bold;">
+                                                                <div>
+                                                                    <apex:inputField id="pUnit" styleClass="form-control input-sm input-xs" value="{!transp.Preco_unitario__c}" />
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    </apex:repeat>
+                                                </table>
+                                            </apex:outputPanel>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                        <!--************************************************************************************************
+************************************************ Modals ********************************************
+****************************************************************************************************-->
+                        <!-- Modal Groups -->
+                        <div class="modal fade bd-example-modal-sm" id="myModalGroup" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                            <div class="modal-dialog modal-sm" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="exampleModalLabel">{!$Label.Agrupar_produtos}</h5>
+                                        
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body slds-scope" style="padding:inherit;">
+                                        <apex:outputPanel id="groupModal">
+                                            <apex:messages styleClass="slds-m-around--small"/>
+                                            <apex:dataTable value="{!sortedKeys}" var="prod" headerClass="slds-section-title--divider" styleClass="slds-table slds-table_bordered slds-table_cell-buffer">
+                                                <apex:column headerValue="Selected" styleClass="{!if(produtos[prod].item.Agrupador_OLI__c != null,'groupedRow','')}">
+                                                    <div class="slds-form-element__row">
+                                                        <div class="slds-form-element">
+                                                            <div class="slds-form-element__control">
+                                                                <span class="slds-checkbox">
+                                                                    <apex:inputCheckbox disabled="{!produtos[prod].item.Agrupador_OLI__c != null}" value="{!agrupamento[prod]}" id="checkbox"/>
+                                                                    <apex:outputLabel styleClass="slds-checkbox__label" for="checkbox">
+                                                                        <span class="slds-checkbox--faux"></span>
+                                                                    </apex:outputLabel>
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </apex:column>
+                                                <apex:column styleClass="{!if(produtos[prod].item.Agrupador_OLI__c != null,'groupedRow','')}" headerValue="Index">
+                                                    {!IF(produtos[prod].item.Agrupador_Oli__c != null, agrupadores[produtos[prod].item.Agrupador_Oli__c].index,'')}
+                                                </apex:column>
+                                                <apex:column styleClass="{!if(produtos[prod].item.Agrupador_OLI__c != null,'groupedRow','')}" value="{!produtos[prod].item.Referencia_SKU__c}" headerValue="{!$ObjectType.OpportunityLineItem.fields.Referencia_SKU__c.Label}"/>
+                                                <apex:column styleClass="{!if(produtos[prod].item.Agrupador_OLI__c != null,'groupedRow','')}" value="{!produtos[prod].item.Quantity}" headerValue="{!$ObjectType.OpportunityLineItem.fields.Quantity.Label}"/>
+                                                <apex:column styleClass="{!if(produtos[prod].item.Agrupador_OLI__c != null,'groupedRow','')}" headerValue="{!$ObjectType.OpportunityLineItem.fields.Preco_unitario__c.Label}">
+                                                    {!opp.CurrencyIsoCode} {!if(produtos[prod].item.Preco_Unitario__c != null, text(produtos[prod].item.Preco_Unitario__c), '0.00')}
+                                                </apex:column>
+                                            </apex:dataTable>
+                                            <div class="slds-section-title--divider">
+                                                {!$ObjectType.Agrupador_OLI__c.labelPlural}
+                                            </div>
+                                            <apex:dataTable value="{!agrupadores}" var="group" styleClass="slds-table slds-table_bordered slds-table_cell-buffer">
+                                                <apex:column value="{!agrupadores[group].index}"/>
+                                                <apex:column value="{!agrupadores[group].grupo.Name}"/>
+                                                <apex:column >
+                                                    {!IF(agrupadores[group].grupo.Produto_de_oportunidade__r.size != 0,agrupadores[group].grupo.Produto_de_oportunidade__r.size,agrupadores[group].nRecords)} 
+                                                    {!IF(OR(agrupadores[group].grupo.Produto_de_oportunidade__r.size=1, agrupadores[group].nRecords=1),'linha','linhas')} 
+                                                </apex:column>
+                                                <apex:column >
+                                                    <span title="{!$Label.Apagar}">
+                                                        <i class="glyphicon glyphicon-trash" style="cursor: pointer;font-size: 12px;" data-toggle="modal" data-target="#myModalA" onclick="removeGroup('{!agrupadores[group].grupo.Id}');"/>
+                                                    </span>
+                                                </apex:column>
+                                            </apex:dataTable>
+                                        </apex:outputPanel>
+                                    </div>
+                                    
+                                    <div class="modal-footer" style="margin-top:0;">
+                                        <apex:commandButton styleclass="btn btn-default btn-xs" html-data-dismiss="modal" value="{!$Label.Sair}"/>
+                                        <apex:commandButton styleclass="btn btn-primary btn-xs" value="{!$Label.Novo_agrupamento}" rerender="groupModal, thePanel" action="{!criarAgrupamento}"/>
+                                    </div>
+                                </div>
+                                
+                            </div>
+                        </div>
+                        <!-- Modal Remove Product -->
+                        <div class="modal fade bd-example-modal-sm" id="myModalP" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                            <div class="modal-dialog modal-sm" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="exampleModalLabel">{!$Label.Confirmar}</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <apex:outputText id="rProduct" value="{!$Label.Apagar}?"/>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <apex:commandButton styleclass="btn btn-secondary btn-xs" html-data-dismiss="modal" value="{!$Label.Cancelar}"/>
+                                        <apex:commandButton styleclass="btn btn-primary btn-xs" html-data-dismiss="modal" value="{!$Label.Apagar}" action="{!removeProduct}" rerender="thePanel, prodPanelTitle, autoComplete"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Modal Remove Custom -->
+                        <div class="modal fade bd-example-modal-sm" id="myModalC" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                            <div class="modal-dialog modal-sm" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="exampleModalLabel">{!$Label.Confirmar}</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <apex:outputText id="rCustom" value="{!$Label.Apagar}?"/>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <apex:commandButton styleclass="btn btn-secondary btn-xs" html-data-dismiss="modal" value="{!$Label.Cancelar}"/>
+                                        <apex:commandButton styleclass="btn btn-primary btn-xs" html-data-dismiss="modal" value="{!$Label.Apagar}" action="{!removeCustom}" rerender="prodPanelTitle,thePanel"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Modal Remove Agrupador -->
+                        <div class="modal fade bd-example-modal-sm" id="myModalA" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                            <div class="modal-dialog modal-sm" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="exampleModalLabel">{!$Label.Confirmar}</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <apex:outputText id="rAgrup" value="{!$Label.Apagar}?"/>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <apex:commandButton styleclass="btn btn-secondary btn-xs" html-data-dismiss="modal" value="{!$Label.Cancelar}"/>
+                                        <apex:commandButton styleclass="btn btn-primary btn-xs" html-data-dismiss="modal" value="{!$Label.Apagar}" action="{!deleteAgrupador}" rerender="groupModal, thePanel"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Modal Table -->
+                        <div class="modal fade bd-example-modal-sm" id="myModalTable" tabindex="-1" role="dialog" aria-labelledby="exampleModalTable" aria-hidden="true">
+                            <div class="modal-dialog modal-sm" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="exampleModalTable">{!$Label.Tabela_de_Precos}</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body" style="padding-bottom: 0px;padding-top: 0px;">
+                                        <div class="container" style="padding-bottom: 0;">
+                                            <apex:outputPanel id="pnlTable" style="padding: 0;">
+                                                <div class="col-md-12" style="padding: 0;">
+                                                    <div class="col-md-7" style="padding: 0;">
+                                                        <table class="table table-condensed table-hover table-striped" style="border-right: 1px solid white;margin-bottom: 0;">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th>{!$Label.Minimo}</th>
+                                                                    <th>{!$Label.Maximo}</th>
+                                                                    <th>{!$Label.Preco}</th>
+                                                                    <th></th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                <apex:repeat value="{!nPrices}" var="int">
+                                                                    <tr>
+                                                                        <td style="padding-bottom: 2px;padding-top: 2px;"><apex:outputField value="{!table.pbe['Minimo_' + int + '__c']}"/></td>
+                                                                        <td style="padding-bottom: 2px;padding-top: 2px;"><apex:outputField value="{!table.pbe['Maximo_' + int + '__c']}"/></td>
+                                                                        <td style="padding-bottom: 2px;padding-top: 2px;">
+                                                                            <apex:outputText >
+                                                                                {!opp.CurrencyIsoCode} {!if(table.pbe['Preco_' + int + '__c'] != null, text(table.pbe['Preco_' + int + '__c'] ), '0.00')}
+                                                                            </apex:outputText>
+                                                                        </td>
+                                                                        <td style="padding-bottom: 2px;padding-top: 2px;width: 20px;"><input type="radio" class="form-control input-sm input-xs" name="optradio" style="padding: 0;margin: 0;width: 13px;" onchange="tableButtonEnabled(false);insertPriceTable('{!table.pbe['Preco_' + int + '__c']}');"/></td>
+                                                                    </tr>
+                                                                </apex:repeat>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                    <div class="col-md-5" style="padding: 0;">
+                                                        <table class="table table-condensed table-hover table-striped" style="border-left: 1px solid #cccccc;margin-bottom: 0;">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th>{!$Label.Escalao}</th>
+                                                                    <th>{!$Label.Preco}</th>
+                                                                    <th></th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                
+                                                                <apex:repeat value="{!nPrices}" var="int">
+                                                                    <tr>
+                                                                        <td style="padding-bottom: 2px;padding-top: 2px;">{!intEscalaoMap[int]}</td>
+                                                                        <td style="padding-bottom: 2px;padding-top: 2px;">
+                                                                            <apex:outputText >
+                                                                                {!opp.CurrencyIsoCode} {!if(table.pbe['Preco_' + intEscalaoMap[int] + '__c'] != null, text(table.pbe['Preco_' + intEscalaoMap[int] + '__c']), '0.00')}
+                                                                            </apex:outputText>
+                                                                        </td>
+                                                                        <td style="padding-bottom: 2px;padding-top: 2px;width: 20px;">
+                                                                            <input type="radio" class="form-control input-sm input-xs" name="optradio" style="padding: 0;margin: 0;width: 13px;" 
+                                                                                   onchange="tableButtonEnabled(false);insertPriceTable('{!table.pbe['Preco_' + intEscalaoMap[int] + '__c']}');"/>
+                                                                        </td>
+                                                                    </tr>
+                                                                </apex:repeat>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                                <table class="table table-condensed table-hover table-striped" style="margin-bottom: 0;">
+                                                    <tr>
+                                                        <td class="col-md-7" style="text-align: right;">
+                                                            <div class="input-group">
+                                                                <span class="input-group-addon input-sm input-xs">Aplicar descontos</span>
+                                                                <apex:inputText id="descvalue" value="{!header.Discount}" styleClass="form-control input-sm input-xs"/>
+                                                                <span class="input-group-addon input-sm input-xs"><input type="radio" id="optradio" name="optradio" onchange="rerenderButtons();"/></span>
+                                                                <apex:actionFunction name="rerenderButtons" rerender="priceTableButtons"/>
+                                                                <script>
+                                                                j$ = jQuery.noConflict();
+                                                                
+                                                                function checkDisc() {
+                                                                    if(!('{!header.Discount}' == 'null' || '{!header.Discount}' == '0')){
+                                                                        j$('#optradio').prop('checked', true);
+                                                                    }else{
+                                                                        j$('#optradio').removeProp('checked');
+                                                                    }
+                                                                    $('#optradio').trigger("change");
+                                                                }
+                                                                
+                                                                var a = checkDisc();
+                                                                var teste = 'teste';
+                                                                var teste3 = 'teste2';
+                                                                </script>
+                                                            </div>
+                                                        </td>
+                                                        <td  class="col-md-5" style="text-align: right;">
+                                                            <apex:outputPanel rendered="{!table.precocliente != null}">
+                                                                <div class="input-group">
+                                                                    <span class="input-group-addon input-sm input-xs">{!$ObjectType.Preco_por_cliente__c.label}</span>
+                                                                    <apex:inputField id="pcvalue" value="{!table.precocliente.Valor__c}" styleClass="form-control input-sm input-xs" html-disabled="disabled"/>
+                                                                    <span class="input-group-addon input-sm input-xs"><input type="radio" name="optradio" onchange="insertPriceTable('{!table.precocliente.Valor__c}');"/></span>
+                                                                </div>
+                                                            </apex:outputPanel>
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </apex:outputPanel>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer" style="margin-top: 0;">
+                                        <apex:outputPanel id="priceTableButtons">
+                                            <button class="btn btn-secondary btn-xs" data-dismiss="modal">{!$Label.Sair}</button>
+                                            <button class="btn btn-primary btn-xs tableButton" data-dismiss="modal"
+                                               onclick="closeInsertTable();{!IF(header.Discount != null && header.Discount != 0,'insertDiscount();','')}">Ok</button>
+                                        </apex:outputPanel>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Modal Confirmar Clonar -->
+                        <div class="modal fade bd-example-modal-sm" id="myModalClone" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                            <div class="modal-dialog modal-sm" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="exampleModalLabel">{!$Label.Confirmar}</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <apex:outputText id="rClone" value="{!$Label.Clonar_linha}?"/>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <apex:commandButton styleclass="btn btn-secondary btn-xs" html-data-dismiss="modal" value="{!$Label.Cancelar}"/>
+                                        <apex:commandButton styleclass="btn btn-primary btn-xs" html-data-dismiss="modal" value="{!$Label.Confirmar}" action="{!cloneOLI}" rerender="prodPanelTitle,thePanel"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Modal Colors -->
+                        <div class="modal fade bd-example-modal-sm" id="myModalColors" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                            <div class="modal-dialog modal-sm" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="exampleModalLabel">{!$Label.Escolha_as_cores}</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body" style="padding:0px;">
+                                        <apex:outputPanel id="cores">
+                                            <apex:outputPanel rendered="{!idProduct != null}">
+                                                <div class="slds-scope">
+                                                    <apex:dataTable value="{!colorTable}" var="cor" headerClass="slds-section-title--divider" styleClass="slds-table slds-table_bordered slds-table_cell-buffer">
+                                                        <apex:column headerValue="{!$Label.Selecionado}"> 
+                                                            <div class="slds-form-element">
+                                                                <div class="slds-form-element__control" style="text-align: center;">
+                                                                    <span class="slds-checkbox">
+                                                                        <apex:inputCheckbox id="colorSelected" value="{!cor.selected}"/>
+                                                                        <apex:outputLabel styleClass="slds-checkbox__label" for="colorSelected">
+                                                                            <span class="slds-checkbox--faux"></span>
+                                                                        </apex:outputLabel>
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+                                                        </apex:column>
+                                                        <apex:column headerValue="{!$Label.Cor}" value="{!cor.color}" styleClass="slds-text-title"/>
+                                                        <apex:column headerValue="{!$Label.Quantidade}">
+                                                            <apex:inputText value="{!cor.quantity}" styleClass="slds-input"/>
+                                                        </apex:column>
+                                                    </apex:dataTable>
+                                                </div>
+                                            </apex:outputPanel>
+                                        </apex:outputPanel>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button class="btn btn-secondary btn-xs" data-dismiss="modal">{!$Label.Cancelar}</button>
+                                        <apex:commandButton styleclass="btn btn-primary btn-xs" html-data-dismiss="modal" value="{!$Label.Retirar}" action="{!createColorLines}"
+                                                            rerender="thePanel, cabecalho,prodPanelTitle"/>
+                                        <apex:commandButton styleclass="btn btn-primary btn-xs" html-data-dismiss="modal" value="{!$Label.Adicionar}" action="{!createNewColorLines}"
+                                                            rerender="thePanel, prodPanelTitle"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Modal Extra Fields-->
+                        <div class="modal fade bd-example-modal-sm" id="modalExtraFields" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                            <div class="modal-dialog modal-sm" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="exampleModalLabel">{!$Label.Customizar}</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <apex:outputPanel id="painelCustCust">
+                                            <apex:outputPanel rendered="{!And(typeCustom != null, idCustom != null)}">
+                                                <div class="slds-scope">
+                                                    <fieldset class="slds-form--compound" >
+                                                        <div class="slds-form-element__group ">
+                                                            <div class="slds-form-element__row">
+                                                                <div class="slds-form-element">
+                                                                    <label class="slds-form-element__label" for="custAlt">{!$ObjectType.OpportunityLineItem.fields.Altura__c.Label} (mm)</label>
+                                                                    <apex:inputField id="custAlt" styleClass="slds-input" value="{!produtos[typeCustom].customList[idCustom].item.Altura__c}"/>
+                                                                </div>
+                                                                <div class="slds-form-element">
+                                                                    <label class="slds-form-element__label" for="custCom">{!$ObjectType.OpportunityLineItem.fields.Comprimento__c.Label} (mm)</label>
+                                                                    <apex:inputField id="custCom" styleClass="slds-input" value="{!produtos[typeCustom].customList[idCustom].item.Comprimento__c}" />
+                                                                </div>
+                                                                <div class="slds-form-element">
+                                                                    <label class="slds-form-element__label" for="custNum">{!$ObjectType.OpportunityLineItem.fields.Numero_de_repeticoes__c.Label}</label>
+                                                                    <apex:inputField id="custNum" styleClass="slds-input" value="{!produtos[typeCustom].customList[idCustom].item.Numero_de_repeticoes__c}">
+                                                                        <apex:actionSupport event="onchange" action="{!valueChangeReps}" reRender="thePanel,prodPanelTitle,pvalorc,ptotalc, pquantc"/>
+                                                                    </apex:inputField>
+                                                                </div>
+                                                            </div>
+                                                            <div class="slds-form-element__row">
+                                                                <div class="slds-form-element">
+                                                                    <label class="slds-form-element__label" for="custAli">{!$ObjectType.OpportunityLineItem.fields.Alinhamento__c.Label}</label>
+                                                                    <apex:inputField id="custAli" styleClass="slds-input" value="{!produtos[typeCustom].customList[idCustom].item.Alinhamento__c}"/>
+                                                                </div>
+                                                                
+                                                                <div class="slds-form-element">
+                                                                    <label class="slds-form-element__label" for="custPanton">{!$ObjectType.OpportunityLineItem.fields.Pantone_Cor__c.Label}</label>
+                                                                    <apex:inputField id="custPanton" styleClass="slds-input" value="{!produtos[typeCustom].customList[idCustom].item.Pantone_Cor__c}"/>
+                                                                </div>
+                                                            </div>
+                                                            <div class="slds-form-element__row">
+                                                                <div class="slds-form-element">
+                                                                    <label class="slds-form-element__label" for="custFon">{!$ObjectType.OpportunityLineItem.fields.Fonte__c.Label}</label>
+                                                                    <apex:inputField id="custFon" styleClass="slds-input" value="{!produtos[typeCustom].customList[idCustom].item.Fonte__c}"/>
+                                                                </div>
+                                                                <div class="slds-form-element">
+                                                                    <label class="slds-form-element__label" for="custTex">{!$ObjectType.OpportunityLineItem.fields.Texto_a_customizar__c.Label}</label>
+                                                                    <apex:inputField id="custTex" styleClass="slds-input" value="{!produtos[typeCustom].customList[idCustom].item.Texto_a_customizar__c}"/>
+                                                                </div>
+                                                            </div>
+                                                            <div class="slds-form-element__row">
+                                                                <div class="slds-form-element">
+                                                                    <apex:actionFunction name="createFile" rerender="fileScripts, fileName" action="{!showBlob}" oncomplete="showSucess();">
+                                                                    	<apex:param assignTo="{!blobFile}" name="p1" value=""/>
+                                                                    	<apex:param assignTo="{!fileName}" name="p2" value=""/>
+                                                                    </apex:actionFunction>
+                                                                    <apex:outputPanel id="fileScripts">
+                                                                        <script>
+                                                                        function midFile(){
+                                                                            var file = document.querySelector('input[type=file]').files[0];
+                                                                            if(file != null){
+                                                                                var reader = new FileReader();
+                                                                                reader.readAsDataURL(file);
+                                                                                reader.addEventListener("load", function () {
+                                                                                    createFile(reader.result, file.name);
+                                                                                }, false);
+                                                                            }else{
+                                                                                swal('{!$Label.Erro}','No file uploaded','error');
+                                                                            }
+                                                                        }
+                                                                        function readFileName(){
+                                                                            var file = document.querySelector('input[type=file]').files[0];
+                                                                            if(file != null){
+                                                                                var reader = new FileReader();
+                                                                                reader.readAsDataURL(file);
+                                                                                reader.addEventListener("load", function () {
+                                                                                    console.log(file.name);
+                                                                                    document.getElementById("txtFile").innerHTML = file.name;
+                                                                                }, false);
+                                                                            }
+                                                                        }
+                                                                        
+                                                                        function showSucess(){
+                                                                            if({!fileSucess}){
+                                                                                swal('{!$Label.Sucesso}!','','success');
+                                                                            }else{
+                                                                                swal('{!$Label.Erro}','','error');
+                                                                            }
+                                                                        }
+                                                                        </script>
+                                                                    </apex:outputPanel>
+                                                                    <span class="slds-form-element__label" id="file-selector-primary-label">{!$ObjectType.Attachment.label}</span>
+                                                                    <div class="slds-form-element__control">
+                                                                        <div class="slds-file-selector slds-file-selector_files">
+                                                                            <div class="slds-file-selector__dropzone">
+                                                                                <apex:outputPanel id="fileName">
+                                                                                    <div id="txtFile">
+                                                                                    </div>
+                                                                                </apex:outputPanel>
+                                                                                <input type="file" class="slds-file-selector__input slds-assistive-text" accept="image/png" id="file-upload-input-01" aria-labelledby="file-selector-primary-label file-selector-secondary-label" onchange="readFileName();"/>
+                                                                                <label class="slds-file-selector__body" for="file-upload-input-01" id="file-selector-secondary-label">
+                                                                                    <span class="slds-file-selector__button slds-button slds-button_neutral">Upload</span>
+                                                                                </label>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                
+                                                                <div class="slds-form-element slds-align-middle slds-p-top--x-small">
+                                                                    <a class="slds-file-selector__button slds-button slds-button_brand" onclick="midFile();" >
+                                                                        Upload
+                                                                    </a>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </fieldset>
+                                                </div>
+                                            </apex:outputPanel>
+                                        </apex:outputPanel>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <apex:commandButton styleclass="btn btn-secondary btn-xs" html-data-dismiss="modal" value="{!$Label.Botao_Salvar_Respostas}"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </apex:pageBlock>
+                <apex:outputPanel rendered="{!isAuthorized}">
+                    <div class="slds-scope">
+                        <div class="slds-notify slds-notify_alert slds-theme_alert-texture slds-theme_warning" role="alert">
+                            <span class="slds-assistive-text">warning</span>
+                            <span class="slds-icon_container slds-icon-utility-warning slds-m-right_x-small">
+                                <svg class="slds-icon slds-icon_x-small" aria-hidden="true">
+                                    <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{!URLFOR($Asset.SLDS , '/assets/icons/utility-sprite/svg/symbols.svg#warning')}"/>
+                                </svg>
+                            </span>
+                            <apex:outputPanel rendered="{!opp.Autorizada__c != ''}">
+                                <h2>{!$Label.Dossier_autorizado}</h2>
+                            </apex:outputPanel>
+                            <apex:outputPanel rendered="{!opp.Impresso__c}">
+                                <h2>{!$Label.Dossier_impresso}</h2>
+                            </apex:outputPanel>
+                        </div>
+                    </div>
+                </apex:outputPanel>
+            </apex:form>
+        </body>
+    </html>
+</apex:page>

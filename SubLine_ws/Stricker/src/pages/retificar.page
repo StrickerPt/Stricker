@@ -1,0 +1,129 @@
+<apex:page showHeader="false" sidebar="false" controller="c_maquete" cache="false" standardStylesheets="false" title="Maquete" language="{!opp.Account.Lingua_do_cliente__c}">
+    <html>
+        <head>
+            <apex:includeScript value="{!URLFOR($Resource.bs, '/jQuery_2_0_3.js')}"/>
+            <apex:includeScript value="{!URLFOR($Resource.bs, '/js/bootstrap.js')}"/>
+            <apex:includeScript value="{!URLFOR($Resource.bs, '/js/bootstrap-typeahead.js')}"/>
+            <apex:stylesheet value="{!URLFOR($Resource.bs, '/css/bootstrap.css')}"/>
+            <apex:stylesheet value="{!URLFOR($Resource.bs, '/css/bootstrap-theme.css')}"/>
+            <apex:stylesheet value="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/6.6.5/sweetalert2.min.css"/>
+            <apex:includeScript value="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/6.6.5/sweetalert2.min.js"/>
+            <apex:slds />
+        </head>
+        <body>
+            <apex:form id="frm">
+                <div class="bs" >
+                    <font face="calibri">
+                        <div class="page-header">
+                            <div class="container">
+                                <div class="row no-gutters">
+                                    <div class="col-12 col-sm-6 col-md-8">
+                                        <h1 style="font-size: 14pt;color: blue;font-weight: bold;"><font face="calibri">{!$Label.Retificacao_de_maquete}</font></h1>
+                                    </div>
+                                    <div class="col-6 col-md-4">
+                                        <apex:image style="height: 50px;float: right;" value="https://c.cs88.content.force.com/servlet/servlet.ImageServer?id=0159E0000009A4L&oid=00D9E000000Cw4d&lastMod=1488465733000"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="container" style="display:{!if(isSucess, 'none', 'block')}">
+                            <div class="row">
+                                <div class="col-sm-12" style="margin-top: 10px;color: #4c4c4c;">
+                                    <apex:outputPanel id="retPanel">
+                                        <div class="slds-scope">
+                                            <div class="form-group">
+                                                <label for="exampleTextarea">{!$Label.Retificacoes_necessarias}</label>
+                                                <apex:inputTextarea value="{!motivo}" styleClass="form-control mandatoryInput" rows="5" style="height: 100px;resize: none;"/>
+                                            </div>
+                                        </div>
+                                    </apex:outputPanel>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-12" style="margin-top: 10px;color: #4c4c4c;">
+                                    
+                                    <label for="inputFile"><p>
+                                        {!$Label.Deseja_enviar_algum_anexo} {!uploadedFiles.size} {!$Label.Anexo}{!if(uploadedFiles.size = 1, '','s')} {!$Label.Enviado}{!if(uploadedFiles.size = 1, '','s')}
+                                        </p></label>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-12" style="margin-top: 10px;color: #4c4c4c;display: -webkit-inline-box;">
+                                    <apex:commandButton action="{!uploadFile}" styleClass="btn btn-primary" value="{!$Label.Carregar}" style="display: -webkit-inline-box;" id="uploadbtn"/>
+                                    <apex:inputFile value="{!content.Body}" styleclass="btn btn-xs" fileName="{!content.Name}" id="inputFile"
+                                                    style="display: -webkit-inline-box;" onchange="check_extension(this.value,'inputFile');"/>
+                                    <script>
+                                    var hash = {
+                                        '.TIFF'  : 1,
+                                        '.tiff'  : 1,
+                                        '.AI' : 1,
+                                        '.ai' : 1,
+                                        '.EPS' : 1,
+                                        '.eps' : 1,
+                                        '.PDF' : 1,
+                                        '.pdf' : 1,
+                                    };
+                                    
+                                    function check_extension(filename,submitId) {
+                                        var re = /\..+$/;
+                                        var ext = filename.match(re);
+                                        var submitEl = document.getElementById('{!$Component.uploadbtn}');
+                                        
+                                        console.log(ext);
+                                        if (hash[ext]) {
+                                            submitEl.disabled = false;
+                                            return true;
+                                        } else {
+                                            swal('Failure','Invalid filename, please select another file','error');  
+                                            //alert("Invalid filename, please select another file");
+                                            submitEl.disabled = true;
+                                            
+                                            return false;
+                                        }
+                                    }
+                                    </script>
+                                </div>
+                            </div>
+                            <a id="nextBtt" class="btn btn-primary" style="float: right;" onclick="checkNext()">{!$Label.Submeter}</a>
+
+                            <apex:commandButton value="{!$Label.Botao_Voltar}" onclick="window.open('/apex/maquete?id={!opp.id}','_self'); return false;" styleClass="btn btn-default" style="float: right;margin-right:2%;"/>
+                        </div>
+                        <apex:outputPanel rendered="{!!isBlocked && isSucess}">
+                            <div class="row no-gutters">
+                                <div class="col-sm-12" style="margin-top: 60px;text-align: center;font-weight: bold;color: #4c4c4c;">
+                                    {!$Label.Resposta_foi_submetida_com_sucesso}
+                                </div>
+                            </div>
+                        </apex:outputPanel>
+                        <apex:outputPanel rendered="{!isBlocked}">
+                            <div class="row no-gutters">
+                                <div class="col-sm-12" style="margin-top: 60px;text-align: center;font-weight: bold;color: #4c4c4c;">
+                                    {!$Label.Pedido_de_aprovacao_ja_foi_respondido}
+                                </div>
+                            </div>
+                        </apex:outputPanel>
+                    </font>
+                </div>
+                <apex:actionFunction name="enviar" action="{!enviar}"/>
+            </apex:form>
+            <script>
+            function checkNext(){
+                var inputs = document.getElementsByClassName("mandatoryInput");
+                var valid = true;
+                for(var i = 0; i < inputs.length; i++){
+                    if(inputs[i].value == ""){
+                        inputs[i].classList.add("slds-has-error");
+                        valid = false;
+                    }
+                }
+                if(valid){
+                    enviar();
+                }else{
+                    alert("{!$Label.Campos_obrigatorios}");
+                }
+            }
+            </script>
+        </body>
+    </html>
+</apex:page>

@@ -1,0 +1,378 @@
+<apex:page standardController="Account" extensions="c_ImportarPrecosCliente" recordSetVar="acc">
+    <apex:slds />
+    <apex:includeScript value="/support/console/43.0/integration.js"/>
+    <apex:includeScript value="{!URLFOR($Resource.swal2, '/sweetalert2.min.js')}"/>
+    <style>
+        .swal-icon{
+        box-sizing: content-box !important;
+        }
+        .swal-styled{
+        background-image: inherit;
+        }
+        .swal-container {
+        z-index: 9001;
+        }
+        .swal-button {
+        background-image: inherit;
+        font-size: 14px !important;
+        }
+        .slds-scope .slds-image:not(.slds-file_loading):hover:after, .slds-scope .slds-file:not(.slds-file_loading):hover:after{
+        display:none;
+        }
+        .slds-scope .slds-image:not(.slds-file_loading):hover:before, .slds-scope .slds-file:not(.slds-file_loading):hover:before{
+        display:none;
+        }
+    </style>
+    <apex:form >
+        <apex:actionFunction name="rerenderFilepanel" rerender="filePanel">
+            <apex:param assignTo="{!fileName}" name="p1" value=""/>
+        </apex:actionFunction>
+        <apex:actionFunction name="processFile" action="{!processFile}" reRender="finalScript" oncomplete="checkFinal();">
+            <apex:param assignTo="{!blobFile}" name="p1" value=""/>
+            <apex:param assignTo="{!fileName}" name="p2" value=""/>
+        </apex:actionFunction>
+        <apex:outputPanel id="finalScript">
+            <script>
+            function checkFinal(){
+                var picklist = document.getElementById("{!$Component.operations}");
+
+                var aux = "{!msgErro}".split("{!separador}");
+
+                var msg = "";
+                for(var i = 0 ; i < aux.length ; i++){
+                   if(aux[i] != "") msg += "<p>" + aux[i] + "</p>"; 
+                }
+
+                if(picklist.value == "insert"){
+
+                    if({!isSucess} && "{!msgErro}" == ""){
+                        showAlert("Precos criados com sucesso", "Sucesso");
+                    }else if({!!isSucess}){
+                        showAlert("Erro", "Erros");
+                        showPainel(msg);
+                    }else{
+                        showAlert("Avisos", "Warning");
+                        showPainel(msg);
+                    }
+                }else if(picklist.value == "delete"){
+                    if({!isSucess} && "{!msgErro}" == ""){
+                        showAlert("Precos apagados com sucesso", "Sucesso");
+                    }else if({!!isSucess}){
+                        showAlert("{!msgErro}", "Erros");
+                    }else{
+                        showAlert("{!msgErro}", "Warning");
+                    }
+                }
+                spinnerOn(false);
+            }
+            </script>
+        </apex:outputPanel>
+        <div class="slds-scope">
+            <article class="slds-card">
+                <div class="slds-card__header slds-grid">
+                    <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                        <div class="slds-media__figure">
+                            <span class="slds-icon_container slds-icon-custom-custom87">
+                                <svg class="slds-icon" aria-hidden="true">
+                                    <use xmlns:xlink="http://www.w3.org/1999/xlink"
+                                         xlink:href="{!URLFOR($Asset.SLDS , '/assets/icons/custom-sprite/svg/symbols.svg#custom87')}"></use>
+                                </svg>
+                            </span>
+                        </div>
+                        <div class="slds-media__body">
+                            <h2 class="slds-card__header-title">
+                                <span class="slds-text-heading_large">{!$Label.Carregar} {!$ObjectType.Preco_por_cliente__c.labelPlural}</span>
+                            </h2>
+                        </div>
+                    </header>
+                </div>
+                <div class="slds-card__body slds-card__body_inner">
+                    <div class="slds-form slds-p-around--small" role="list">
+                        <div class="slds-grid slds-gutters_small">
+                            <div class="slds-col slds-has-flexi-truncate" role="listitem">
+                                <div class="slds-form-element slds-form-element_edit slds-hint-parent">
+                                    <div class="slds-notify slds-notify_alert slds-theme_alert-texture slds-theme_error slds-hide alerta" id="alertasErros" role="alert">
+                                        <h2 id="alertasErrosMensagem">
+                                            
+                                        </h2>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="slds-grid slds-gutters_small">
+                            <div class="slds-col slds-has-flexi-truncate" role="listitem">
+                                <div class="slds-form-element slds-form-element_edit slds-hint-parent">
+                                    <div class="slds-notify slds-notify_alert slds-theme_alert-texture slds-theme_success slds-hide alerta" id="alertasSucesso" role="alert">
+                                        <h2 id="alertasSucessoMensagem">
+                                            
+                                        </h2>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="slds-grid slds-gutters_small">
+                            <div class="slds-col slds-has-flexi-truncate" role="listitem">
+                                <div class="slds-form-element slds-form-element_edit slds-hint-parent">
+                                    <div class="slds-notify slds-notify_alert slds-theme_alert-texture slds-theme_warning slds-hide alerta" id="alertasWarning" role="alert">
+                                        <h2 id="alertasWarningMensagem">
+                                            
+                                        </h2>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="slds-grid slds-gutters_small slds-m-top--large">
+                            <div class="slds-col slds-has-flexi-truncate" role="listitem">
+                                <div class="slds-form-element slds-form-element_edit slds-hint-parent">
+                                    <div class="slds-form-element__control">
+                                        <span class="slds-form-element__static">
+                                            <apex:selectList value="{!selectedOperation}" styleClass="slds-input slds-size--1-of-2" size="1" id="operations">
+                                                <apex:selectOptions value="{!Operations}"/>
+                                            </apex:selectList>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="slds-col slds-has-flexi-truncate {!If(accId != null, '', 'slds-hide')}" role="listitem">
+                                <div class="slds-form-element slds-form-element_edit slds-hint-parent">
+                                    <div class="slds-form-element__control">
+                                        <span class="slds-form-element__static">
+                                            <span class="slds-checkbox">
+                                                <apex:inputCheckbox value="{!includeClients}" id="checkbox"/>
+                                                <apex:outputLabel styleClass="slds-checkbox__label" for="checkbox">
+                                                    {!$Label.Incluir_clientes} <span class="slds-checkbox--faux"></span>
+                                                </apex:outputLabel>
+                                            </span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="slds-grid slds-gutters_small">
+                            <div class="slds-col slds-has-flexi-truncate" role="listitem">
+                                <div class="slds-form-element slds-form-element_edit slds-hint-parent">
+                                    <div class="slds-form slds-p-around--small" role="list">
+                                        <div class="slds-grid slds-gutters_small">
+                                            <div class="slds-col slds-has-flexi-truncate" role="listitem">
+                                                <div class="slds-form-element slds-form-element_edit slds-hint-parent">
+                                                    <span class="slds-form-element__label">{!$Label.Ficheiro}</span>
+                                                    <div class="slds-file-selector slds-file-selector_files">
+                                                        <div class="slds-file-selector__dropzone">
+                                                            <input type="file" class="slds-file-selector__input slds-assistive-text mandatoryInput" accept=".csv" id="file-upload-input-01" 
+                                                                   aria-labelledby="file-selector-primary-label file-selector-secondary-label" onchange="readFileName(this.value);"/>
+                                                            <label class="slds-file-selector__body" for="file-upload-input-01" id="file-selector-secondary-label">
+                                                                <span class="slds-file-selector__button slds-button slds-button_neutral">{!$Label.Carregar}</span>
+                                                                <span class="slds-file-selector__text slds-medium-show">{!$Label.Clique_para_carregar}</span>
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="slds-grid slds-gutters_small slds-m-top--xx-large">
+                                            <div class="slds-col slds-has-flexi-truncate" role="listitem">
+                                                <div class="slds-form-element slds-form-element_edit slds-hint-parent">
+                                                    <c:cmp_PPCTemplateSection />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="slds-col slds-has-flexi-truncate" role="listitem">
+                                <div class="slds-form-element slds-form-element_edit slds-hint-parent">
+                                    <div class="slds-form-element__control">
+                                        <span class="slds-form-element__static">
+                                            
+                                            <!------------------------------------------ Mostrar imagem de "ficheiro" ------------------------------------------->
+                                            <div class="slds-col slds-has-flexi-truncate" role="listitem">
+                                                <div class="slds-form-element slds-hide" id="midleEle">
+                                                    
+                                                    <div style="width: 20rem;" class="slds-m-top_medium">
+                                                        <div class="slds-file slds-file_card">
+                                                            <figure>
+                                                                <a class="slds-file__crop" style="cursor: default;">
+                                                                    <span class="slds-file__icon slds-icon_container" title="image">
+                                                                        <svg class="slds-icon" aria-hidden="true">
+                                                                            <use xmlns:xlink="http://www.w3.org/1999/xlink" class="" xlink:href="{!URLFOR($Asset.SLDS , '/assets/icons/doctype-sprite/svg/symbols.svg#csv')}" />
+                                                                        </svg>
+                                                                        <span class="slds-assistive-text"></span>
+                                                                    </span>
+                                                                    <!--img src="https://www.lightningdesignsystem.com/assets/images/placeholder-img@16x9.jpg"/-->
+                                                                </a>
+                                                                <figcaption class="slds-file__title slds-file__title_card">
+                                                                    <div class="slds-media slds-media_small slds-media_center">
+                                                                        <div class="slds-media__figure slds-line-height_reset">
+                                                                            <span class="slds-icon_container" title="pdf">
+                                                                                <svg class="slds-icon slds-icon_x-small" aria-hidden="true">
+                                                                                    <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{!URLFOR($Asset.SLDS , '/assets/icons/doctype-sprite/svg/symbols.svg#csv')}" />
+                                                                                </svg>
+                                                                                <span class="slds-assistive-text">pdf</span>
+                                                                            </span>
+                                                                        </div>
+                                                                        <div class="slds-media__body">
+                                                                            <apex:outputPanel id="filePanel">
+                                                                                <span class="slds-file__text slds-truncate" title="{!fileName}">{!fileName}</span>
+                                                                            </apex:outputPanel>
+                                                                        </div>
+                                                                    </div>
+                                                                </figcaption>
+                                                            </figure>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="slds-border--bottom slds-border--left slds-border--right slds-border--top slds-col slds-color__background_gray-5 slds-has-flexi-truncate slds-hide" 
+                                 id="painelErros" role="listitem" style="border-color: red;">
+                                <div class="slds-form-element slds-form-element_edit slds-hint-parent" id="painelErrosMensagem">
+                                    
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <footer class="slds-card__footer">
+                    <a id="nextBtt" class="slds-button slds-button--destructive" onclick="openTab('{!retURL}')">{!$Label.Botao_voltar}</a>
+                    <a id="nextBtt" class="slds-button slds-button--success" style="color: white;" onclick="spinnerOn(true);checkNext();">{!$Label.Confirmar}</a>
+                </footer>
+            </article>
+            <div class="slds-spinner_container" style="display: none; position: fixed;" id="spinner">
+                <div role="status" class="slds-spinner slds-spinner--medium">
+                    <span class="slds-assistive-text">Loading</span>
+                    <div class="slds-spinner__dot-a"></div>
+                    <div class="slds-spinner__dot-b"></div>
+                </div>
+            </div>
+        </div>
+        <script>
+        function spinnerOn(activated){
+            if(activated){
+                document.getElementById("spinner").style.display = "block";   
+            }else{
+                document.getElementById("spinner").style.display = "none";
+            }
+        }
+        function openTab(url){
+            if(sforce.console.isInConsole()){
+                if({!accId != null}){
+                    console.log("1");
+                    var closeSubtab = function closeSubtab(result) {
+                        var tabId = result.id;
+                        sforce.console.closeTab(tabId);
+                    };
+                    sforce.console.getFocusedSubtabId(closeSubtab);
+                }else{
+                    console.log("21");
+                    sforce.console.refreshNavigationTab();
+                }
+            }else{
+                window.open(url, "_self");
+            }
+        }
+        
+        function changeSection(ele, parEle){
+            var classList = parEle.classList.value;
+            if(classList.includes("slds-is-open")){
+                parEle.classList.remove("slds-is-open");
+            }else{
+                parEle.classList.add("slds-is-open");
+            }
+            
+        }
+        
+        var fileT;
+        function readFileName(fileValue){
+            if(check_extension(fileValue)){
+                var file = document.querySelector('input[type=file]').files[0];
+                if(file != null){
+                    if(file.size < 6291456){
+                        var reader = new FileReader();
+                        reader.readAsDataURL(file);
+                        reader.addEventListener("load", function () {
+                            
+                            var re = /\..+$/;
+                            var ext = file.name.match(re)[0];
+                            
+                            rerenderFilepanel(file.name);
+                            document.getElementById("midleEle").classList.remove("slds-hide");
+                            fileT = {body: reader.result, name : file.name, extension : ext};
+                        }, false);
+                    }else{
+                        swal('{!$Label.Erro}','{!$Label.Tamanho_de_ficheiro_excedido}','error');
+                    }
+                }
+            }
+        }
+        
+        var hash = {
+            '.csv' : 1,
+        };
+        
+        function check_extension(filename) {
+            var re = /\..+$/;
+            var ext = filename.match(re);
+            
+            if (hash[ext[0].toLowerCase()]) {
+                return true;
+            } else {
+                swal('{!$Label.Erro}','{!$Label.Ficheiro_invalido}','error');  
+                //submitEl.disabled = true;
+                document.getElementById("midleEle").style.display = "none";
+                return false;
+            }
+        }
+        /***********************END***************************/
+        function showAlert(message, component){
+            var divAlert = document.getElementById("alertas" + component);
+            var mensagem = document.getElementById("alertas" + component + "Mensagem");
+            divAlert.classList.remove("slds-hide");
+            
+            mensagem.innerHTML = message;
+        }
+        function showPainel(message){
+            var divAlert = document.getElementById("painelErros");
+            var mensagem = document.getElementById("painelErrosMensagem");
+            divAlert.classList.remove("slds-hide");
+            
+            mensagem.innerHTML = message;
+        }
+        
+        function hideAlert(){
+            var divAlert = document.getElementsByClassName("alerta");
+            for(var i = 0; i < divAlert.length; i++){
+                divAlert[i].classList.add("slds-hide");
+            }
+            
+            var inputs = document.getElementsByClassName("slds-has-error");
+            for(var i = 0; i < inputs.length; i++){
+                inputs[i].classList.remove("slds-has-error");
+            }
+            
+            var painelErros = document.getElementById("painelErros");
+
+            painelErros.classList.add("slds-hide");
+        }
+        //Navigation
+        function checkNext(){
+            hideAlert();
+            var picklist = document.getElementById("{!$Component.operations}");
+            console.log(picklist.value);
+            if(picklist.value == 'insert' || picklist.value == 'delete'){
+                if(fileT != null){
+                    //chamar servidor
+                    processFile(fileT.body,fileT.name);
+                }else{
+                    showAlert("Por favor, insira um ficheiro.", "Erros");
+                    spinnerOn(false);
+                }
+            }else if(picklist.value == 'deleteAll'){
+                
+            }
+        }
+        </script>
+    </apex:form>
+</apex:page>
